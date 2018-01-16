@@ -1,0 +1,7 @@
+ext{
+    rxjavaVersion = '2.1.0'
+    rxandroidVersion = '2.0.1'
+    daggerVersion = "2.13"
+    gsonVersion = "2.8.2"
+    volleyVersion = "1.0.0"
+}
