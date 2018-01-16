@@ -6,7 +6,6 @@ import com.android.volley.Request;
 import com.frangerapp.network.HttpClient;
 import com.frangerapp.network.HttpClientException;
 import com.frangerapp.network.HttpResponseValidator;
-import com.frangerapp.network.multipart.FDMultipartEntity;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;

@@ -10,13 +10,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.frangerapp.network.HttpClient;
 import com.frangerapp.network.HttpResponseValidator;
-import com.frangerapp.network.multipart.FDHttpEntity;
 import com.frangerapp.network.volley.util.VolleyUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -35,7 +32,6 @@ class VolleyRequest<T> extends Request<T> {
     private static final String TAG = "VolleyRequest";
     private Map<String, String> mHeaders;
     private String mBody;
-    private FDHttpEntity httpEntity;
     private String mBodyContentType;
     private Type typeOfT;
     private Gson jsonParser;
@@ -103,32 +99,6 @@ class VolleyRequest<T> extends Request<T> {
 //        FSLogger.logInformation(TAG, "BodyContentType : " + bodyContentType);
     }
 
-//    /**
-//     * Constructor.
-//     *
-//     * @param identifier            Unique string to identify individual request.
-//     * @param method                HTTP Request Method.
-//     * @param headers               Request Headers.
-//     * @param url                   Request Url.
-//     * @param httpEntity            Request Body as HttpEntity.
-//     * @param bodyContentType       Request Body Content Type.
-//     * @param shouldCache           whether or not responses to this request should be cached.
-//     * @param typeOfT               the type of T.
-//     * @param jsonParser            JsonParser used to parse the response.
-//     * @param httpResponseValidator Http Response Validator.
-//     * @param listener              Listener used to get callback on request completes.
-//     */
-//    VolleyRequest(final String identifier, final int method, final Map<String, String> headers, final String url, final FDHttpEntity httpEntity,
-//                  final String bodyContentType, final boolean shouldCache, final Type typeOfT, final Gson jsonParser,
-//                  final HttpResponseValidator httpResponseValidator, final HttpClient.HttpResponseListener<T> listener) {
-//        this(identifier, method, headers, url, shouldCache, typeOfT, jsonParser, httpResponseValidator, listener);
-//
-//        this.httpEntity = httpEntity;
-//        this.mBodyContentType = bodyContentType;
-//
-////        FSLogger.logInformation(TAG, "HttpEntity : " + httpEntity);
-////        FSLogger.logInformation(TAG, "BodyContentType : " + bodyContentType);
-//    }
 
     /**
      * Request METHODS.
@@ -156,16 +126,6 @@ class VolleyRequest<T> extends Request<T> {
         // String Request Body.
         if (mBody != null) {
             body = mBody.getBytes();
-        }
-        // Http Entity Request Body.
-        else if (httpEntity != null) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                httpEntity.writeTo(bos);
-            } catch (IOException e) {
-//                FSLogger.logError(TAG, "IOException writing to ByteArrayOutputStream : " + e);
-            }
-            body = bos.toByteArray();
         } else {
             body = super.getBody();
         }
