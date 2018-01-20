@@ -1,9 +1,9 @@
-package com.frangerapp.franger.di.module.app;
+package com.frangerapp.franger.app.util.di.module.app;
 
 import android.content.Context;
 
 import com.frangerapp.franger.app.FrangerApp;
-import com.frangerapp.franger.common.util.FSHttpResponseValidator;
+import com.frangerapp.franger.data.common.util.FSHttpResponseValidator;
 import com.frangerapp.network.HttpClient;
 import com.frangerapp.network.HttpResponseValidator;
 import com.frangerapp.network.volley.VolleyHttpClientImpl;

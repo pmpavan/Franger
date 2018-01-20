@@ -1,13 +1,13 @@
 package com.frangerapp.franger.app;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.BuildConfig;
 import com.frangerapp.franger.app.util.AppConstants;
-import com.frangerapp.franger.di.component.DaggerAppComponent;
-import com.frangerapp.franger.di.module.app.AppModule;
+import com.frangerapp.franger.app.util.di.module.app.AppModule;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -22,14 +22,18 @@ public class FrangerApp extends Application {
         super.onCreate();
         initFabric();
 
-        DaggerAppComponent
-                .builder()
-                .appModule(new AppModule(this))
+//        DaggerAppComponent
+//                .builder()
+//                .appModule(new AppModule(this))
 //                .application(this)
-                .build()
-                .inject(this);
+//                .build()
+//                .inject(this);
 
         enableLogger();
+    }
+
+    public static FrangerApp get(Context context) {
+        return (FrangerApp) context.getApplicationContext();
     }
 
     private void initFabric() {

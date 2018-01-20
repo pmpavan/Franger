@@ -1,4 +1,4 @@
-package com.frangerapp.franger.di.scope;
+package com.frangerapp.franger.app.util.di.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

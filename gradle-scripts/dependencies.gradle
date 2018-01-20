@@ -4,4 +4,5 @@ ext{
     daggerVersion = "2.13"
     gsonVersion = "2.8.2"
     volleyVersion = "1.0.0"
+    butterknifeVersion = "8.6.0"
 }

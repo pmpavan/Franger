@@ -1,4 +1,4 @@
-package com.frangerapp.franger.common.util;
+package com.frangerapp.franger.data.common.util;
 
 import com.frangerapp.network.HttpResponseValidator;
 

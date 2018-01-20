@@ -1,4 +1,4 @@
-package com.frangerapp.franger.rx;
+package com.frangerapp.franger.presentation.rx;
 
 import io.reactivex.CompletableTransformer;
 import io.reactivex.FlowableTransformer;
