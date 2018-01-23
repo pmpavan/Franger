@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.frangerapp.franger.viewmodel.countries.CountriesViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:hint="@string/country_name_hint" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/countriesListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            app:adapter="@{vm.countriesList}"
+            app:layoutManager="LinearLayoutManager"
+            app:listitem="@{@layout/fragment_countries_list_dialog_item}"
+            app:onItemClick="@{vm.itemClickHandler}"
+            tools:context="com.frangerapp.franger.ui.login.countries.CountriesListDialogFragment"
+            tools:listitem="@layout/fragment_countries_list_dialog_item" />
+    </LinearLayout>
+</layout>

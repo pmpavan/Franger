@@ -1,4 +1,4 @@
-package com.frangerapp.franger.presentation;
+package com.frangerapp.franger.viewmodel;
 
 /**
  * Created by Pavan on 20/01/18.

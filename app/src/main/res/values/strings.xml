@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Franger</string>
+    <string name="register">Register</string>
+    <string name="login_hint">Login Using</string>
+    <string name="phone_number_error_msg">Please enter a valid phone number</string>
+    <string name="sorry_error_occurred">Some problem in server</string>
+    <string name="title_activity_otp">OTPActivity</string>
+    <string name="country_name_hint">Enter Country name/code to search</string>
 </resources>
