@@ -6,7 +6,7 @@ package com.frangerapp.franger.viewmodel;
 
 public class BaseEvent {
 
-    private int id;
+    protected int id;
 
     public int getId() {
         return id;

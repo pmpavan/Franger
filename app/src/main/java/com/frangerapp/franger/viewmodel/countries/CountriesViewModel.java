@@ -7,6 +7,7 @@ import com.frangerapp.franger.ui.BaseBindingAdapters;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.countries.CountriesListItemViewModel;
 import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent;
+import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -87,6 +88,9 @@ public class CountriesViewModel extends BaseViewModel {
 
     public final BaseBindingAdapters.ItemClickHandler<CountriesListItemViewModel> itemClickHandler = (position, item) -> {
         FRLogger.msg("item " + item);
-        EventBus.getDefault().post(CountriesViewEvent.builder().setCountriesListItemViewModel(item));
+        CountriesViewEvent countriesViewEvent = CountriesViewEvent.builder();
+        countriesViewEvent.setId(CountriesPresentationConstants.COUNTRY_ITEM_CLICKED);
+        countriesViewEvent.setCountriesListItemViewModel(item);
+        EventBus.getDefault().post(countriesViewEvent);
     };
 }

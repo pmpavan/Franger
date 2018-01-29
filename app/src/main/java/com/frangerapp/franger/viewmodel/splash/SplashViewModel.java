@@ -1,5 +1,11 @@
 package com.frangerapp.franger.viewmodel.splash;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.splash.eventbus.SplashViewEvent;
 import com.frangerapp.franger.viewmodel.splash.util.SplashPresentationConstants;
@@ -14,9 +20,15 @@ import org.greenrobot.eventbus.EventBus;
 public class SplashViewModel extends BaseViewModel implements SplashView {
 
 
+    private Context context;
+    private EventBus eventBus;
+    private UserManager userManager;
     private boolean isUserLoggedIn = false;
 
-    public SplashViewModel() {
+    public SplashViewModel(Context context, EventBus eventBus, UserManager userManager) {
+        this.context = context;
+        this.userManager = userManager;
+        this.eventBus = eventBus;
         init();
     }
 
@@ -30,13 +42,36 @@ public class SplashViewModel extends BaseViewModel implements SplashView {
 
     private void checkIfUserIsLoggedInAndMoveToRespectivePage() {
         //TODO Check If the user is logged in or not
+        isUserLoggedIn = userManager.isUserAvailable();
         int eventId = SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT;
         if (isUserLoggedIn) {
             eventId = SplashPresentationConstants.NAVIGATE_TO_HOME_EVENT;
         }
         SplashViewEvent event = new SplashViewEvent();
         event.setId(eventId);
-        EventBus.getDefault().post(event);
+        eventBus.post(event);
 
+    }
+
+    public static class Factory implements ViewModelProvider.Factory {
+
+        private EventBus eventBus;
+        private Context context;
+        private UserManager userManager;
+
+        public Factory(Context context, EventBus eventBus, UserManager userManager) {
+            this.eventBus = eventBus;
+            this.context = context;
+            this.userManager = userManager;
+        }
+
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (modelClass.isAssignableFrom(SplashViewModel.class)) {
+                return (T) new SplashViewModel(context, eventBus, userManager);
+            }
+            throw new IllegalArgumentException("Unknown class name");
+        }
     }
 }

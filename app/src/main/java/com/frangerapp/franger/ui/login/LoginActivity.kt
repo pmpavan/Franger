@@ -52,16 +52,6 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun setupControllers() {
-        viewDataBinding.btnLogin.setOnClickListener({
-            viewDataBinding.btnLogin.startAnimation()
-            Handler().postDelayed({
-                this@LoginActivity.runOnUiThread {
-                    viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
-                            BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
-//                    viewDataBinding.btnLogin.revertAnimation()
-                }
-            }, 500)
-        })
 
     }
 

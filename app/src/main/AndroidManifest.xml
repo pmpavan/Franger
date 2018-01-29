@@ -30,9 +30,13 @@
             android:value="7f968dd8aaf8d379e330597a9f30b0f7d19d38c5" />
 
         <activity
-            android:name=".ui.login.OTPActivity"
+            android:name=".ui.login.VerifyActivity"
             android:label="@string/title_activity_otp"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
