@@ -1,6 +1,5 @@
 package com.frangerapp.franger.app.util.di.component;
 
-import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.util.di.component.login.LoginComponent;
 import com.frangerapp.franger.app.util.di.component.user.UserComponent;
 import com.frangerapp.franger.app.util.di.module.app.AppModule;

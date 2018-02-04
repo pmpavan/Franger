@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.app.UserManager;
+import com.frangerapp.franger.domain.splash.interactor.SplashInteractor;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.splash.eventbus.SplashViewEvent;
 import com.frangerapp.franger.viewmodel.splash.util.SplashPresentationConstants;
@@ -24,11 +25,13 @@ public class SplashViewModel extends BaseViewModel implements SplashView {
     private EventBus eventBus;
     private UserManager userManager;
     private boolean isUserLoggedIn = false;
+    private SplashInteractor splashInteractor;
 
-    public SplashViewModel(Context context, EventBus eventBus, UserManager userManager) {
+    public SplashViewModel(Context context, EventBus eventBus, UserManager userManager, SplashInteractor splashInteractor) {
         this.context = context;
         this.userManager = userManager;
         this.eventBus = eventBus;
+        this.splashInteractor = splashInteractor;
         init();
     }
 
@@ -58,18 +61,20 @@ public class SplashViewModel extends BaseViewModel implements SplashView {
         private EventBus eventBus;
         private Context context;
         private UserManager userManager;
+        private SplashInteractor splashInteractor;
 
-        public Factory(Context context, EventBus eventBus, UserManager userManager) {
+        public Factory(Context context, EventBus eventBus, UserManager userManager, SplashInteractor splashInteractor) {
             this.eventBus = eventBus;
             this.context = context;
             this.userManager = userManager;
+            this.splashInteractor = splashInteractor;
         }
 
         @NonNull
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(SplashViewModel.class)) {
-                return (T) new SplashViewModel(context, eventBus, userManager);
+                return (T) new SplashViewModel(context, eventBus, userManager,splashInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

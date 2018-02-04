@@ -7,4 +7,14 @@ import com.frangerapp.franger.viewmodel.BaseEvent;
  */
 
 public class LoginViewEvent extends BaseEvent {
+
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

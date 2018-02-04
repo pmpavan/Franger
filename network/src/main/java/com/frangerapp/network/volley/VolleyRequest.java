@@ -8,6 +8,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.network.HttpClient;
 import com.frangerapp.network.HttpResponseValidator;
 import com.frangerapp.network.volley.util.VolleyUtil;
@@ -66,10 +67,10 @@ class VolleyRequest<T> extends Request<T> {
         this.httpResponseValidator = httpResponseValidator;
         this.listener = listener;
 
-//        FSLogger.logInformation(TAG, "Url : " + url);
-//        for (Map.Entry<String, String> entry : headers.entrySet()) {
-//            FSLogger.logInformation(TAG, entry.getKey() + ":" + entry.getValue());
-//        }
+        FRLogger.msg("Url : " + url);
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            FRLogger.msg(entry.getKey() + ":" + entry.getValue());
+        }
     }
 
     /**
@@ -95,8 +96,8 @@ class VolleyRequest<T> extends Request<T> {
         this.mBody = body;
         this.mBodyContentType = bodyContentType;
 
-//        FSLogger.logInformation(TAG, "Body : " + body);
-//        FSLogger.logInformation(TAG, "BodyContentType : " + bodyContentType);
+        FRLogger.msg("Body : " + body);
+        FRLogger.msg("BodyContentType : " + bodyContentType);
     }
 
 
@@ -153,8 +154,8 @@ class VolleyRequest<T> extends Request<T> {
         Response<T> response;
         try {
             String json = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
-//            FSLogger.logInformation(TAG, "Success Response : " + json);
-//            FSLogger.logInformation(TAG, "Response Code : " + networkResponse.statusCode);
+            FRLogger.msg("Success Response : " + json);
+            FRLogger.msg("Response Code : " + networkResponse.statusCode);
 
             if (httpResponseValidator.validateHttpResponseForApplicationErrors(json)) {
                 T t = null;
@@ -217,7 +218,7 @@ class VolleyRequest<T> extends Request<T> {
          */
         @Override
         public void onErrorResponse(final VolleyError error) {
-//            FSLogger.logInformation(TAG, "Error Response : " + error.getMessage());
+            FRLogger.msg("Error Response : " + error.getMessage());
 
             mListener.onErrorResponse(VolleyUtil.parseVolleyErrorToOurAppError(error));
         }

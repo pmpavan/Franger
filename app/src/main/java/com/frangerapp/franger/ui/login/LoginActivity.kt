@@ -1,15 +1,24 @@
 package com.frangerapp.franger.ui.login
 
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.Handler
+import android.widget.Toast
 import com.frangerapp.franger.R
+import com.frangerapp.franger.app.FrangerApp
+import com.frangerapp.franger.app.util.di.module.login.SignUpModule
+import com.frangerapp.franger.app.util.di.module.login.SplashModule
+import com.frangerapp.franger.data.login.LoginApi
 import com.frangerapp.franger.databinding.ActivityLoginBinding
 import com.frangerapp.franger.ui.BaseActivity
+import com.frangerapp.franger.ui.login.countries.CountriesListDialogFragment
 import com.frangerapp.franger.ui.util.UiUtils
+import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent
+import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants
 import com.frangerapp.franger.viewmodel.login.LoginViewModel
 import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants
@@ -17,9 +26,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import com.frangerapp.franger.ui.login.countries.CountriesListDialogFragment
-import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent
-import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants
+import javax.inject.Inject
 
 
 /**
@@ -36,11 +43,21 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+
+    @Inject
+    lateinit var eventBus: EventBus
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+
     private lateinit var viewDataBinding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FrangerApp.get(this@LoginActivity)
+                .loginComponent()
+                .plus(SignUpModule(this@LoginActivity))
+                .inject(this@LoginActivity)
         invokeDataBinding()
         setupViews()
         setupControllers()
@@ -56,7 +73,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun invokeDataBinding() {
-        viewModel = LoginViewModel()
+        viewModel = ViewModelProviders.of(this@LoginActivity, factory).get(LoginViewModel::class.java)
         viewDataBinding = DataBindingUtil.setContentView(this@LoginActivity, R.layout.activity_login)
         viewDataBinding.vm = viewModel
         viewDataBinding.executePendingBindings()
@@ -68,12 +85,12 @@ class LoginActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        EventBus.getDefault().register(this)
+        eventBus.register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        EventBus.getDefault().unregister(this)
+        eventBus.unregister(this)
     }
 
     override fun onDestroy() {
@@ -87,9 +104,11 @@ class LoginActivity : BaseActivity() {
             LoginPresentationConstants.VALID_NUMBER_CHECK_SUCCESS -> {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
+                Toast.makeText(this@LoginActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
             }
             LoginPresentationConstants.VALID_NUMBER_CHECK_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()
+                Toast.makeText(this@LoginActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
             }
             LoginPresentationConstants.VALID_NUMBER_REQUEST_SENT -> {
                 viewDataBinding.btnLogin.startAnimation()

@@ -7,6 +7,11 @@ import android.support.annotation.NonNull;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.app.util.di.scope.FragmentScope;
+import com.frangerapp.franger.app.util.di.scope.LoginScope;
+import com.frangerapp.franger.data.common.AppStore;
+import com.frangerapp.franger.data.common.UserStore;
+import com.frangerapp.franger.domain.splash.interactor.SplashInteractor;
+import com.frangerapp.franger.domain.splash.interactor.impl.SplashPresentationImpl;
 import com.frangerapp.franger.ui.splash.SplashActivity;
 import com.frangerapp.franger.viewmodel.splash.SplashViewModel;
 
@@ -26,15 +31,17 @@ public class SplashModule {
     public SplashModule(@NonNull SplashActivity activity) {
     }
 
-//    @ActivityScope
-//    @Provides
-//    SplashViewModel splashActivityViewModel(@NonNull Context context, @NonNull UserManager userManager, @NotNull EventBus eventBus) {
-//        return new SplashViewModel(context, eventBus, userManager);
-//    }
+    @ActivityScope
+    @Provides
+    SplashInteractor splashInteractor(@NonNull Context context,
+                                      @NonNull UserStore userStore,
+                                      @NonNull AppStore appStore) {
+        return new SplashPresentationImpl(context, appStore, userStore);
+    }
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory splashActivityViewModel(@NonNull Context context, @NonNull UserManager userManager, @NotNull EventBus eventBus) {
-        return new SplashViewModel.Factory(context, eventBus, userManager);
+    ViewModelProvider.Factory splashActivityViewModel(@NonNull Context context, @NonNull UserManager userManager, @NotNull EventBus eventBus, SplashInteractor splashInteractor) {
+        return new SplashViewModel.Factory(context, eventBus, userManager, splashInteractor);
     }
 }

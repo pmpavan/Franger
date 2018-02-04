@@ -6,6 +6,22 @@ package com.frangerapp.franger.data.common.util;
 
 public class DataConstants {
 
-    public static final String PROTOCOL = "https://";
+
+    public static final String API_HEADER_KEY_ACCEPT = "Accept";
+    public static final String API_HEADER_VALUE_ACCEPT = "application/json";
+    public static final String API_HEADER_KEY_USER_AGENT = "User-Agent";
+    public static final String API_HEADER_VALUE_USER_AGENT = "Franger_Native_Android";
+    public static final String API_HEADER_KEY_AUTHORIZATION = "Authorization";
+    public static final String API_HEADER_KEY_MOBILE_TYPE = "mobile_type";
+    public static final String API_HEADER_VALUE_MOBILE_TYPE = "1";
+    public static final String API_HEADER_KEY_DEVICE_DESC = "device_desc";
+    public static final String API_HEADER_KEY_OS_VERSION = "os_version";
+    public static final String API_HEADER_KEY_APP_VERSION = "app_version";
+    public static final String API_HEADER_KEY_API_VERSION = "api_version";
+    public static final String API_HEADER_VALUE_API_VERSION = "1";
+    public static final String API_HEADER_KEY_DOMAIN_NAME = "domain_name";
+    public static final String API_HEADER_KEY_REQUEST_ID = "Request-Id";
+    public static final String PROTOCOL = "http://";
     public static final String EMPTY = "";
+
 }
