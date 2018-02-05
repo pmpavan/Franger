@@ -20,5 +20,6 @@ public class BaseActivity extends AppCompatActivity {
             return getResources().getColor(colorId, this.getTheme());
         } else {
             return getResources().getColor(colorId);
-        }    }
+        }
+    }
 }

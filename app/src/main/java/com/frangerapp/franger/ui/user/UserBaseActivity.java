@@ -3,6 +3,7 @@ package com.frangerapp.franger.ui.user;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.ui.BaseActivity;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
  * Created by Pavan on 24/01/18.
  */
 
-public class UserBaseActivity extends BaseActivity{
+public abstract class UserBaseActivity extends BaseActivity {
 
 
     @Inject
@@ -30,8 +31,11 @@ public class UserBaseActivity extends BaseActivity{
 
     // PRIVATE METHODS.
     private void createUserComponent() {
+        FRLogger.msg("createUserComponent " + !userManager.isUserSessionCreated());
         if (!userManager.isUserSessionCreated()) {
             boolean isUserSessionCreated = userManager.createUserSession();
+            FRLogger.msg("createUserComponent " + isUserSessionCreated);
+            FRLogger.msg("createUserComponent " + userManager);
 
             // If userSession not created then logOut user.
             if (!isUserSessionCreated) {

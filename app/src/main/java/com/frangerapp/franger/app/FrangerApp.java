@@ -47,12 +47,6 @@ public class FrangerApp extends Application {
                 .appModule(new AppModule(this))
                 .build();
 
-//        DaggerAppComponent
-//                .builder()
-//                .appModule(new AppModule(this))
-//                .build()
-//                .inject(this);
-
         initializeRXGlobalErrorConsumer();
         enableLogger();
     }
@@ -68,7 +62,7 @@ public class FrangerApp extends Application {
 
     private void initFabric() {
         CrashlyticsCore core = new CrashlyticsCore.Builder()
-                .disabled(BuildConfig.DEBUG)
+//                .disabled(BuildConfig.DEBUG)
                 .build();
         Fabric.with(this, core);
     }

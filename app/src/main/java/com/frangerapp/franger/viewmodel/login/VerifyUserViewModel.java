@@ -8,9 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
-import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent;
 import com.frangerapp.franger.viewmodel.login.eventbus.VerifyUserViewEvent;
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 
@@ -22,7 +20,7 @@ import io.reactivex.disposables.Disposable;
  * Created by Pavan on 04/02/18.
  */
 
-public class VerifyUserViewModel extends BaseViewModel {
+public class VerifyUserViewModel extends LoginBaseViewModel {
 
     private Context context;
     private EventBus eventBus;

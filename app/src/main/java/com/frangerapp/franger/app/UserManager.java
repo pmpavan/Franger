@@ -2,6 +2,7 @@ package com.frangerapp.franger.app;
 
 import android.content.Context;
 
+import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 
 /**
@@ -23,13 +24,20 @@ public class UserManager {
         return userStore.getIfUserVerified(context);
     }
 
+    // if the user is onboarded.
+    public boolean isUserOnboarded() {
+        return userStore.getIfUserOnboarded(context);
+    }
+
     // create user component, providing it saved user details to be shared across the user component.
     public boolean createUserSession() {
         boolean isUserSessionCreated = false;
+        FRLogger.msg("createUserSession user manager " + userStore.getUser());
         if (userStore.getUser() != null) {
             FrangerApp.get(context).createUserComponent(userStore.getUser());
             isUserSessionCreated = true;
         }
+        FRLogger.msg("createUserSession user manager " + isUserSessionCreated);
         return isUserSessionCreated;
     }
 

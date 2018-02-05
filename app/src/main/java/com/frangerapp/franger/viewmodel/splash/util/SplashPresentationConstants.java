@@ -8,4 +8,5 @@ public class SplashPresentationConstants {
 
     public static final int NAVIGATE_TO_HOME_EVENT = 100;
     public static final int NAVIGATE_TO_LOGIN_EVENT = 101;
+    public static final int NAVIGATE_TO_ONBOARD_EVENT = 102;
 }

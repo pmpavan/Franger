@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
+import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
@@ -26,9 +27,10 @@ import io.reactivex.disposables.Disposable;
  * Created by Pavan on 20/01/18.
  */
 
-public class LoginViewModel extends BaseViewModel {
+public class LoginViewModel extends LoginBaseViewModel {
 
 
+    private UserStore userStore;
     private LoginInteractor loginInteractor;
     private EventBus eventBus;
     private Context context;
@@ -39,10 +41,11 @@ public class LoginViewModel extends BaseViewModel {
 
     private String countryCode = "";
 
-    public LoginViewModel(Context context, EventBus eventBus, LoginInteractor loginInteractor) {
+    public LoginViewModel(Context context, EventBus eventBus, LoginInteractor loginInteractor, UserStore userStore) {
         this.context = context;
         this.eventBus = eventBus;
         this.loginInteractor = loginInteractor;
+        this.userStore = userStore;
         init();
     }
 
@@ -76,9 +79,12 @@ public class LoginViewModel extends BaseViewModel {
     }
 
     private void requestCompletedEvent() {
+        //Save the phone number
+        userStore.savePhoneNumber(countryCode, phoneNumberTxt.get());
+
         LoginViewEvent loginViewEvent = new LoginViewEvent();
         loginViewEvent.setId(LoginPresentationConstants.VALID_NUMBER_CHECK_SUCCESS);
-        loginViewEvent.setMessage("OTP message sent");
+        loginViewEvent.setMessage(context.getString(R.string.sms_sent_msg));
         eventBus.post(loginViewEvent);
     }
 
@@ -97,7 +103,7 @@ public class LoginViewModel extends BaseViewModel {
 
     public void onCountryCodeSelected(@Nullable CountriesListItemViewModel countriesListItemViewModel) {
         if (countriesListItemViewModel != null) {
-            countryCodeWithCountryNameTxt.set(countriesListItemViewModel.getCountryName() + " (" + countriesListItemViewModel.getCountryCode() + ")");
+            countryCodeWithCountryNameTxt.set(String.format(context.getString(R.string.country_list_string_format), countriesListItemViewModel.getCountryName(), countriesListItemViewModel.getCountryCode()));
             countryCodeTxt.set(countriesListItemViewModel.getCountryCode() + " - ");
             countryCode = countriesListItemViewModel.getCountryCode();
         }
@@ -108,11 +114,13 @@ public class LoginViewModel extends BaseViewModel {
 
         private EventBus eventBus;
         private Context context;
+        private UserStore userStore;
         private LoginInteractor loginInteractor;
 
-        public Factory(Context context, EventBus eventBus, LoginInteractor loginInteractor) {
+        public Factory(Context context, EventBus eventBus, LoginInteractor loginInteractor, UserStore userStore) {
             this.eventBus = eventBus;
             this.context = context;
+            this.userStore = userStore;
             this.loginInteractor = loginInteractor;
         }
 
@@ -120,7 +128,7 @@ public class LoginViewModel extends BaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(LoginViewModel.class)) {
-                return (T) new LoginViewModel(context, eventBus, loginInteractor);
+                return (T) new LoginViewModel(context, eventBus, loginInteractor, userStore);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

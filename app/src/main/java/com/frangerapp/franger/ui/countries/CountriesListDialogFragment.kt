@@ -1,4 +1,4 @@
-package com.frangerapp.franger.ui.login.countries
+package com.frangerapp.franger.ui.countries
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle

@@ -31,7 +31,7 @@
             app:layoutManager="LinearLayoutManager"
             app:listitem="@{@layout/fragment_countries_list_dialog_item}"
             app:onItemClick="@{vm.itemClickHandler}"
-            tools:context="com.frangerapp.franger.ui.login.countries.CountriesListDialogFragment"
+            tools:context=".ui.countries.CountriesListDialogFragment"
             tools:listitem="@layout/fragment_countries_list_dialog_item" />
     </LinearLayout>
 </layout>

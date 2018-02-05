@@ -13,14 +13,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public class User {
     private final String phoneNumber;
+    private final String countryCode;
     private final String userName;
     private final String userId;
     private final String authToken;
 
 
-    public User(@NotNull String userId,@NotNull String userName, @NonNull String phoneNumber, @NonNull String authToken) {
+    public User(@NotNull String userId,@NotNull String userName,@NotNull String countryCode, @NonNull String phoneNumber, @NonNull String authToken) {
         this.userId = userId;
         this.userName = userName;
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
         this.authToken = authToken;
     }
@@ -39,5 +41,9 @@ public class User {
 
     public String getUserName() {
         return userName;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
     }
 }

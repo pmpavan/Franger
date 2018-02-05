@@ -9,6 +9,7 @@ import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.login.SplashModule
 import com.frangerapp.franger.databinding.ActivitySplashBinding
 import com.frangerapp.franger.ui.home.HomeActivity
+import com.frangerapp.franger.ui.invite.InviteActivity
 import com.frangerapp.franger.ui.login.LoginActivity
 import com.frangerapp.franger.ui.login.LoginBaseActivity
 import com.frangerapp.franger.viewmodel.splash.SplashViewModel
@@ -59,7 +60,7 @@ class SplashActivity : LoginBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventBus!!.unregister(this)
+        eventBus.unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -71,11 +72,18 @@ class SplashActivity : LoginBaseActivity() {
             SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT -> {
                 moveToLoginPage()
             }
+            SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT -> {
+                moveToInvitePage()
+            }
         }
     }
 
     private fun moveToLoginPage() {
         this@SplashActivity.startActivity(LoginActivity.newInstance(this@SplashActivity))
+    }
+
+    private fun moveToInvitePage() {
+        this@SplashActivity.startActivity(InviteActivity.newInstance(this@SplashActivity))
     }
 
     private fun moveToHomePage() {

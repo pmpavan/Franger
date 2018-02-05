@@ -15,13 +15,11 @@ public class LoginDataUtil {
 
     @NonNull
     public static String getLoginUrl() {
-        return DataConstants.PROTOCOL +
-                LoginDataConstants.BASE_DOMAIN_URL +
-                LoginDataConstants.SIGN_UP_URL;
+        return LoginDataConstants.SIGN_UP_URL;
     }
 
     public static String getVerifyUrl(String userId) {
-        String builder = DataConstants.PROTOCOL + LoginDataConstants.BASE_DOMAIN_URL + LoginDataConstants.VERIFY_URL;
+        String builder = LoginDataConstants.VERIFY_URL;
         return String.format(builder, userId);
     }
 

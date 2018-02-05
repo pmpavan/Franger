@@ -17,4 +17,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="sms_sent_msg">OTP sent</string>
     <string name="otp_hint">Enter OTP here</string>
+    <string name="title_activity_invite">InviteActivity</string>
+
+    <string name="country_list_string_format">%s (%s)</string>
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.frangerapp.franger.data.BaseApi;
 import com.frangerapp.franger.data.common.util.DataUtil;
 import com.frangerapp.franger.data.login.model.LoginRequestData;
 import com.frangerapp.franger.data.login.model.LoginResponse;
@@ -22,7 +23,7 @@ import io.reactivex.Single;
  * Created by Pavan on 23/01/18.
  */
 
-public class LoginApi {
+public class LoginApi extends BaseApi {
     private static final String TAG = "LoginApi";
 
     private HttpClient httpClient;
@@ -39,7 +40,7 @@ public class LoginApi {
     public Single<LoginResponse> registerUser(@NonNull final String username, @NotNull String countryCode, @NonNull final String phoneNumber) {
         return Single.fromCallable(() -> {
             Map<String, String> headers = DataUtil.getCommonApiHeaders();
-            String url = LoginDataUtil.getLoginUrl();
+            String url = getURL(LoginDataUtil.getLoginUrl());
             String params = LoginDataUtil.getLoginRequestObject(gson, username, countryCode, phoneNumber);
             LoginResponse loginDetail = httpClient.postRequestSynchronously(TAG, headers, url,
                     params, HttpClient.BODY_CONTENT_TYPE_JSON, false, LoginResponse.class);
@@ -51,7 +52,7 @@ public class LoginApi {
     public Single<LoginResponse> verifyUser(@NonNull final String userId, @NotNull final String userEnteredOtp) {
         return Single.fromCallable(() -> {
             Map<String, String> headers = DataUtil.getCommonApiHeaders();
-            String url = LoginDataUtil.getVerifyUrl(userId);
+            String url = getURL(LoginDataUtil.getVerifyUrl(userId));
             String params = LoginDataUtil.getLoginVerifyRequestData(gson, userEnteredOtp);
             LoginResponse loginDetail = httpClient.postRequestSynchronously(TAG, headers, url,
                     params, HttpClient.BODY_CONTENT_TYPE_JSON, false, LoginResponse.class);

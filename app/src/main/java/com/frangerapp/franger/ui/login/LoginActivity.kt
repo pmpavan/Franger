@@ -11,11 +11,9 @@ import android.widget.Toast
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.login.SignUpModule
-import com.frangerapp.franger.app.util.di.module.login.SplashModule
-import com.frangerapp.franger.data.login.LoginApi
 import com.frangerapp.franger.databinding.ActivityLoginBinding
 import com.frangerapp.franger.ui.BaseActivity
-import com.frangerapp.franger.ui.login.countries.CountriesListDialogFragment
+import com.frangerapp.franger.ui.countries.CountriesListDialogFragment
 import com.frangerapp.franger.ui.util.UiUtils
 import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent
 import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants
@@ -32,7 +30,7 @@ import javax.inject.Inject
 /**
  * Created by Pavan on 20/01/18.
  */
-class LoginActivity : BaseActivity() {
+class LoginActivity : LoginBaseActivity() {
 
     companion object {
         val TAG = "LoginActivity"

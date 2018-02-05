@@ -8,6 +8,7 @@ import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.countries.CountriesListItemViewModel;
 import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent;
 import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants;
+import com.frangerapp.franger.viewmodel.login.LoginBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by Pavan on 22/01/18.
  */
 
-public class CountriesViewModel extends BaseViewModel {
+public class CountriesViewModel extends LoginBaseViewModel {
 
     private ArrayList<CountriesListItemViewModel> list = new ArrayList<>();
     public ObservableField<List<CountriesListItemViewModel>> countriesList = new ObservableField<>(list);
@@ -29,58 +30,6 @@ public class CountriesViewModel extends BaseViewModel {
 
     private void init() {
         list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("India", "+91"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
-        list.add(new CountriesListItemViewModel("US", "+1"));
         list.add(new CountriesListItemViewModel("US", "+1"));
         countriesList.set(list);
     }

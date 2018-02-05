@@ -44,6 +44,7 @@ public class LoginPresenterImpl implements LoginInteractor {
         return loginApi.registerUser(username, countryCode, phoneNumber).flatMap(loginDetail -> Single.create(s -> {
             if (loginDetail.getId() != null) {
                 userStore.storeUserId(context, loginDetail.getId());
+                FRLogger.msg("user Id " + loginDetail.getId());
                 s.onSuccess(loginDetail);
             } else {
                 s.onError(new LoginFailedException());
@@ -61,7 +62,7 @@ public class LoginPresenterImpl implements LoginInteractor {
     public Completable verifyPhoneNumber(@NonNull String userId, @NotNull String userEnteredOtp) {
         return loginApi.verifyUser(userId, userEnteredOtp).flatMap(loginDetail -> Single.create(s -> {
             if (loginDetail != null) {
-                userStore.storeUserId(context, loginDetail.getId());
+//                userStore.storeUserId(context, loginDetail.getId());
                 userStore.setUserVerified(context, true);
                 userStore.storeAuthToken(context, loginDetail.getToken());
                 s.onSuccess(loginDetail);

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.domain.splash.interactor.SplashInteractor;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
+import com.frangerapp.franger.viewmodel.login.LoginBaseViewModel;
 import com.frangerapp.franger.viewmodel.splash.eventbus.SplashViewEvent;
 import com.frangerapp.franger.viewmodel.splash.util.SplashPresentationConstants;
 import com.frangerapp.franger.viewmodel.splash.view.SplashView;
@@ -18,13 +19,14 @@ import org.greenrobot.eventbus.EventBus;
  * Created by Pavan on 20/01/18.
  */
 
-public class SplashViewModel extends BaseViewModel implements SplashView {
+public class SplashViewModel extends LoginBaseViewModel implements SplashView {
 
 
     private Context context;
     private EventBus eventBus;
     private UserManager userManager;
     private boolean isUserLoggedIn = false;
+    private boolean isUserOnboarded = false;
     private SplashInteractor splashInteractor;
 
     public SplashViewModel(Context context, EventBus eventBus, UserManager userManager, SplashInteractor splashInteractor) {
@@ -44,11 +46,14 @@ public class SplashViewModel extends BaseViewModel implements SplashView {
     }
 
     private void checkIfUserIsLoggedInAndMoveToRespectivePage() {
-        //TODO Check If the user is logged in or not
         isUserLoggedIn = userManager.isUserAvailable();
+        isUserOnboarded = userManager.isUserOnboarded();
         int eventId = SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT;
         if (isUserLoggedIn) {
             eventId = SplashPresentationConstants.NAVIGATE_TO_HOME_EVENT;
+            if (!isUserOnboarded) {
+                eventId = SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT;
+            }
         }
         SplashViewEvent event = new SplashViewEvent();
         event.setId(eventId);
@@ -74,7 +79,7 @@ public class SplashViewModel extends BaseViewModel implements SplashView {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(SplashViewModel.class)) {
-                return (T) new SplashViewModel(context, eventBus, userManager,splashInteractor);
+                return (T) new SplashViewModel(context, eventBus, userManager, splashInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }
