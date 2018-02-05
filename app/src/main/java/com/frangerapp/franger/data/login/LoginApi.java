@@ -46,4 +46,16 @@ public class LoginApi {
             return loginDetail;
         });
     }
+
+    @NonNull
+    public Single<LoginResponse> verifyUser(@NonNull final String userId, @NotNull final String userEnteredOtp) {
+        return Single.fromCallable(() -> {
+            Map<String, String> headers = DataUtil.getCommonApiHeaders();
+            String url = LoginDataUtil.getVerifyUrl(userId);
+            String params = LoginDataUtil.getLoginVerifyRequestData(gson, userEnteredOtp);
+            LoginResponse loginDetail = httpClient.postRequestSynchronously(TAG, headers, url,
+                    params, HttpClient.BODY_CONTENT_TYPE_JSON, false, LoginResponse.class);
+            return loginDetail;
+        });
+    }
 }

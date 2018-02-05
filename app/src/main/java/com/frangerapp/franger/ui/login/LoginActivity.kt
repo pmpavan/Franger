@@ -96,6 +96,7 @@ class LoginActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         btnLogin.dispose()
+        viewModel.onViewDestroyed()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -105,6 +106,7 @@ class LoginActivity : BaseActivity() {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
                 Toast.makeText(this@LoginActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
+                moveToVerifyUserPage()
             }
             LoginPresentationConstants.VALID_NUMBER_CHECK_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()
@@ -127,5 +129,9 @@ class LoginActivity : BaseActivity() {
                 viewModel.onCountryCodeSelected(countriesViewEvent.countriesListItemViewModel)
             }
         }
+    }
+
+    private fun moveToVerifyUserPage() {
+        this@LoginActivity.startActivity(VerifyUserActivity.newInstance(this@LoginActivity))
     }
 }

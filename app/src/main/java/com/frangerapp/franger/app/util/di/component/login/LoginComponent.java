@@ -3,9 +3,11 @@ package com.frangerapp.franger.app.util.di.component.login;
 import com.frangerapp.franger.app.util.di.module.login.LoginModule;
 import com.frangerapp.franger.app.util.di.module.login.SignUpModule;
 import com.frangerapp.franger.app.util.di.module.login.SplashModule;
+import com.frangerapp.franger.app.util.di.module.login.VerifyUserModule;
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.app.util.di.scope.LoginScope;
 import com.frangerapp.franger.ui.login.LoginActivity;
+import com.frangerapp.franger.ui.login.VerifyUserActivity;
 import com.frangerapp.franger.ui.splash.SplashActivity;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,9 @@ public interface LoginComponent {
     @NotNull
     SignUpComponent plus(@NotNull SignUpModule signUpModule);
 
+    @NotNull
+    VerifyUserComponent plus(@NotNull VerifyUserModule verifyUserModule);
+
     @ActivityScope
     @Subcomponent(modules = SplashModule.class)
     interface SplashComponent {
@@ -34,5 +39,11 @@ public interface LoginComponent {
     @Subcomponent(modules = SignUpModule.class)
     interface SignUpComponent {
         void inject(LoginActivity activity);
+    }
+
+    @ActivityScope
+    @Subcomponent(modules = VerifyUserModule.class)
+    interface VerifyUserComponent {
+        void inject(VerifyUserActivity activity);
     }
 }

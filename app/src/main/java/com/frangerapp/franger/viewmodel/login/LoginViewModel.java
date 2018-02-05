@@ -17,6 +17,7 @@ import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent;
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 
 import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import io.reactivex.disposables.Disposable;

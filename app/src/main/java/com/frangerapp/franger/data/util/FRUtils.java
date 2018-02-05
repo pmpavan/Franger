@@ -41,8 +41,7 @@ public class FRUtils {
         editor.apply();
     }
 
-    public static void storeInPreferences(Context context, String preferenceKey, String key,
-                                          boolean value) {
+    public static void storeInPreferences(Context context, String preferenceKey, String key, boolean value) {
         SharedPreferences sharedPreferences = getPrefs(context, preferenceKey);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);

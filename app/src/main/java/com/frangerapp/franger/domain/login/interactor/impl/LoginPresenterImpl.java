@@ -8,8 +8,9 @@ import com.frangerapp.franger.data.common.AppStore;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.login.LoginApi;
 import com.frangerapp.franger.domain.login.exception.LoginFailedException;
+import com.frangerapp.franger.domain.login.exception.VerificationFailedException;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
-import com.frangerapp.franger.viewmodel.login.LoginValidator;
+import com.frangerapp.franger.viewmodel.login.util.LoginValidator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +43,6 @@ public class LoginPresenterImpl implements LoginInteractor {
     public Completable registerUser(@NonNull String username, @NotNull String countryCode, @NonNull String phoneNumber) {
         return loginApi.registerUser(username, countryCode, phoneNumber).flatMap(loginDetail -> Single.create(s -> {
             if (loginDetail.getId() != null) {
-                //TODO Save User details
                 userStore.storeUserId(context, loginDetail.getId());
                 s.onSuccess(loginDetail);
             } else {
@@ -55,5 +55,19 @@ public class LoginPresenterImpl implements LoginInteractor {
     public boolean validateNumber(@NotNull String countryCode, @NonNull String phoneNumber) {
         FRLogger.msg("validateNumber " + validator.validateNumber(countryCode, phoneNumber));
         return validator.validateNumber(countryCode, phoneNumber);
+    }
+
+    @Override
+    public Completable verifyPhoneNumber(@NonNull String userId, @NotNull String userEnteredOtp) {
+        return loginApi.verifyUser(userId, userEnteredOtp).flatMap(loginDetail -> Single.create(s -> {
+            if (loginDetail != null) {
+                userStore.storeUserId(context, loginDetail.getId());
+                userStore.setUserVerified(context, true);
+                userStore.storeAuthToken(context, loginDetail.getToken());
+                s.onSuccess(loginDetail);
+            } else {
+                s.onError(new VerificationFailedException());
+            }
+        })).toCompletable();
     }
 }

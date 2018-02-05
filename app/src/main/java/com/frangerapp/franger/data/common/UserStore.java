@@ -34,6 +34,7 @@ public class UserStore {
         AUTH_TOKEN("auth_token"),
         USER_NAME("user_name"),
         PHONE_NUMBER("phone_number"),
+        IS_USER_VERIFIED("is_user_verified"),
         USER_ID("access_token");
         String key;
 
@@ -62,6 +63,18 @@ public class UserStore {
 
     public String getUserName(Context context, String defValue) {
         return preferences.getString(PREFERENCE_TYPE.USER_NAME.key, defValue);
+    }
+
+    public void setUserVerified(Context context, boolean isVerified) {
+        FRUtils.storeInPreferences(context, PREFERENCE, PREFERENCE_TYPE.IS_USER_VERIFIED.key, isVerified);
+    }
+
+    public boolean getIfUserVerified(Context context, boolean defValue) {
+        return preferences.getBoolean(PREFERENCE_TYPE.IS_USER_VERIFIED.key, defValue);
+    }
+
+    public boolean getIfUserVerified(Context context) {
+        return preferences.getBoolean(PREFERENCE_TYPE.IS_USER_VERIFIED.key, false);
     }
 
     public void storeUserId(Context context, String userId) {

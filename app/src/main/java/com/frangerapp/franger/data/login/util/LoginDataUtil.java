@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.data.common.util.DataConstants;
 import com.frangerapp.franger.data.login.model.LoginRequestData;
+import com.frangerapp.franger.data.login.model.LoginVerifyRequestData;
 import com.google.gson.Gson;
 
 /**
@@ -14,14 +15,14 @@ public class LoginDataUtil {
 
     @NonNull
     public static String getLoginUrl() {
-        return new StringBuilder(DataConstants.PROTOCOL)
-                .append(LoginDataConstants.BASE_DOMAIN_URL)
-                .append(LoginDataConstants.SIGN_UP_URL).toString();
+        return DataConstants.PROTOCOL +
+                LoginDataConstants.BASE_DOMAIN_URL +
+                LoginDataConstants.SIGN_UP_URL;
     }
 
-    public static String getVerifyUrl(String phoneNumber) {
+    public static String getVerifyUrl(String userId) {
         String builder = DataConstants.PROTOCOL + LoginDataConstants.BASE_DOMAIN_URL + LoginDataConstants.VERIFY_URL;
-        return String.format(builder, phoneNumber);
+        return String.format(builder, userId);
     }
 
     public static String getLoginRequestObject(Gson gson, String username, String countryCode, String phoneNumber) {
@@ -30,5 +31,11 @@ public class LoginDataUtil {
         loginRequestData.setCountryCode(countryCode);
         loginRequestData.setNumber(phoneNumber);
         return gson.toJson(loginRequestData);
+    }
+
+    public static String getLoginVerifyRequestData(Gson gson, String userEnteredOtp) {
+        LoginVerifyRequestData loginVerifyRequestData = new LoginVerifyRequestData();
+        loginVerifyRequestData.setUserEnteredOTP(userEnteredOtp);
+        return gson.toJson(loginVerifyRequestData);
     }
 }

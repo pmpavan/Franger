@@ -20,7 +20,7 @@ public class UserManager {
 
     // if there is any saved user.
     public boolean isUserAvailable() {
-        return userStore.getUserId(context, null) != null;
+        return userStore.getIfUserVerified(context);
     }
 
     // create user component, providing it saved user details to be shared across the user component.

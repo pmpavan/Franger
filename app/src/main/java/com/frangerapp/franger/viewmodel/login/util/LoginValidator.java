@@ -1,4 +1,4 @@
-package com.frangerapp.franger.viewmodel.login;
+package com.frangerapp.franger.viewmodel.login.util;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;

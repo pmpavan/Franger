@@ -9,9 +9,7 @@ import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.login.LoginApi;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
 import com.frangerapp.franger.domain.login.interactor.impl.LoginPresenterImpl;
-import com.frangerapp.franger.domain.splash.interactor.SplashInteractor;
-import com.frangerapp.franger.domain.splash.interactor.impl.SplashPresentationImpl;
-import com.frangerapp.franger.viewmodel.login.LoginValidator;
+import com.frangerapp.franger.viewmodel.login.util.LoginValidator;
 import com.frangerapp.network.HttpClient;
 import com.google.gson.Gson;
 

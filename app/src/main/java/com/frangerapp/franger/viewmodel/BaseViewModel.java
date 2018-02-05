@@ -13,4 +13,8 @@ public class BaseViewModel extends ViewModel {
     public CompositeDisposable disposables = new CompositeDisposable();
 
 
+    public void onViewDestroyed(){
+        disposables.dispose();
+    }
+
 }

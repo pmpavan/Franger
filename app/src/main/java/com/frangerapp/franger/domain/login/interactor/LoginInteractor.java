@@ -15,4 +15,6 @@ public interface LoginInteractor {
     Completable registerUser(@NonNull final String username, @NotNull String countryCode, @NonNull final String phoneNumber);
 
     boolean validateNumber(@NotNull String countryCode, @NonNull String phoneNumber);
+
+    Completable verifyPhoneNumber(@NonNull final String userId,@NotNull final String userEnteredOtp);
 }
