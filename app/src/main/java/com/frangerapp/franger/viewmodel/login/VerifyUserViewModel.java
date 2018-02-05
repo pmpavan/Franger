@@ -10,6 +10,9 @@ import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
+import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent;
+import com.frangerapp.franger.viewmodel.login.eventbus.VerifyUserViewEvent;
+import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -42,6 +45,7 @@ public class VerifyUserViewModel extends BaseViewModel {
 
     public void onVerifyUserBtnClicked() {
         if (!userId.isEmpty()) {
+            requestSentEvent();
             Disposable disposable = loginInteractor.verifyPhoneNumber(userId, verifyOtpTxt.get())
                     .compose(ScheduerUtils.ioToMainCompletableScheduler())
                     .subscribe(this::requestCompletedEvent, this::requestFailedEvent);
@@ -49,12 +53,25 @@ public class VerifyUserViewModel extends BaseViewModel {
         }
     }
 
-    private void requestFailedEvent(Throwable throwable) {
 
+    private void requestSentEvent() {
+        VerifyUserViewEvent loginViewEvent = new VerifyUserViewEvent();
+        loginViewEvent.setId(LoginPresentationConstants.VALID_OTP_REQUEST_SENT);
+        eventBus.post(loginViewEvent);
     }
 
     private void requestCompletedEvent() {
+        VerifyUserViewEvent loginViewEvent = new VerifyUserViewEvent();
+        loginViewEvent.setId(LoginPresentationConstants.VALID_OTP_REQUEST_SUCCESS);
+        loginViewEvent.setMessage("User login successful");
+        eventBus.post(loginViewEvent);
+    }
 
+    private void requestFailedEvent(Throwable throwable) {
+        VerifyUserViewEvent loginViewEvent = new VerifyUserViewEvent();
+        loginViewEvent.setId(LoginPresentationConstants.VALID_OTP_REQUEST_FAIL);
+        loginViewEvent.setMessage(throwable.getMessage());
+        eventBus.post(loginViewEvent);
     }
 
     public static class Factory implements ViewModelProvider.Factory {

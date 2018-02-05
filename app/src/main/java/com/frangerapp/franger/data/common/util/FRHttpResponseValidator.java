@@ -1,5 +1,6 @@
 package com.frangerapp.franger.data.common.util;
 
+import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.network.HttpResponseValidator;
 
 /**
@@ -9,6 +10,7 @@ import com.frangerapp.network.HttpResponseValidator;
 public class FRHttpResponseValidator implements HttpResponseValidator {
     @Override
     public boolean validateHttpResponseForApplicationErrors(String httpResponse) {
+        FRLogger.msg("http response " + httpResponse);
         return true;
     }
 }

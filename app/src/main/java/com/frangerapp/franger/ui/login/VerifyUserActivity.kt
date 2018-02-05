@@ -5,13 +5,17 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.widget.Toast
+import com.franger.mobile.logger.FRLogger
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.login.VerifyUserModule
 import com.frangerapp.franger.databinding.ActivityVerifyBinding
 import com.frangerapp.franger.viewmodel.login.VerifyUserViewModel
 import com.frangerapp.franger.viewmodel.login.eventbus.VerifyUserViewEvent
+import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants
 import kotlinx.android.synthetic.main.activity_login.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -91,7 +95,23 @@ class VerifyUserActivity : LoginBaseActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(loginViewEvent: VerifyUserViewEvent) {
         when (loginViewEvent.id) {
-
+            LoginPresentationConstants.VALID_OTP_REQUEST_SUCCESS -> {
+                viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
+                        BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
+                Toast.makeText(this@VerifyUserActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
+                moveToUserImportPage()
+            }
+            LoginPresentationConstants.VALID_OTP_REQUEST_FAIL -> {
+                viewDataBinding.btnLogin.revertAnimation()
+                Toast.makeText(this@VerifyUserActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
+            }
+            LoginPresentationConstants.VALID_OTP_REQUEST_SENT -> {
+                viewDataBinding.btnLogin.startAnimation()
+            }
         }
+    }
+
+    private fun moveToUserImportPage() {
+        FRLogger.msg("moveToUserImportPage")
     }
 }
