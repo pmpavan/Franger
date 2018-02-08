@@ -13,6 +13,7 @@ import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.login.VerifyUserModule
 import com.frangerapp.franger.databinding.ActivityVerifyBinding
+import com.frangerapp.franger.ui.profile.AddEditProfileActivity
 import com.frangerapp.franger.viewmodel.login.VerifyUserViewModel
 import com.frangerapp.franger.viewmodel.login.eventbus.VerifyUserViewEvent
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants
@@ -99,7 +100,7 @@ class VerifyUserActivity : LoginBaseActivity() {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
                 Toast.makeText(this@VerifyUserActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
-                moveToUserImportPage()
+                moveToEditProfilePage()
             }
             LoginPresentationConstants.VALID_OTP_REQUEST_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()
@@ -111,7 +112,9 @@ class VerifyUserActivity : LoginBaseActivity() {
         }
     }
 
-    private fun moveToUserImportPage() {
-        FRLogger.msg("moveToUserImportPage")
+    private fun moveToEditProfilePage() {
+        this@VerifyUserActivity.startActivity(AddEditProfileActivity.newInstance(this@VerifyUserActivity))
     }
+
+
 }

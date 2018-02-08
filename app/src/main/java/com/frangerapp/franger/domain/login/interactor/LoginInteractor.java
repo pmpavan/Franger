@@ -16,5 +16,7 @@ public interface LoginInteractor {
 
     boolean validateNumber(@NotNull String countryCode, @NonNull String phoneNumber);
 
-    Completable verifyPhoneNumber(@NonNull final String userId,@NotNull final String userEnteredOtp);
+    Completable verifyPhoneNumber(@NonNull final String userId, @NotNull final String userEnteredOtp);
+
+    void setAppVersionCode(int versionCode);
 }

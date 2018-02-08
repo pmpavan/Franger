@@ -71,4 +71,9 @@ public class LoginPresenterImpl implements LoginInteractor {
             }
         })).toCompletable();
     }
+
+    @Override
+    public void setAppVersionCode(int versionCode) {
+        appStore.setAppVersionCode(versionCode);
+    }
 }

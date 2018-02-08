@@ -1,4 +1,4 @@
-package com.frangerapp.franger.data.user.contacts.util;
+package com.frangerapp.franger.data.contacts.util;
 
 /**
  * Created by Pavan on 23/01/18.

@@ -29,6 +29,11 @@ public class UserManager {
         return userStore.getIfUserOnboarded(context);
     }
 
+    // if the user details added.
+    public boolean isUserProfileAdded() {
+        return userStore.getIfUserProfileCollected(context);
+    }
+
     // create user component, providing it saved user details to be shared across the user component.
     public boolean createUserSession() {
         boolean isUserSessionCreated = false;

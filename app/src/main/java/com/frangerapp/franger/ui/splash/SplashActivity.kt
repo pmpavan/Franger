@@ -12,6 +12,7 @@ import com.frangerapp.franger.ui.home.HomeActivity
 import com.frangerapp.franger.ui.invite.InviteActivity
 import com.frangerapp.franger.ui.login.LoginActivity
 import com.frangerapp.franger.ui.login.LoginBaseActivity
+import com.frangerapp.franger.ui.profile.AddEditProfileActivity
 import com.frangerapp.franger.viewmodel.splash.SplashViewModel
 import com.frangerapp.franger.viewmodel.splash.eventbus.SplashViewEvent
 import com.frangerapp.franger.viewmodel.splash.util.SplashPresentationConstants
@@ -72,6 +73,9 @@ class SplashActivity : LoginBaseActivity() {
             SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT -> {
                 moveToLoginPage()
             }
+            SplashPresentationConstants.NAVIGATE_TO_USER_PROFILE_EVENT -> {
+                moveToEditProfilePage()
+            }
             SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT -> {
                 moveToInvitePage()
             }
@@ -84,6 +88,10 @@ class SplashActivity : LoginBaseActivity() {
 
     private fun moveToInvitePage() {
         this@SplashActivity.startActivity(InviteActivity.newInstance(this@SplashActivity))
+    }
+
+    private fun moveToEditProfilePage() {
+        this@SplashActivity.startActivity(AddEditProfileActivity.newInstance(this@SplashActivity))
     }
 
     private fun moveToHomePage() {

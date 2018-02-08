@@ -37,7 +37,8 @@ public class UserStore {
         PHONE_NUMBER("phone_number"),
         COUNTRY_CODE("country_code"),
         IS_USER_VERIFIED("is_user_verified"),
-        IS_USER_ONBOARDING_COMPLTD("is_user_onboarding_compltd"),
+        IS_USER_ONBOARDING_COMPLTD("is_user_onboarding_completed"),
+        IS_USER_PROFILE_COLLECTED("is_user_profile_completed"),
         USER_ID("user_id");
         String key;
 
@@ -72,7 +73,7 @@ public class UserStore {
         FRUtils.storeInPreferences(context, PREFERENCE, PREFERENCE_TYPE.IS_USER_VERIFIED.key, isVerified);
     }
 
-    public boolean getIfUserVerified(Context context, boolean defValue) {
+    private boolean getIfUserVerified(Context context, boolean defValue) {
         return preferences.getBoolean(PREFERENCE_TYPE.IS_USER_VERIFIED.key, defValue);
     }
 
@@ -84,11 +85,23 @@ public class UserStore {
         FRUtils.storeInPreferences(context, PREFERENCE, PREFERENCE_TYPE.IS_USER_ONBOARDING_COMPLTD.key, isVerified);
     }
 
-    public boolean getIfUserOnboarded(Context context, boolean defValue) {
+    private boolean getIfUserOnboarded(Context context, boolean defValue) {
         return preferences.getBoolean(PREFERENCE_TYPE.IS_USER_ONBOARDING_COMPLTD.key, defValue);
     }
 
     public boolean getIfUserOnboarded(Context context) {
+        return getIfUserOnboarded(context, false);
+    }
+
+    public void setUserProfileCollected(Context context, boolean isVerified) {
+        FRUtils.storeInPreferences(context, PREFERENCE, PREFERENCE_TYPE.IS_USER_PROFILE_COLLECTED.key, isVerified);
+    }
+
+    public boolean getIfUserProfileCollected(Context context, boolean defValue) {
+        return preferences.getBoolean(PREFERENCE_TYPE.IS_USER_PROFILE_COLLECTED.key, defValue);
+    }
+
+    public boolean getIfUserProfileCollected(Context context) {
         return getIfUserOnboarded(context, false);
     }
 

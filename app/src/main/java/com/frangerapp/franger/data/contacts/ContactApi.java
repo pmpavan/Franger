@@ -1,4 +1,4 @@
-package com.frangerapp.franger.data.user.contacts;
+package com.frangerapp.franger.data.contacts;
 
 import com.frangerapp.franger.data.BaseApi;
 

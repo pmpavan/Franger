@@ -9,6 +9,9 @@ import com.frangerapp.franger.ui.home.HomeActivity;
 import com.frangerapp.franger.viewmodel.home.HomeViewModel;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -22,13 +25,11 @@ public class HomeModule {
     public HomeModule(@NonNull HomeActivity activity) {
     }
 
-    @Provides
-    Gson newGson(){
-        return new Gson();
-    }
     @ActivityScope
     @Provides
-    HomeViewModel homePresenter(@NonNull Context context, @NonNull User user) {
-        return new HomeViewModel(context, user);
+    HomeViewModel homePresenter(@NonNull Context context, @NonNull User user, @NotNull EventBus eventBus) {
+        return new HomeViewModel(context, user, eventBus);
     }
+
+
 }

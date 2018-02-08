@@ -5,9 +5,9 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.frangerapp.franger.BuildConfig;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.domain.splash.interactor.SplashInteractor;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.login.LoginBaseViewModel;
 import com.frangerapp.franger.viewmodel.splash.eventbus.SplashViewEvent;
 import com.frangerapp.franger.viewmodel.splash.util.SplashPresentationConstants;
@@ -25,8 +25,6 @@ public class SplashViewModel extends LoginBaseViewModel implements SplashView {
     private Context context;
     private EventBus eventBus;
     private UserManager userManager;
-    private boolean isUserLoggedIn = false;
-    private boolean isUserOnboarded = false;
     private SplashInteractor splashInteractor;
 
     public SplashViewModel(Context context, EventBus eventBus, UserManager userManager, SplashInteractor splashInteractor) {
@@ -38,6 +36,7 @@ public class SplashViewModel extends LoginBaseViewModel implements SplashView {
     }
 
     private void init() {
+        splashInteractor.setAppVersionCode(BuildConfig.VERSION_CODE);
     }
 
     @Override
@@ -46,13 +45,16 @@ public class SplashViewModel extends LoginBaseViewModel implements SplashView {
     }
 
     private void checkIfUserIsLoggedInAndMoveToRespectivePage() {
-        isUserLoggedIn = userManager.isUserAvailable();
-        isUserOnboarded = userManager.isUserOnboarded();
+        boolean isUserLoggedIn = userManager.isUserAvailable();
+        boolean isUserOnboarded = userManager.isUserOnboarded();
+        boolean isUserProfileAdded = userManager.isUserProfileAdded();
         int eventId = SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT;
         if (isUserLoggedIn) {
             eventId = SplashPresentationConstants.NAVIGATE_TO_HOME_EVENT;
             if (!isUserOnboarded) {
                 eventId = SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT;
+            } else if (!isUserProfileAdded) {
+                eventId = SplashPresentationConstants.NAVIGATE_TO_USER_PROFILE_EVENT;
             }
         }
         SplashViewEvent event = new SplashViewEvent();

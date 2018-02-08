@@ -20,4 +20,5 @@
     <string name="title_activity_invite">InviteActivity</string>
 
     <string name="country_list_string_format">%s (%s)</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
 </resources>
