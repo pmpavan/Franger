@@ -51,10 +51,10 @@ public class SplashViewModel extends LoginBaseViewModel implements SplashView {
         int eventId = SplashPresentationConstants.NAVIGATE_TO_LOGIN_EVENT;
         if (isUserLoggedIn) {
             eventId = SplashPresentationConstants.NAVIGATE_TO_HOME_EVENT;
-            if (!isUserOnboarded) {
-                eventId = SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT;
-            } else if (!isUserProfileAdded) {
+            if (!isUserProfileAdded) {
                 eventId = SplashPresentationConstants.NAVIGATE_TO_USER_PROFILE_EVENT;
+            } else if (!isUserOnboarded) {
+                eventId = SplashPresentationConstants.NAVIGATE_TO_ONBOARD_EVENT;
             }
         }
         SplashViewEvent event = new SplashViewEvent();

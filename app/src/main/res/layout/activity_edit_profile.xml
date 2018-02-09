@@ -29,10 +29,71 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="451dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:context="com.frangerapp.franger.ui.profile.AddEditProfileActivity"
+            tools:layout_editor_absoluteY="60dp"
+            tools:showIn="@layout/activity_edit_profile">
 
+            <EditText
+                android:id="@+id/userNameEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="15dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:text="@={vm.userNameTxt}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/name_hint"
+                app:layout_constraintBottom_toTopOf="@+id/userNameEditText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/errorTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_name_blank_error"
+                android:textColor="@color/red"
+                android:visibility="@{vm.errorVisibility}"
+                app:layout_constraintStart_toStartOf="@+id/userNameEditText"
+                app:layout_constraintTop_toBottomOf="@+id/userNameEditText" />
+
+            <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="15dp"
+                android:background="@drawable/circular_border_shape"
+                android:gravity="center"
+                android:onClick="@{vm::onProfileSubmitBtnClicked}"
+                android:text="@string/submit"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                app:initialCornerAngle="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/errorTxt"
+                app:spinning_bar_color="@color/white"
+                app:spinning_bar_padding="6dp"
+                app:spinning_bar_width="4dp" />
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 </layout>

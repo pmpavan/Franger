@@ -33,7 +33,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -53,7 +52,7 @@
             android:layout_marginStart="15dp"
             android:gravity="center"
             android:background="@drawable/circular_border_shape"
-            android:text="@string/register"
+            android:text="@string/verify"
             android:textColor="@color/white"
             app:initialCornerAngle="2dp"
             app:layout_constraintEnd_toEndOf="parent"

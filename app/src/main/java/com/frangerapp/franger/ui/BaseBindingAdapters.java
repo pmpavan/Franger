@@ -24,6 +24,11 @@ public class BaseBindingAdapters {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    @BindingAdapter("android:visibility")
+    public static void setVisibility(View view, int viewVisibility) {
+        view.setVisibility(viewVisibility);
+    }
+
     @BindingAdapter("android:onClick")
     public static void setClickListener(View view, ClickHandler handler) {
         view.setOnClickListener(view1 -> handler.onClick());

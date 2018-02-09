@@ -5,10 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.data.BaseApi;
 import com.frangerapp.franger.data.common.util.DataUtil;
-import com.frangerapp.franger.data.login.model.LoginResponse;
-import com.frangerapp.franger.data.login.util.LoginDataUtil;
 import com.frangerapp.franger.data.profile.model.ProfileResponse;
-import com.frangerapp.franger.data.profile.util.ProfileDataConstants;
 import com.frangerapp.franger.data.profile.util.ProfileDataUtil;
 import com.frangerapp.network.HttpClient;
 import com.google.gson.Gson;
@@ -43,9 +40,10 @@ public class ProfileApi extends BaseApi {
         return Single.fromCallable(() -> {
             Map<String, String> headers = DataUtil.getCommonApiHeaders();
             String url = getURL(ProfileDataUtil.getEditProfileUrl(userId));
-            ProfileResponse response = new ProfileResponse();
-            response.setId(userId);
-            return response;
+            String params = ProfileDataUtil.getProfileRequestObject(gson, username);
+            ProfileResponse profileResponse = httpClient.putRequestSynchronously(TAG, headers, url,
+                    params, HttpClient.BODY_CONTENT_TYPE_JSON, false, ProfileResponse.class);
+            return profileResponse;
         });
     }
 }

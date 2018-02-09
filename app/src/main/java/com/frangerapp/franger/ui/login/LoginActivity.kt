@@ -108,7 +108,6 @@ class LoginActivity : LoginBaseActivity() {
             }
             LoginPresentationConstants.VALID_NUMBER_CHECK_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()
-                Toast.makeText(this@LoginActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
             }
             LoginPresentationConstants.VALID_NUMBER_REQUEST_SENT -> {
                 viewDataBinding.btnLogin.startAnimation()
