@@ -27,10 +27,8 @@ public class AddProfilePresentationImpl implements ProfileInteractor {
     private static final String TAG = LoginPresenterImpl.class.getName();
 
     private Context context;
-    private LoginValidator validator;
     private ProfileApi profileApi;
     private UserStore userStore;
-    private AppStore appStore;
 
     public AddProfilePresentationImpl(@NonNull Context context, @NonNull ProfileApi profileApi, UserStore userStore) {
         this.context = context;

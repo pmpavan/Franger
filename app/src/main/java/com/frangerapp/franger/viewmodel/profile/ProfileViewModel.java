@@ -8,14 +8,11 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.frangerapp.franger.R;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
-import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent;
-import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 import com.frangerapp.franger.viewmodel.profile.eventbus.ProfileViewEvent;
 import com.frangerapp.franger.viewmodel.profile.util.ProfilePresentationConstants;
 
@@ -68,6 +65,7 @@ public class ProfileViewModel extends BaseViewModel {
     private void onFailure(Throwable throwable) {
         ProfileViewEvent profileViewEvent = new ProfileViewEvent();
         profileViewEvent.setId(ProfilePresentationConstants.ON_PROFILE_REQUEST_FAILURE);
+        profileViewEvent.setMessage(throwable.getMessage());
         eventBus.post(profileViewEvent);
     }
 
