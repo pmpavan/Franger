@@ -22,11 +22,11 @@ import javax.inject.Inject
 
 /**
  *
- * A fragment that shows a list of items as a modal bottom sheet.
+ * A fragment that shows a list of countries as a modal bottom sheet.
  *
  * You can show this modal bottom sheet from your activity like this:
  * <pre>
- *    CountriesListDialogFragment.newInstance(30).show(supportFragmentManager, "dialog")
+ *    CountriesListDialogFragment.newInstance().show(supportFragmentManager, "dialog")
  * </pre>
  */
 class CountriesListDialogFragment : BaseBottomSheetFragment() {

@@ -9,7 +9,8 @@ import android.support.annotation.NonNull;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.domain.countries.interactor.CountriesInteractor;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
-import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
+import com.frangerapp.franger.viewmodel.common.databinding.FieldUtils;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.countries.converter.CountriesConverter;
 import com.frangerapp.franger.viewmodel.countries.eventbus.CountriesViewEvent;
 import com.frangerapp.franger.viewmodel.countries.util.CountriesPresentationConstants;
@@ -20,7 +21,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -32,6 +35,8 @@ public class CountriesViewModel extends LoginBaseViewModel {
     private ArrayList<CountriesListItemViewModel> list = new ArrayList<>();
     public ObservableField<List<CountriesListItemViewModel>> countriesList = new ObservableField<>(list);
 
+    private List<CountriesListItemViewModel> itemViewModels = new ArrayList<>();
+    public ObservableField<String> searchTxt = new ObservableField<>("");
 
     private CountriesInteractor countriesInteractor;
     private EventBus eventBus;
@@ -52,9 +57,29 @@ public class CountriesViewModel extends LoginBaseViewModel {
                 .flatMapIterable(agents -> agents)
                 .flatMapSingle(CountriesConverter::convert)
                 .toList()
-                .compose(ScheduerUtils.ioToMainSingleScheduler())
+                .compose(SchedulerUtils.ioToMainSingleScheduler())
                 .subscribe(this::onSuccess, this::onError);
         disposables.add(disposable);
+
+        FieldUtils.toObservable(searchTxt)
+                .debounce(10L, TimeUnit.MILLISECONDS)
+                .subscribe(this::filterList, t -> FRLogger.msg("Error " + t.getMessage()), this::onComplete);
+    }
+
+    private void onComplete() {
+
+    }
+
+    private void filterList(String text) {
+        FRLogger.msg("String " + searchTxt);
+        Observable.just(itemViewModels)
+                .concatMapIterable(activityTypes -> activityTypes)
+                .filter(activityTypes -> text.isEmpty()
+                        || (activityTypes.getCountryName().toLowerCase().contains(text.toLowerCase())
+                        || activityTypes.getCountryCode().toLowerCase().contains(text.toLowerCase())))
+                .toList()
+                .compose(SchedulerUtils.ioToMainSingleScheduler())
+                .subscribe(this::onSuccess, t -> FRLogger.msg("Error " + t.getMessage()));
     }
 
     private void onError(Throwable throwable) {
@@ -64,6 +89,7 @@ public class CountriesViewModel extends LoginBaseViewModel {
 
     private void onSuccess(List<CountriesListItemViewModel> countriesListItemViewModels) {
         FRLogger.msg(countriesListItemViewModels.toString());
+        itemViewModels = countriesListItemViewModels;
         countriesList.set(countriesListItemViewModels);
     }
 

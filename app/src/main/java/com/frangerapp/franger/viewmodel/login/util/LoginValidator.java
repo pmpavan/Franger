@@ -1,9 +1,5 @@
 package com.frangerapp.franger.viewmodel.login.util;
 
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
-import com.frangerapp.franger.R;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;

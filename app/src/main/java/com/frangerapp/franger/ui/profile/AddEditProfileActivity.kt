@@ -7,6 +7,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
@@ -22,6 +23,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
+import android.databinding.adapters.TextViewBindingAdapter.setText
+import br.com.simplepass.loading_button_lib.interfaces.OnAnimationEndListener
+
 
 class AddEditProfileActivity : UserBaseActivity() {
 
@@ -44,7 +48,7 @@ class AddEditProfileActivity : UserBaseActivity() {
         super.onCreate(savedInstanceState)
         FrangerApp.get(this@AddEditProfileActivity)
                 .userComponent()
-                .plus(ProfileModule(this@AddEditProfileActivity,true))
+                .plus(ProfileModule(this@AddEditProfileActivity, true))
                 .inject(this@AddEditProfileActivity)
         invokeDataBinding()
         setupViews()
@@ -57,7 +61,10 @@ class AddEditProfileActivity : UserBaseActivity() {
     }
 
     private fun setupControllers() {
-
+//        viewDataBinding.btnLogin.revertAnimation({
+//            if (viewModel.ifRequestSucceeded)
+//                moveToInviteActivity()
+//        })
     }
 
     private fun invokeDataBinding() {
@@ -93,8 +100,7 @@ class AddEditProfileActivity : UserBaseActivity() {
             ProfilePresentationConstants.ON_PROFILE_REQUEST_SUCCESS -> {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
-                Toast.makeText(this@AddEditProfileActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
-                moveToInviteActivity()
+                Handler().postDelayed({ moveToInviteActivity() }, 500)
             }
             ProfilePresentationConstants.ON_PROFILE_REQUEST_FAILURE -> {
                 viewDataBinding.btnLogin.revertAnimation()
@@ -109,5 +115,6 @@ class AddEditProfileActivity : UserBaseActivity() {
     private fun moveToInviteActivity() {
         val intent = InviteActivity.newInstance(this@AddEditProfileActivity)
         startActivity(intent)
+        finish()
     }
 }

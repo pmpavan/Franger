@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Pavan on 15/01/18.
  * A class contains Scheduler util methods.
  */
-public class ScheduerUtils {
+public class SchedulerUtils {
 
     /**
      * Transform the Observable to - 1. subscribe in IO thread & 2. observe in Main thread.

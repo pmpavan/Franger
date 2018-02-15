@@ -12,9 +12,10 @@ import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
-import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.profile.eventbus.ProfileViewEvent;
 import com.frangerapp.franger.viewmodel.profile.util.ProfilePresentationConstants;
+import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -24,7 +25,7 @@ import io.reactivex.disposables.Disposable;
  * Created by Pavan on 07/02/18.
  */
 
-public class ProfileViewModel extends BaseViewModel {
+public class ProfileViewModel extends UserBaseViewModel {
 
     private Context context;
     private User user;
@@ -35,6 +36,8 @@ public class ProfileViewModel extends BaseViewModel {
 
     public ObservableField<String> userNameTxt = new ObservableField<>("");
     public ObservableInt errorVisibility = new ObservableInt(View.INVISIBLE);
+
+    public boolean ifRequestSucceeded = false;
 
     public ProfileViewModel(Context context, User user, UserStore userStore, EventBus eventBus, ProfileInteractor profileInteractor) {
         this.context = context;
@@ -54,7 +57,7 @@ public class ProfileViewModel extends BaseViewModel {
             requestSentEvent();
             //send register request
             Disposable disposable = profileInteractor.submitProfile(user.getUserId(), userNameTxt.get())
-                    .compose(ScheduerUtils.ioToMainCompletableScheduler())
+                    .compose(SchedulerUtils.ioToMainCompletableScheduler())
                     .subscribe(this::onSuccess, this::onFailure);
             disposables.add(disposable);
         } else {
@@ -70,6 +73,7 @@ public class ProfileViewModel extends BaseViewModel {
     }
 
     private void onSuccess() {
+        ifRequestSucceeded = true;
         ProfileViewEvent profileViewEvent = new ProfileViewEvent();
         profileViewEvent.setId(ProfilePresentationConstants.ON_PROFILE_REQUEST_SUCCESS);
         eventBus.post(profileViewEvent);

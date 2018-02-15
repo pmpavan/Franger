@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
-import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.login.eventbus.VerifyUserViewEvent;
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 
@@ -45,7 +45,7 @@ public class VerifyUserViewModel extends LoginBaseViewModel {
         if (!userId.isEmpty()) {
             requestSentEvent();
             Disposable disposable = loginInteractor.verifyPhoneNumber(userId, verifyOtpTxt.get())
-                    .compose(ScheduerUtils.ioToMainCompletableScheduler())
+                    .compose(SchedulerUtils.ioToMainCompletableScheduler())
                     .subscribe(this::requestCompletedEvent, this::requestFailedEvent);
             disposables.add(disposable);
         }

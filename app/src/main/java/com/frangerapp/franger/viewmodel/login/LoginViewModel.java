@@ -7,18 +7,15 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
-import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.login.interactor.LoginInteractor;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
-import com.frangerapp.franger.viewmodel.common.rx.ScheduerUtils;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.countries.CountriesListItemViewModel;
 import com.frangerapp.franger.viewmodel.login.eventbus.LoginViewEvent;
 import com.frangerapp.franger.viewmodel.login.util.LoginPresentationConstants;
 
 import org.greenrobot.eventbus.EventBus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import io.reactivex.disposables.Disposable;
@@ -64,7 +61,7 @@ public class LoginViewModel extends LoginBaseViewModel {
             requestSentEvent();
             //send register request
             Disposable disposable = loginInteractor.registerUser("", countryCode, phoneNumberTxt.get())
-                    .compose(ScheduerUtils.ioToMainCompletableScheduler())
+                    .compose(SchedulerUtils.ioToMainCompletableScheduler())
                     .subscribe(this::requestCompletedEvent, this::requestFailedEvent);
             disposables.add(disposable);
         } else {
