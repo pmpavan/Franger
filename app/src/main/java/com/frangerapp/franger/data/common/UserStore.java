@@ -102,7 +102,7 @@ public class UserStore {
     }
 
     public boolean getIfUserProfileCollected(Context context) {
-        return getIfUserOnboarded(context, false);
+        return getIfUserProfileCollected(context, false);
     }
 
     public void storeUserId(Context context, String userId) {

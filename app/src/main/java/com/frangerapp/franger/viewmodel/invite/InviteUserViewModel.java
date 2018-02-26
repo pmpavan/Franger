@@ -8,9 +8,13 @@ import android.support.annotation.NonNull;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Pavan on 07/02/18.
@@ -29,6 +33,40 @@ public class InviteUserViewModel extends UserBaseViewModel {
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.profileInteractor = profileInteractor;
+
+//        List<String> list = new ArrayList<>();
+//        list.add("+91-9790708464");
+//        list.add("+91-9840636541");
+//        list.add("+91-9445589121");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9790708464");
+//        list.add("+91-9962344255");
+//        list.add("+91-9962344255");
+//        list.add("+91-9962344255");
+//        list.add("+91-9962344255");
+//        list.add("+91-9962344255");
+//        list.add("+91-9789098830");
+        profileInteractor.syncContacts(user.getUserId())
+                .compose(SchedulerUtils.ioToMainCompletableScheduler())
+                .subscribe(this::onSuccess, this::onFailure);
+    }
+
+    private void onFailure(Throwable throwable) {
+
+    }
+
+    private void onSuccess() {
+
     }
 
 

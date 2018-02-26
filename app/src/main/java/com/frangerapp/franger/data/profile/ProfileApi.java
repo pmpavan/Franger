@@ -3,6 +3,7 @@ package com.frangerapp.franger.data.profile;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.frangerapp.contacts.Contact;
 import com.frangerapp.franger.data.BaseApi;
 import com.frangerapp.franger.data.common.util.DataUtil;
 import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
@@ -51,11 +52,11 @@ public class ProfileApi extends BaseApi {
     }
 
     @NonNull
-    public Single<ContactSyncResponse> syncContacts(@NonNull final String userId, @NotNull final List<String> phoneNumberList) {
+    public Single<ContactSyncResponse> syncContacts(@NonNull final String userId, @NotNull final List<Contact> phoneNumberList, final boolean isLastPage) {
         return Single.fromCallable(() -> {
             Map<String, String> headers = DataUtil.getCommonApiHeaders();
             String url = getURL(ProfileDataUtil.getContactsSyncUrl(userId));
-            String params = ProfileDataUtil.getContactSyncRequestObject(gson, phoneNumberList);
+            String params = ProfileDataUtil.getContactSyncRequestObject(gson, phoneNumberList, isLastPage);
             ContactSyncResponse contactSyncResponse = httpClient.postRequestSynchronously(TAG, headers, url,
                     params, HttpClient.BODY_CONTENT_TYPE_JSON, false, ContactSyncResponse.class);
             return contactSyncResponse;

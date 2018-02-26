@@ -10,16 +10,29 @@
             type="com.frangerapp.franger.viewmodel.login.VerifyUserViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.frangerapp.franger.ui.login.VerifyUserActivity"
         tools:showIn="@layout/activity_verify">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:text="@string/otp_hint"
+            app:layout_constraintBottom_toTopOf="@+id/otpEditText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <EditText
             android:id="@+id/otpEditText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
@@ -32,16 +45,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/otp_hint"
-            app:layout_constraintBottom_toTopOf="@+id/otpEditText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
             android:id="@+id/btnLogin"
@@ -49,20 +52,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginEnd="15dp"
+            android:layout_marginTop="15dp"
             android:layout_marginStart="15dp"
-            android:gravity="center"
             android:background="@drawable/circular_border_shape"
+            android:gravity="center"
+            android:onClick="@{vm::onVerifyUserBtnClicked}"
             android:text="@string/verify"
+            android:textAlignment="center"
             android:textColor="@color/white"
             app:initialCornerAngle="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textAlignment="center"
-            android:onClick="@{vm::onVerifyUserBtnClicked}"
             app:layout_constraintTop_toBottomOf="@+id/otpEditText"
             app:spinning_bar_color="@color/white"
             app:spinning_bar_padding="6dp"
             app:spinning_bar_width="4dp" />
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 
 </layout>

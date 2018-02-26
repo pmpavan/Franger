@@ -1,7 +1,7 @@
 package com.frangerapp.franger.data.profile.util;
 
-import android.content.Context;
-
+import com.franger.mobile.logger.FRLogger;
+import com.frangerapp.contacts.Contact;
 import com.frangerapp.franger.data.profile.model.ContactSyncRequest;
 import com.frangerapp.franger.data.profile.model.ContactSyncRequestData;
 import com.frangerapp.franger.data.profile.model.ProfileDataRequest;
@@ -11,9 +11,8 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Pavan on 23/01/18.
@@ -37,28 +36,34 @@ public class ProfileDataUtil {
         return gson.toJson(request);
     }
 
-    public static String getContactSyncRequestObject(Gson gson, List<String> phoneNumberHashMap) {
+    public static String getContactSyncRequestObject(Gson gson, List<Contact> phoneNumberHashMap, boolean isLastPage) {
         ContactSyncRequest request = new ContactSyncRequest();
+        request.setLastPage(isLastPage);
         List<ContactSyncRequestData> contactSyncRequestDataList = new ArrayList<>();
         if (phoneNumberHashMap != null) {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            ContactSyncRequestData contactSyncRequestData = new ContactSyncRequestData();
-            for (String phoneNumber : phoneNumberHashMap) {
-                contactSyncRequestData.setOriginalNumber(phoneNumber);
-                try {
-                    Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNumber, "IN");
-                    String number = "";
-                    if (cleanedPhoneNumber.hasNationalNumber()) {
-                        number = String.valueOf(cleanedPhoneNumber.getNationalNumber());
+            for (Contact phoneNumber : phoneNumberHashMap) {
+                ContactSyncRequestData contactSyncRequestData = new ContactSyncRequestData();
+                if (!phoneNumber.getPhoneNumbers().isEmpty()) {
+                    for (String phoneNum : phoneNumber.getPhoneNumbers()) {
+                        contactSyncRequestData.setOriginalNumber(phoneNum);
+                        try {
+                            Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum, "IN");
+                            String number = "";
+                            if (cleanedPhoneNumber.hasNationalNumber()) {
+                                number = String.valueOf(cleanedPhoneNumber.getNationalNumber());
+                            }
+                            contactSyncRequestData.setPureNumber(number);
+                        } catch (NumberParseException e) {
+                            contactSyncRequestData.setPureNumber(phoneNum);
+                        }
+                        contactSyncRequestDataList.add(contactSyncRequestData);
                     }
-                    contactSyncRequestData.setPureNumber(number);
-                } catch (NumberParseException e) {
-                    contactSyncRequestData.setPureNumber(phoneNumber);
                 }
-
             }
         }
         request.setData(contactSyncRequestDataList);
+        FRLogger.msg("request object " + gson.toJson(request));
         return gson.toJson(request);
     }
 

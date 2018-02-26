@@ -14,6 +14,9 @@ public class ContactSyncRequest {
     @SerializedName("data")
     @Expose
     private List<ContactSyncRequestData> data = new ArrayList<>();
+    @SerializedName("lastPage")
+    @Expose
+    private Boolean lastPage = false;
 
     public ContactSyncRequest() {
 
@@ -25,5 +28,13 @@ public class ContactSyncRequest {
 
     public void setData(List<ContactSyncRequestData> data) {
         this.data = data;
+    }
+
+    public Boolean getLastPage() {
+        return lastPage;
+    }
+
+    public void setLastPage(Boolean lastPage) {
+        this.lastPage = lastPage;
     }
 }

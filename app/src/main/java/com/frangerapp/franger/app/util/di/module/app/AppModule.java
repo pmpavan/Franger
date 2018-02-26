@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.UserManager;
+import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.data.common.AppStore;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.common.util.FRHttpResponseValidator;
@@ -87,5 +88,11 @@ public class AppModule {
     @Provides
     HttpClient httpClient(Context context, Gson jsonParser, HttpResponseValidator httpResponseValidator) {
         return new VolleyHttpClientImpl(context, jsonParser, httpResponseValidator);
+    }
+
+    @Provides
+    @Singleton
+    AppDatabase getDatabase(@NonNull Context context) {
+        return AppDatabase.getDatabase(context);
     }
 }
