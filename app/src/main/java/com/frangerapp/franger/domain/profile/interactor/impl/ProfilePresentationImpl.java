@@ -5,28 +5,25 @@ import android.support.annotation.NonNull;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.contacts.Contact;
+import com.frangerapp.contacts.PhoneNumber;
 import com.frangerapp.contacts.RxContacts;
 import com.frangerapp.franger.app.util.db.AppDatabase;
-import com.frangerapp.franger.data.common.AppStore;
+import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.ProfileApi;
-import com.frangerapp.franger.domain.login.exception.LoginFailedException;
+import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
 import com.frangerapp.franger.domain.login.interactor.impl.LoginPresenterImpl;
 import com.frangerapp.franger.domain.profile.exception.ProfileUpdateFailed;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
-import com.frangerapp.franger.viewmodel.login.util.LoginValidator;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Pavan on 08/02/18.
@@ -63,25 +60,47 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     }
 
     @Override
-    public Completable syncContacts(@NonNull String userId) {
-        HashMap<String, Contact> hashMap = new HashMap<>();
+    public Observable<ContactSyncResponse> syncContacts(@NonNull String userId) {
         return RxContacts.fetch(context)
                 .buffer(50)
                 .flatMap(lists -> {
+                    FRLogger.msg("list " + lists);
+                    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
                     for (Contact contact : lists) {
                         if (contact.getPhoneNumbers() != null || !contact.getPhoneNumbers().isEmpty())
-                            for (String phoneNumber : contact.getPhoneNumbers())
-                                hashMap.put(phoneNumber, contact);
+                            for (PhoneNumber phoneNumber : contact.getPhoneNumbers()) {
+                                User user = new User();
+                                user.phoneNumber = phoneNumber.getPhoneNumber();
+                                user.displayName = contact.getDisplayName();
+                                String phoneNum = phoneNumber.getPhoneNumber();
+                                try {
+                                    Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum, "IN");
+                                    if (cleanedPhoneNumber.hasNationalNumber()) {
+                                        phoneNum = String.valueOf(cleanedPhoneNumber.getNationalNumber());
+                                    }
+                                } catch (NumberParseException ignored) {
+                                }
+                                user.cleanedPhoneNumber = phoneNum;
+//                                user.phoneNumberType = phoneNumber.getPhoneType();
+                                appDatabase.userDao().addUser(user);
+                            }
                     }
                     return profileApi.syncContacts(userId, lists, false)
                             .map(listViewModels -> {
                                 //update database
-//                            recentCallsListViewModel.setPhoneNumberLookupList(listViewModels);
+                                Observable.just(listViewModels)
+                                        .flatMapIterable(ContactSyncResponse::getJoinedList)
+                                        .flatMap(joined -> {
+                                            User user = new User();
+                                            user.phoneNumber = joined.getOriginalNumber();
+                                            user.userId = joined.getUserId();
+                                            FRLogger.msg("user 1" + user.toString());
+                                            appDatabase.userDao().updateUser(user);
+                                            return Observable.just(joined);
+                                        });
                                 FRLogger.msg("list models " + listViewModels);
                                 return listViewModels;
                             }).toObservable();
-                })
-                .toList()
-                .toCompletable();
+                });
     }
 }

@@ -9,4 +9,6 @@ ext {
     archComponentVersion = "1.1.0"
     archComponentExtVersion = "1.1.0"
     archComponentCompilerVersion = "1.1.0"
+    archRoomVersion = "1.0.0"
+    archLifecycleVersion = "1.0.0"
 }

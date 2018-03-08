@@ -16,6 +16,7 @@ import static com.frangerapp.contacts.ColumnMapper.*;
 
 /**
  * Android contacts as rx observable.
+ *
  * @author Ulrich Raab
  * @author MADNESS
  */
@@ -33,7 +34,7 @@ public class RxContacts {
 
     private ContentResolver mResolver;
 
-    public static Observable<Contact> fetch (@NonNull final Context context) {
+    public static Observable<Contact> fetch(@NonNull final Context context) {
         return Observable.create(new ObservableOnSubscribe<Contact>() {
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull
@@ -48,7 +49,7 @@ public class RxContacts {
     }
 
 
-    private void fetch (ObservableEmitter<Contact> emitter) {
+    private void fetch(ObservableEmitter<Contact> emitter) {
         HashMap<Long, Contact> contacts = new HashMap<>();
         Cursor cursor = createCursor();
         cursor.moveToFirst();
@@ -59,6 +60,8 @@ public class RxContacts {
         int thumbnailColumnIndex = cursor.getColumnIndex(ContactsContract.Data.PHOTO_THUMBNAIL_URI);
         int mimetypeColumnIndex = cursor.getColumnIndex(ContactsContract.Data.MIMETYPE);
         int dataColumnIndex = cursor.getColumnIndex(ContactsContract.Data.DATA1);
+//        int indexPhoneType = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+
         while (!cursor.isAfterLast()) {
             long id = cursor.getLong(idColumnIndex);
             Contact contact = contacts.get(id);
@@ -90,7 +93,7 @@ public class RxContacts {
         emitter.onComplete();
     }
 
-    private Cursor createCursor () {
+    private Cursor createCursor() {
         return mResolver.query(
                 ContactsContract.Data.CONTENT_URI,
                 PROJECTION,

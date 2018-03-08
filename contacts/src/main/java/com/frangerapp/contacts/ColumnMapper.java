@@ -32,12 +32,16 @@ class ColumnMapper {
         }
     }
 
-    static void mapPhoneNumber (Cursor cursor, Contact contact, int columnIndex) {
-        String phoneNumber = cursor.getString(columnIndex);
+    static void mapPhoneNumber(Cursor cursor, Contact contact, int dataColumnIndex) {
+        String phoneNumber = cursor.getString(dataColumnIndex);
         if (phoneNumber != null && !phoneNumber.isEmpty()) {
             // Remove all whitespaces
             phoneNumber = phoneNumber.replaceAll("\\s+","");
-            contact.getPhoneNumbers().add(phoneNumber);
+//            String phoneType =  cursor.getString(indexPhoneType);
+            PhoneNumber  phoneNumber1 = new PhoneNumber();
+            phoneNumber1.setPhoneNumber(phoneNumber);
+//            phoneNumber1.setPhoneType(phoneType);
+            contact.getPhoneNumbers().add(phoneNumber1);
         }
     }
 

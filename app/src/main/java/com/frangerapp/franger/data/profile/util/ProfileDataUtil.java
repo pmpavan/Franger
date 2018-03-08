@@ -2,6 +2,7 @@ package com.frangerapp.franger.data.profile.util;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.contacts.Contact;
+import com.frangerapp.contacts.PhoneNumber;
 import com.frangerapp.franger.data.profile.model.ContactSyncRequest;
 import com.frangerapp.franger.data.profile.model.ContactSyncRequestData;
 import com.frangerapp.franger.data.profile.model.ProfileDataRequest;
@@ -45,17 +46,17 @@ public class ProfileDataUtil {
             for (Contact phoneNumber : phoneNumberHashMap) {
                 ContactSyncRequestData contactSyncRequestData = new ContactSyncRequestData();
                 if (!phoneNumber.getPhoneNumbers().isEmpty()) {
-                    for (String phoneNum : phoneNumber.getPhoneNumbers()) {
-                        contactSyncRequestData.setOriginalNumber(phoneNum);
+                    for (PhoneNumber phoneNum : phoneNumber.getPhoneNumbers()) {
+                        contactSyncRequestData.setOriginalNumber(phoneNum.getPhoneNumber());
                         try {
-                            Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum, "IN");
+                            Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum.getPhoneNumber(), "IN");
                             String number = "";
                             if (cleanedPhoneNumber.hasNationalNumber()) {
                                 number = String.valueOf(cleanedPhoneNumber.getNationalNumber());
                             }
                             contactSyncRequestData.setPureNumber(number);
                         } catch (NumberParseException e) {
-                            contactSyncRequestData.setPureNumber(phoneNum);
+                            contactSyncRequestData.setPureNumber(phoneNum.getPhoneNumber());
                         }
                         contactSyncRequestDataList.add(contactSyncRequestData);
                     }

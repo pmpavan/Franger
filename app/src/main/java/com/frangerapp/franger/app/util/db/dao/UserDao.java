@@ -22,10 +22,10 @@ public interface UserDao {
     void addUser(User user);
 
     @Query("select * from user")
-    public LiveData<List<User>> getAllUser();
+    LiveData<List<User>> getAllUser();
 
-    @Query("select * from user where id = :userId")
-    public List<User> getUser(long userId);
+    @Query("select * from user where userId = :userId")
+    LiveData<User> getUser(String userId);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateUser(User user);

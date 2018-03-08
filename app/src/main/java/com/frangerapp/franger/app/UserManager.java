@@ -37,12 +37,10 @@ public class UserManager {
     // create user component, providing it saved user details to be shared across the user component.
     public boolean createUserSession() {
         boolean isUserSessionCreated = false;
-        FRLogger.msg("createUserSession user manager " + userStore.getUser());
         if (userStore.getUser() != null) {
             FrangerApp.get(context).createUserComponent(userStore.getUser());
             isUserSessionCreated = true;
         }
-        FRLogger.msg("createUserSession user manager " + isUserSessionCreated);
         return isUserSessionCreated;
     }
 

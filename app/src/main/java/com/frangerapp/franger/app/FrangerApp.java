@@ -8,6 +8,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.BuildConfig;
 import com.frangerapp.franger.app.util.AppConstants;
+import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.component.AppComponent;
 import com.frangerapp.franger.app.util.di.component.DaggerAppComponent;
 import com.frangerapp.franger.app.util.di.component.login.LoginComponent;
@@ -37,18 +38,25 @@ public class FrangerApp extends Application {
     private LoginComponent loginComponent;
     private UserComponent userComponent;
 
+    private AppDatabase appDatabase;
+
     @Override
     public void onCreate() {
         super.onCreate();
         initFabric();
+        initDatabase();
 
 
         appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
+                .appModule(new AppModule(this,appDatabase))
                 .build();
 
         initializeRXGlobalErrorConsumer();
         enableLogger();
+    }
+
+    private void initDatabase() {
+        appDatabase = AppDatabase.getDatabase(this);
     }
 
     public static FrangerApp get(Context context) {
@@ -57,6 +65,10 @@ public class FrangerApp extends Application {
 
     public AppComponent appComponent() {
         return appComponent;
+    }
+
+    public AppDatabase appDatabase() {
+        return appDatabase;
     }
 
 

@@ -15,8 +15,19 @@ public class User {
     @NotNull
     public String phoneNumber;
     @NotNull
-    public String originalPhoneNumber;
+    public String cleanedPhoneNumber;
     public String userId;
     public String displayName;
-    public int phoneNumberType;
+    public String phoneNumberType;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "phoneNumber='" + phoneNumber + '\'' +
+                ", cleanedPhoneNumber='" + cleanedPhoneNumber + '\'' +
+                ", userId='" + userId + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", phoneNumberType='" + phoneNumberType + '\'' +
+                '}';
+    }
 }

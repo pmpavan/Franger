@@ -31,9 +31,11 @@ import dagger.Provides;
 public class AppModule {
 
     private FrangerApp app;
+    private AppDatabase appDatabase;
 
-    public AppModule(FrangerApp app) {
+    public AppModule(FrangerApp app, AppDatabase appDatabase) {
         this.app = app;
+        this.appDatabase = appDatabase;
     }
 
     @Singleton
@@ -92,7 +94,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    AppDatabase getDatabase(@NonNull Context context) {
-        return AppDatabase.getDatabase(context);
+    AppDatabase getDatabase() {
+        return appDatabase;
     }
 }

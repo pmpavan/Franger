@@ -22,7 +22,7 @@ public class Contact implements Comparable<Contact> {
     private Uri mPhoto;
     private Uri mThumbnail;
     private Set<String> mEmails = new HashSet<>();
-    private Set<String> mPhoneNumbers = new HashSet<>();
+    private Set<PhoneNumber> mPhoneNumbers = new HashSet<>();
 
     Contact(long id) {
         this.mId = id;
@@ -80,11 +80,11 @@ public class Contact implements Comparable<Contact> {
         mEmails = emails;
     }
 
-    public Set<String> getPhoneNumbers() {
+    public Set<PhoneNumber> getPhoneNumbers() {
         return mPhoneNumbers;
     }
 
-    public void setPhoneNumbers(Set<String> phoneNumbers) {
+    public void setPhoneNumbers(Set<PhoneNumber> phoneNumbers) {
         mPhoneNumbers = phoneNumbers;
     }
 
