@@ -10,6 +10,7 @@ import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.InviteEvent;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
@@ -17,6 +18,8 @@ import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
+import com.frangerapp.franger.viewmodel.invite.eventbus.InviteUserEvent;
+import com.frangerapp.franger.viewmodel.invite.util.InviteUserPresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -81,17 +84,6 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     private void onComplete() {
         FRLogger.msg("onComplete");
-        showLoading.set(false);
-//        profileInteractor.getExistingUsersList()
-//                .toObservable()
-//                .concatMapIterable(user -> user)
-//                .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
-//                .toList()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
-
-
 
         Observable.zip(profileInteractor.getExistingUsersList().toObservable(), profileInteractor.getNonFrangerUsersList().toObservable(),
                 (users, users2) -> {
@@ -105,13 +97,6 @@ public class InviteUserViewModel extends UserBaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
-//        Observable.merge(profileInteractor.getExistingUsersList().toObservable(), profileInteractor.getNonFrangerUsersList().toObservable())
-//                .concatMapIterable(user -> user)
-//                .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
-//                .toList()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
     }
 
 
@@ -121,6 +106,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     private void onPhoneNumberAssociated(List<InviteUserListItemViewModel> inviteUserListItemViewModels) {
         FRLogger.msg("invite user list " + inviteUserListItemViewModels);
+        showLoading.set(false);
         itemViewModels.addAll(inviteUserListItemViewModels);
         inviteUserList.set(itemViewModels);
 
@@ -134,9 +120,14 @@ public class InviteUserViewModel extends UserBaseViewModel {
     private void onFailure(Throwable throwable) {
         FRLogger.msg("onfailure " + throwable.getMessage());
         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-        onComplete();
     }
 
+    public void onNextClicked(){
+        profileInteractor.setUserInviteCompleted();
+        InviteUserEvent event =new InviteUserEvent();
+        event.setId(InviteUserPresentationConstants.ON_NEXT_BTN_CLICKED);
+        eventBus.post(event);
+    }
 
     public final BaseBindingAdapters.ItemClickHandler<InviteUserListItemViewModel> itemClickHandler = (position, item) -> {
         FRLogger.msg("item " + item);

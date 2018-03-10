@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.util.DataConstants;
 import com.frangerapp.franger.data.util.FRUtils;
 import com.frangerapp.franger.domain.user.model.User;

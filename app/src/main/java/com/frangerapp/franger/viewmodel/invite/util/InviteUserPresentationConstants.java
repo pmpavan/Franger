@@ -6,4 +6,5 @@ package com.frangerapp.franger.viewmodel.invite.util;
 
 public class InviteUserPresentationConstants {
 
+    public static final int ON_NEXT_BTN_CLICKED = 500;
 }

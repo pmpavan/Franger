@@ -126,7 +126,6 @@ public class ProfilePresentationImpl implements ProfileInteractor {
         User user = new User();
         user.phoneNumber = joined.getOriginalNumber();
         user.userId = joined.getUserId();
-        FRLogger.msg("list models 1 user 1" + user.toString());
         appDatabase.userDao().updateUser(joined.getUserId(), joined.getOriginalNumber());
     }
 
@@ -143,5 +142,10 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     @Override
     public void clearUsersList() {
         appDatabase.userDao().removeAllUsers();
+    }
+
+    @Override
+    public void setUserInviteCompleted() {
+        userStore.setUserOnboarded(context, true);
     }
 }

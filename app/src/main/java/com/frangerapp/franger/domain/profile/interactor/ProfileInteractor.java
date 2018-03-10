@@ -29,4 +29,6 @@ public interface ProfileInteractor {
     Single<List<User>> getNonFrangerUsersList();
 
     void clearUsersList();
+
+    void setUserInviteCompleted();
 }
