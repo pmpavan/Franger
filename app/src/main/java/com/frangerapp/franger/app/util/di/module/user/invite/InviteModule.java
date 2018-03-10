@@ -1,5 +1,6 @@
 package com.frangerapp.franger.app.util.di.module.user.invite;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -25,7 +26,10 @@ import dagger.Provides;
 @Module
 public class InviteModule {
 
+    private final Activity activity;
+
     public InviteModule(@NonNull InviteActivity activity) {
+        this.activity = activity;
     }
 
     @Provides

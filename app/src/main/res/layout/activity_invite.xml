@@ -10,28 +10,44 @@
             type="com.frangerapp.franger.viewmodel.invite.InviteUserViewModel" />
     </data>
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context="com.frangerapp.franger.ui.invite.InviteActivity">
 
-        <android.support.design.widget.AppBarLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        </android.support.design.widget.AppBarLayout>
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-    </android.support.design.widget.CoordinatorLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/inviteListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:visibility="@{!vm.showLoading}"
+                app:adapter="@{vm.inviteUserList}"
+                app:layoutManager="LinearLayoutManager"
+                app:listitem="@{@layout/invite_user_list_item}"
+                app:onItemClick="@{vm.itemClickHandler}"
+                tools:context=".ui.invite.InviteActivity"
+                tools:listitem="@layout/invite_user_list_item" />
+
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:visibility="@{vm.showLoading}" />
+        </RelativeLayout>
+
+    </LinearLayout>
 </layout>
