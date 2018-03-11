@@ -27,4 +27,6 @@
     <string name="user_name_blank_error">Name can\'t be blank</string>
     <string name="invite">Invite</string>
     <string name="next">Next</string>
+    <string name="common_error_msg">Some Problem in Server</string>
+    <string name="search">Search</string>
 </resources>

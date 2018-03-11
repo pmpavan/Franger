@@ -14,6 +14,7 @@ import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.login.SplashModule
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
 import com.frangerapp.franger.ui.BaseActivity
+import com.frangerapp.franger.ui.contact.ContactActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
@@ -59,12 +60,15 @@ class HomeActivity : UserBaseActivity() {
         tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            goToContactsPage()
         }
 
     }
 
+    private fun goToContactsPage(){
+        val intent = ContactActivity.newInstance(this@HomeActivity)
+        startActivity(intent)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

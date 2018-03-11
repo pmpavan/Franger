@@ -10,10 +10,49 @@
             type="com.frangerapp.franger.viewmodel.contact.ContactViewModel" />
     </data>
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.frangerapp.franger.ui.contact.ContactActivity">
+        android:fitsSystemWindows="true"
+        tools:context=".ui.contact.ContactActivity">
 
-    </RelativeLayout>
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:visibility="@{!vm.showLoading}"
+                app:adapter="@{vm.inviteUserList}"
+                app:layoutManager="LinearLayoutManager"
+                app:listitem="@{@layout/contact_list_item}"
+                app:onItemClick="@{vm.itemClickHandler}"
+                tools:context=".ui.contact.ContactActivity"
+                tools:listitem="@layout/contact_list_item" />
+
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:visibility="@{vm.showLoading}" />
+        </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

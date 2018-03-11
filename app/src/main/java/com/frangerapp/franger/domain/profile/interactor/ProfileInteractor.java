@@ -28,6 +28,8 @@ public interface ProfileInteractor {
 
     Single<List<User>> getNonFrangerUsersList();
 
+    Observable<List<User>> getSortedUsersList();
+
     void clearUsersList();
 
     void setUserInviteCompleted();

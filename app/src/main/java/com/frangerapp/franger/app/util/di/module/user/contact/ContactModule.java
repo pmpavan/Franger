@@ -11,7 +11,6 @@ import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.contact.ContactActivity;
 import com.frangerapp.franger.viewmodel.contact.ContactViewModel;
-import com.frangerapp.franger.viewmodel.invite.InviteUserViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;

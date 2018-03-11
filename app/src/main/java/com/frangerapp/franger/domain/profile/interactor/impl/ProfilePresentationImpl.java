@@ -24,6 +24,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -137,6 +138,16 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     @Override
     public Single<List<User>> getNonFrangerUsersList() {
         return appDatabase.userDao().getNonExistingUsers();
+    }
+
+    @Override
+    public Observable<List<User>> getSortedUsersList() {
+        return Observable.zip(getExistingUsersList().toObservable(), getNonFrangerUsersList().toObservable(),
+                (users, users2) -> {
+                    List<com.frangerapp.franger.app.util.db.entity.User> list = new ArrayList<>(users);
+                    list.addAll(users2);
+                    return list;
+                });
     }
 
     @Override

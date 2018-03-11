@@ -85,12 +85,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
     private void onComplete() {
         FRLogger.msg("onComplete");
 
-        Observable.zip(profileInteractor.getExistingUsersList().toObservable(), profileInteractor.getNonFrangerUsersList().toObservable(),
-                (users, users2) -> {
-                    List<com.frangerapp.franger.app.util.db.entity.User> list = new ArrayList<>(users);
-                    list.addAll(users2);
-                    return list;
-                })
+        profileInteractor.getSortedUsersList()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
                 .toList()
