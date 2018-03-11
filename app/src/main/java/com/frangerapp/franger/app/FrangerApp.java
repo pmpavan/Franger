@@ -53,6 +53,8 @@ public class FrangerApp extends Application {
 
         initializeRXGlobalErrorConsumer();
         enableLogger();
+
+
     }
 
     private void initDatabase() {

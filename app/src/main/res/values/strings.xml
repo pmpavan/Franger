@@ -29,4 +29,6 @@
     <string name="next">Next</string>
     <string name="common_error_msg">Some Problem in Server</string>
     <string name="search">Search</string>
+    <string name="incoming">Incoming</string>
+    <string name="outgoing">Outgoing</string>
 </resources>

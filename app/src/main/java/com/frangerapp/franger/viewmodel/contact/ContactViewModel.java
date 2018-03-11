@@ -68,9 +68,9 @@ public class ContactViewModel extends BaseViewModel {
         rxPermissions.request(Manifest.permission.READ_CONTACTS)
                 .subscribe(granted -> {
                     if (granted) { // Always true pre-M
-//                        syncContacts(user);
+                        syncContacts(user);
                     } else {
-                        // Oups permission denied
+                        // Oops permission denied
                         Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -107,7 +107,8 @@ public class ContactViewModel extends BaseViewModel {
     private void onPhoneNumberAssociated(List<ContactListItemViewModel> inviteUserListItemViewModels) {
         showLoading.set(false);
         itemViewModels.addAll(inviteUserListItemViewModels);
-        inviteUserList.set(itemViewModels);
+        if (searchTxt.get().isEmpty())
+            inviteUserList.set(itemViewModels);
 
     }
 
@@ -131,17 +132,11 @@ public class ContactViewModel extends BaseViewModel {
 
     public void onQueryTextChanged(@Nullable String newText) {
         searchTxt.set(newText);
-//        if (TextUtils.isEmpty(newText)) {
-//            adapter.filter("");
-//            listView.clearTextFilter();
-//        } else {
-//            adapter.filter(newText);
-//        }
     }
 
     private void initSearch() {
         FieldUtils.toObservable(searchTxt)
-                .debounce(10L, TimeUnit.MILLISECONDS)
+                .debounce(30L, TimeUnit.MILLISECONDS)
                 .subscribe(this::filterContacts, t -> FRLogger.msg("Error " + t.getMessage()));
     }
 

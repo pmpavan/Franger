@@ -1,4 +1,4 @@
-package com.frangerapp.socket;
+package com.franger.socket;
 
 import org.junit.Test;
 
