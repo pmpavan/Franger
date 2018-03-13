@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.franger.mobile.logger.FRLogger;
+import com.franger.socket.SocketHelper;
+import com.franger.socket.SocketIOCallbacks;
+import com.franger.socket.socketio.SocketIOManager;
 import com.frangerapp.franger.BuildConfig;
 import com.frangerapp.franger.app.util.AppConstants;
 import com.frangerapp.franger.app.util.db.AppDatabase;
@@ -16,6 +19,8 @@ import com.frangerapp.franger.app.util.di.component.user.UserComponent;
 import com.frangerapp.franger.app.util.di.module.app.AppModule;
 import com.frangerapp.franger.app.util.di.module.login.LoginModule;
 import com.frangerapp.franger.app.util.di.module.user.UserModule;
+import com.frangerapp.franger.data.common.util.DataConstants;
+import com.frangerapp.franger.data.util.ChatUtils;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.network.HttpClientException;
 
@@ -23,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.exceptions.UndeliverableException;
@@ -32,33 +38,38 @@ import io.reactivex.plugins.RxJavaPlugins;
  * Created by Pavan on 15/01/18.
  */
 
-public class FrangerApp extends Application {
+public class FrangerApp extends Application implements SocketIOCallbacks {
 
     private AppComponent appComponent;
     private LoginComponent loginComponent;
     private UserComponent userComponent;
 
     private AppDatabase appDatabase;
+    private SocketIOManager socketIOManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         initFabric();
         initDatabase();
-
+//        initSocket();
 
         appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this,appDatabase))
+                .appModule(new AppModule(this, appDatabase))
                 .build();
 
         initializeRXGlobalErrorConsumer();
         enableLogger();
 
-
     }
 
     private void initDatabase() {
         appDatabase = AppDatabase.getDatabase(this);
+    }
+
+    private void initSocket() {
+        socketIOManager = SocketIOManager.getInstance(this);
+        socketIOManager.createASocket(ChatUtils.getDomainName(), new ArrayList<>());
     }
 
     public static FrangerApp get(Context context) {
@@ -71,6 +82,10 @@ public class FrangerApp extends Application {
 
     public AppDatabase appDatabase() {
         return appDatabase;
+    }
+
+    public SocketIOManager socketIOManager() {
+        return socketIOManager;
     }
 
 
@@ -154,5 +169,45 @@ public class FrangerApp extends Application {
                         .uncaughtException(Thread.currentThread(), e);
             }
         });
+    }
+
+    @Override
+    public void onConnecting(String TAG) {
+
+    }
+
+    @Override
+    public void onSocketCreated(String TAG) {
+
+    }
+
+    @Override
+    public void onMessage(String TAG, String message) {
+
+    }
+
+    @Override
+    public void progressChanged(String TAG, int progress) {
+
+    }
+
+    @Override
+    public void on(String TAG, String event, Object... args) {
+
+    }
+
+    @Override
+    public void onError(String TAG, SocketHelper errorCode) {
+
+    }
+
+    @Override
+    public void onDisconnecting(String TAG) {
+
+    }
+
+    @Override
+    public void onSocketDestroyed(String TAG) {
+
     }
 }

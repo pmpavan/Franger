@@ -36,4 +36,8 @@ public class DataConstants {
     public static final String PROTOCOL = "http://";
     public static final String EMPTY = "";
 
+
+    public static final String DOMAIN_URL = "http://139.59.46.115:8080/";
+    public static final String USERS_URL = "users";
+    public static final String SOCKET_URL = "socket";
 }

@@ -39,7 +39,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ProfilePresentationImpl implements ProfileInteractor {
 
-    private static final String TAG = LoginPresenterImpl.class.getName();
+    private static final String TAG = ProfilePresentationImpl.class.getName();
 
     private Context context;
     private ProfileApi profileApi;
@@ -51,6 +51,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
         this.profileApi = profileApi;
         this.userStore = userStore;
         this.appDatabase = appDatabase;
+
     }
 
     @Override

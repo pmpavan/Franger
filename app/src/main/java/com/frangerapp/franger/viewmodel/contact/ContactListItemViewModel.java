@@ -5,12 +5,13 @@ import android.databinding.ObservableBoolean;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
+import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 /**
  * Created by pavanm on 11/03/18.
  */
 
-public class ContactListItemViewModel extends BaseViewModel {
+public class ContactListItemViewModel extends UserBaseViewModel {
 
 
     public String phoneNumber;

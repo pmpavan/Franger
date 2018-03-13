@@ -32,11 +32,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="451dp"
+            android:gravity="center"
+            android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:context="com.frangerapp.franger.ui.profile.AddEditProfileActivity"
             tools:layout_editor_absoluteY="60dp"
-            android:orientation="vertical"
-            android:gravity="center"
             tools:showIn="@layout/activity_edit_profile">
 
             <TextView
@@ -49,6 +49,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/userNameEditText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
             <EditText
                 android:id="@+id/userNameEditText"
                 android:layout_width="match_parent"
@@ -59,6 +60,7 @@
                 android:inputType="textPersonName"
                 android:maxLines="1"
                 android:text="@={vm.userNameTxt}"
+                android:textAlignment="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,10 +71,10 @@
                 android:id="@+id/errorTxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/user_name_blank_error"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="15dp"
+                android:text="@string/user_name_blank_error"
                 android:textColor="@color/red"
                 android:visibility="@{vm.errorVisibility}"
                 app:layout_constraintStart_toStartOf="@+id/userNameEditText"

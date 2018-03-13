@@ -7,6 +7,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import com.franger.mobile.logger.FRLogger
 import com.frangerapp.franger.R
@@ -100,7 +101,8 @@ class VerifyUserActivity : LoginBaseActivity() {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
                 Toast.makeText(this@VerifyUserActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
-                moveToEditProfilePage()
+                Handler().postDelayed({ moveToEditProfilePage() }, 500)
+
             }
             LoginPresentationConstants.VALID_OTP_REQUEST_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()

@@ -20,6 +20,7 @@ import com.frangerapp.franger.ui.BaseBindingAdapters;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.databinding.FieldUtils;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
+import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,7 +38,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by pavanm on 10/03/18.
  */
 
-public class ContactViewModel extends BaseViewModel {
+public class ContactViewModel extends UserBaseViewModel {
 
 
     private User user;

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
@@ -104,7 +105,8 @@ class LoginActivity : LoginBaseActivity() {
                 viewDataBinding.btnLogin.doneLoadingAnimation(getColorRes(R.color.red),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_done_white_48dp))
                 Toast.makeText(this@LoginActivity, loginViewEvent.message, Toast.LENGTH_SHORT).show()
-                moveToVerifyUserPage()
+                Handler().postDelayed({ moveToVerifyUserPage() }, 500)
+
             }
             LoginPresentationConstants.VALID_NUMBER_CHECK_FAIL -> {
                 viewDataBinding.btnLogin.revertAnimation()

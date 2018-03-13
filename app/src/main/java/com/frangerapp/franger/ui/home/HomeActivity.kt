@@ -1,9 +1,11 @@
 package com.frangerapp.franger.ui.home
 
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -11,13 +13,15 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.view.*
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
-import com.frangerapp.franger.app.util.di.module.login.SplashModule
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
-import com.frangerapp.franger.ui.BaseActivity
+import com.frangerapp.franger.databinding.ActivityHomeBinding
 import com.frangerapp.franger.ui.contact.ContactActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
+import com.frangerapp.franger.viewmodel.home.HomeViewModel
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
+import org.greenrobot.eventbus.EventBus
+import javax.inject.Inject
 
 class HomeActivity : UserBaseActivity() {
 
@@ -29,6 +33,13 @@ class HomeActivity : UserBaseActivity() {
         }
     }
 
+    @Inject
+    lateinit var eventBus: EventBus
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+
+    private lateinit var viewDataBinding: ActivityHomeBinding
+    private lateinit var viewModel: HomeViewModel
     /**
      * The [android.support.v4.view.PagerAdapter] that will provide
      * fragments for each of the sections. We use a
@@ -41,14 +52,35 @@ class HomeActivity : UserBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
 
-        setSupportActionBar(toolbar)
 
         FrangerApp.get(this@HomeActivity)
                 .userComponent()
                 .plus(HomeModule(this@HomeActivity))
                 .inject(this@HomeActivity)
+
+
+        invokeDataBinding()
+        setupViews()
+        setupControllers()
+        onPageLoaded()
+    }
+
+    private fun invokeDataBinding() {
+        viewModel = ViewModelProviders.of(this@HomeActivity, factory).get(HomeViewModel::class.java)
+        viewDataBinding = DataBindingUtil.setContentView(this@HomeActivity, R.layout.activity_home)
+        viewDataBinding.vm = viewModel
+        viewDataBinding.executePendingBindings()
+    }
+
+    private fun setupViews() {
+        setSupportActionBar(toolbar)
+
+        setupAdapter()
+
+    }
+
+    private fun setupAdapter() {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
@@ -59,27 +91,29 @@ class HomeActivity : UserBaseActivity() {
         container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
         tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
-        fab.setOnClickListener { view ->
+    }
+
+    private fun setupControllers() {
+        fab.setOnClickListener { _ ->
             goToContactsPage()
         }
+    }
+
+    private fun onPageLoaded() {
 
     }
 
-    private fun goToContactsPage(){
+    private fun goToContactsPage() {
         val intent = ContactActivity.newInstance(this@HomeActivity)
         startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_home, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
 
         if (id == R.id.action_settings) {
