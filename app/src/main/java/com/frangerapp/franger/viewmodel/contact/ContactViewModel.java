@@ -1,7 +1,5 @@
 package com.frangerapp.franger.viewmodel.contact;
 
-import android.Manifest;
-import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
@@ -17,11 +15,11 @@ import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
 import com.frangerapp.franger.viewmodel.common.databinding.FieldUtils;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
+import com.frangerapp.franger.viewmodel.contact.eventbus.ContactEvent;
+import com.frangerapp.franger.viewmodel.contact.util.ContactPresentaionConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.Nullable;
@@ -64,20 +62,7 @@ public class ContactViewModel extends UserBaseViewModel {
     }
 
 
-    public void checkForContactsPermission(Activity activity) {
-        RxPermissions rxPermissions = new RxPermissions(activity);
-        rxPermissions.request(Manifest.permission.READ_CONTACTS)
-                .subscribe(granted -> {
-                    if (granted) { // Always true pre-M
-                        syncContacts(user);
-                    } else {
-                        // Oops permission denied
-                        Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void syncContacts(User user) {
+    private void syncContacts() {
         if (itemViewModels.size() <= 0)
             showLoading.set(true);
         profileInteractor.clearUsersList();
@@ -125,10 +110,12 @@ public class ContactViewModel extends UserBaseViewModel {
 
     public final BaseBindingAdapters.ItemClickHandler<ContactListItemViewModel> itemClickHandler = (position, item) -> {
         FRLogger.msg("item " + item);
-//        CountriesViewEvent countriesViewEvent = CountriesViewEvent.builder();
-//        countriesViewEvent.setId(CountriesPresentationConstants.COUNTRY_ITEM_CLICKED);
-//        countriesViewEvent.setCountriesListItemViewModel(item);
-//        eventBus.post(countriesViewEvent);
+        if (item.getUserId() != null) {
+            ContactEvent contactEvent = new ContactEvent();
+            contactEvent.setId(ContactPresentaionConstants.ON_CONTACT_ITEM_CLCKD);
+            contactEvent.setContactObj(item);
+            eventBus.post(contactEvent);
+        }
     };
 
     public void onQueryTextChanged(@Nullable String newText) {
@@ -155,6 +142,15 @@ public class ContactViewModel extends UserBaseViewModel {
         if (contactListItemViewModels == null)
             contactListItemViewModels = new ArrayList<>();
         inviteUserList.set(contactListItemViewModels);
+    }
+
+    public void handleReadContactsPermission(boolean granted) {
+        if (granted) { // Always true pre-M
+            syncContacts();
+        } else {
+            // Oops permission denied
+            Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

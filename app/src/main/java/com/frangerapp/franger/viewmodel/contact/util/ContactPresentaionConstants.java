@@ -5,4 +5,6 @@ package com.frangerapp.franger.viewmodel.contact.util;
  */
 
 public class ContactPresentaionConstants {
+
+    public static final int ON_CONTACT_ITEM_CLCKD =800;
 }

@@ -23,6 +23,10 @@ public interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addUser(User user);
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addUser(List<User> users);
+
     @Query("select * FROM user  GROUP BY (case when userId is not null then 1 else 0 end) ORDER BY displayName ASC")
     Single<List<User>> getAllUserByGroup();
 

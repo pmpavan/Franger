@@ -1,13 +1,16 @@
 package com.frangerapp.franger.ui.chat
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule
 import com.frangerapp.franger.databinding.ActivityChatBinding
+import com.frangerapp.franger.ui.contact.ContactActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel
 import org.greenrobot.eventbus.EventBus
@@ -15,6 +18,13 @@ import javax.inject.Inject
 
 class ChatActivity : UserBaseActivity() {
 
+
+    companion object {
+        fun newInstance(activity: Activity): Intent {
+            val intent = Intent(activity, ChatActivity::class.java)
+            return intent
+        }
+    }
 
     @Inject
     lateinit var eventBus: EventBus

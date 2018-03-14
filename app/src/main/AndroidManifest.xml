@@ -49,7 +49,9 @@
         <activity
             android:name=".ui.contact.ContactActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.chat.ChatActivity"></activity>
+        <activity
+            android:name=".ui.chat.ChatActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

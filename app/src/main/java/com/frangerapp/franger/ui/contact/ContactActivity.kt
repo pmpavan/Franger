@@ -1,5 +1,6 @@
 package com.frangerapp.franger.ui.contact
 
+import android.Manifest
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -7,15 +8,19 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.SearchView
-import android.text.TextUtils
 import android.view.Menu
+import android.widget.Toast
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.contact.ContactModule
 import com.frangerapp.franger.databinding.ActivityContactBinding
+import com.frangerapp.franger.ui.chat.ChatActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
+import com.frangerapp.franger.viewmodel.contact.ContactListItemViewModel
 import com.frangerapp.franger.viewmodel.contact.ContactViewModel
 import com.frangerapp.franger.viewmodel.contact.eventbus.ContactEvent
+import com.frangerapp.franger.viewmodel.contact.util.ContactPresentaionConstants
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_contact.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -83,15 +88,30 @@ class ContactActivity : UserBaseActivity() {
     }
 
     private fun onPageLoaded() {
-        viewModel.checkForContactsPermission(this@ContactActivity)
+        checkForContactsPermission(this@ContactActivity)
+    }
+
+    private fun checkForContactsPermission(activity: Activity) {
+        val rxPermissions = RxPermissions(activity)
+        rxPermissions.request(Manifest.permission.READ_CONTACTS)
+                .subscribe { granted ->
+                    viewModel.handleReadContactsPermission(granted)
+                }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(loginViewEvent: ContactEvent) {
         when (loginViewEvent.id) {
-//            ContactPresentaionConstants.ON_NEXT_BTN_CLICKED -> {
-//            }
+            ContactPresentaionConstants.ON_CONTACT_ITEM_CLCKD -> {
+                val contact = loginViewEvent.contactObj;
+                goToChatActivity(contact)
+            }
         }
+    }
+
+    private fun goToChatActivity(contact: ContactListItemViewModel) {
+        val intent = ChatActivity.newInstance(this@ContactActivity)
+        startActivity(intent)
     }
 
 
@@ -117,4 +137,6 @@ class ContactActivity : UserBaseActivity() {
         super.onDestroy()
         viewModel.onViewDestroyed()
     }
+
+
 }

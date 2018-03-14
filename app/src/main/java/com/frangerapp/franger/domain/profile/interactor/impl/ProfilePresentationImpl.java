@@ -90,6 +90,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
 
     private void addUserToDb(List<Contact> lists) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        ArrayList<User> users = new ArrayList<>();
         for (Contact contact : lists) {
             if (contact.getPhoneNumbers() != null || !contact.getPhoneNumbers().isEmpty())
                 for (PhoneNumber phoneNumber : contact.getPhoneNumbers()) {
@@ -105,10 +106,12 @@ public class ProfilePresentationImpl implements ProfileInteractor {
                     } catch (NumberParseException ignored) {
                     }
                     user.cleanedPhoneNumber = phoneNum;
-//                                user.phoneNumberType = phoneNumber.getPhoneType();
-                    appDatabase.userDao().addUser(user);
+//                    user.phoneNumberType = phoneNumber.getPhoneType();
+                    users.add(user);
                 }
         }
+        if (users.size() > 0)
+            appDatabase.userDao().addUser(users);
     }
 
     private Observable<Joined> updateUserTableWithId(ContactSyncResponse listViewModels) {
