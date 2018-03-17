@@ -27,13 +27,10 @@ public interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addUser(List<User> users);
 
-    @Query("select * FROM user  GROUP BY (case when userId is not null then 1 else 0 end) ORDER BY displayName ASC")
-    Single<List<User>> getAllUserByGroup();
-
-    @Query("select * FROM user  where (case when userId is not null then 1 else 0 end) ORDER BY displayName ASC")
+    @Query("select * FROM user  where (userId <> 0) ORDER BY displayName ASC")
     Single<List<User>> getExistingUsers();
 
-    @Query("select * FROM user  where (case when userId is  null then 1 else 0 end) ORDER BY displayName ASC")
+    @Query("select * FROM user  where (userId = 0) ORDER BY displayName ASC")
     Single<List<User>> getNonExistingUsers();
 
     @Query("select * from user")
@@ -46,7 +43,7 @@ public interface UserDao {
     void updateUser(User user);
 
     @Query("UPDATE User SET userId = :userId  WHERE phoneNumber = :phoneNumber")
-    int updateUser(String userId,String phoneNumber);
+    int updateUser(String userId, String phoneNumber);
 
     @Query("delete from user")
     void removeAllUsers();

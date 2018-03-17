@@ -8,8 +8,6 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.franger.mobile.logger.FRLogger;
 import com.franger.socket.SocketHelper;
 import com.franger.socket.SocketIOCallbacks;
-import com.franger.socket.socketio.SocketIOManager;
-import com.frangerapp.franger.BuildConfig;
 import com.frangerapp.franger.app.util.AppConstants;
 import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.component.AppComponent;
@@ -19,16 +17,11 @@ import com.frangerapp.franger.app.util.di.component.user.UserComponent;
 import com.frangerapp.franger.app.util.di.module.app.AppModule;
 import com.frangerapp.franger.app.util.di.module.login.LoginModule;
 import com.frangerapp.franger.app.util.di.module.user.UserModule;
-import com.frangerapp.franger.data.common.util.DataConstants;
-import com.frangerapp.franger.data.util.ChatUtils;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.network.HttpClientException;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.exceptions.UndeliverableException;
@@ -45,14 +38,12 @@ public class FrangerApp extends Application implements SocketIOCallbacks {
     private UserComponent userComponent;
 
     private AppDatabase appDatabase;
-    private SocketIOManager socketIOManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         initFabric();
         initDatabase();
-//        initSocket();
 
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this, appDatabase))
@@ -67,11 +58,6 @@ public class FrangerApp extends Application implements SocketIOCallbacks {
         appDatabase = AppDatabase.getDatabase(this);
     }
 
-    private void initSocket() {
-        socketIOManager = SocketIOManager.getInstance(this);
-        socketIOManager.createASocket(ChatUtils.getDomainName(), new ArrayList<>());
-    }
-
     public static FrangerApp get(Context context) {
         return (FrangerApp) context.getApplicationContext();
     }
@@ -83,11 +69,6 @@ public class FrangerApp extends Application implements SocketIOCallbacks {
     public AppDatabase appDatabase() {
         return appDatabase;
     }
-
-    public SocketIOManager socketIOManager() {
-        return socketIOManager;
-    }
-
 
     private void initFabric() {
         CrashlyticsCore core = new CrashlyticsCore.Builder()

@@ -10,7 +10,7 @@ import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule
 import com.frangerapp.franger.databinding.ActivityChatBinding
-import com.frangerapp.franger.ui.contact.ContactActivity
+import com.frangerapp.franger.domain.chat.model.ChatContact
 import com.frangerapp.franger.ui.user.UserBaseActivity
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel
 import org.greenrobot.eventbus.EventBus
@@ -20,8 +20,12 @@ class ChatActivity : UserBaseActivity() {
 
 
     companion object {
-        fun newInstance(activity: Activity): Intent {
+        private val ARG_CONTACT = "arg_contact"
+        private val ARG_IS_INCOMING = "arg_is_incoming"
+        fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean): Intent {
             val intent = Intent(activity, ChatActivity::class.java)
+            intent.putExtra(ARG_CONTACT, user)
+            intent.putExtra(ARG_IS_INCOMING, isIncoming)
             return intent
         }
     }
@@ -40,11 +44,22 @@ class ChatActivity : UserBaseActivity() {
                 .plus(ChatModule(this@ChatActivity))
                 .inject(this@ChatActivity)
 
-
+        messageFromAliens()
         invokeDataBinding()
         setupViews()
         setupControllers()
         onPageLoaded()
+    }
+
+    private lateinit var chatContact: ChatContact
+
+    private var isIncoming: Boolean = false
+
+    private fun messageFromAliens() {
+        if (intent != null) {
+            chatContact = intent.getParcelableExtra(ARG_CONTACT)
+            isIncoming = intent.getBooleanExtra(ARG_IS_INCOMING, false)
+        }
     }
 
     private fun invokeDataBinding() {
@@ -54,6 +69,7 @@ class ChatActivity : UserBaseActivity() {
         viewDataBinding.executePendingBindings()
     }
 
+
     private fun setupViews() {
 
     }
@@ -62,6 +78,6 @@ class ChatActivity : UserBaseActivity() {
     }
 
     private fun onPageLoaded() {
-
+        viewModel.onPageLoaded(chatContact, isIncoming)
     }
 }

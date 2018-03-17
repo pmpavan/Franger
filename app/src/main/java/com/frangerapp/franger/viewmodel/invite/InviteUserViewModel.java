@@ -84,7 +84,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     private void onComplete() {
         FRLogger.msg("onComplete");
-
+        itemViewModels = new ArrayList<>();
         profileInteractor.getSortedUsersList()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))

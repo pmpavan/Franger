@@ -110,7 +110,7 @@ class ContactActivity : UserBaseActivity() {
     }
 
     private fun goToChatActivity(contact: ContactListItemViewModel) {
-        val intent = ChatActivity.newInstance(this@ContactActivity)
+        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false)
         startActivity(intent)
     }
 

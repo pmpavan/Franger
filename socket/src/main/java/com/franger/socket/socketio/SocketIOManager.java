@@ -19,15 +19,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * Wrapper for Socket.io for handling all socket related operations.
  * Makes use of the SocketIOCallbacks interface to deliver callbacks.
  */
-public class SocketIOManager implements com.franger.socket.Socket {
+public class SocketIOManager {
 
     private static SocketIOManager socketIOManager;
+    private String url;
 
     private SocketIOCallbacks socketIOCallbacks;
 
     private String DEBUG_TAG = "SocketIOManager";
 
     private Context context;
+
+    private Socket mSocket;
 
     //Thread safe hashmap, so concurrrency issues could be avoided
     private ConcurrentHashMap<String, Socket> mSocketMap = new ConcurrentHashMap<>();
@@ -37,20 +40,21 @@ public class SocketIOManager implements com.franger.socket.Socket {
      *
      * @param context
      */
-    private SocketIOManager(Context context) {
+    private SocketIOManager(Context context, String url) {
         this.context = context;
+        this.url = url;
+        this.mSocket = getSocket(url, null);
     }
 
     /**
      * Provides a singleton SocketIOManager instance
      *
      * @param context
-     * @param socketIOCallbacks interface for callbacks
      * @return SocketIOManager
      */
-    public static SocketIOManager getInstance(Context context) {
+    public static SocketIOManager getInstance(Context context, String url) {
         if (socketIOManager == null) {
-            socketIOManager = new SocketIOManager(context);
+            socketIOManager = new SocketIOManager(context, url);
         }
         return socketIOManager;
     }
@@ -60,7 +64,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      *
      * @param socketIOCallbacks
      */
-    @Override
     public void setCallBacks(SocketIOCallbacks socketIOCallbacks) {
         this.socketIOCallbacks = socketIOCallbacks;
     }
@@ -72,14 +75,46 @@ public class SocketIOManager implements com.franger.socket.Socket {
         return createASocket(url, eventsToBeListened, null);
     }
 
+    public Socket getSocket(final String url, SocketOptions opts) {
+        if (url == null) {
+            throw new NullPointerException("URL is null");
+        }
+
+        // Also available is options param to create a socket
+        if (opts == null) {
+            //Setting default options
+            opts = new SocketOptions();
+            opts.setForceNew(true);
+            opts.setReconnection(true);
+            opts.setReconnectionAttempts(5);
+        }
+
+        try {
+            mSocket = IO.socket(url, opts);
+            // Put the created socket into the hashmap
+            mSocketMap.put(url, mSocket);
+            Log.d(DEBUG_TAG, "Socket created with the given TAG : " + url);
+            if (socketIOCallbacks != null)
+                socketIOCallbacks.onSocketCreated(url);
+        } catch (URISyntaxException e) {
+            /**
+             * No need to check if the key is contained, the ConcurrentHashMap.remove() method
+             * does nothing if the key is not found
+             */
+            mSocketMap.remove(url);
+            Log.d(DEBUG_TAG, "Error creating socket with the given URI : " + url);
+            socketIOCallbacks.onError(url, SocketHelper.MALFORMED_URI);
+        }
+        return mSocket;
+    }
+
     /**
      * Creates a new socket and returns its tag with which it can be accessed later
      *
-     * @param url               the channel through which the socket must be opened
-     * @param eventToBeListened the event to which the socket must listen to
+     * @param url                the channel through which the socket must be opened
+     * @param eventsToBeListened the event to which the socket must listen to
      */
 
-    @Override
     public String createASocket(final String url, final List<String> eventsToBeListened, SocketOptions opts) {
 
         if (url == null) {
@@ -101,8 +136,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
             opts.setReconnection(true);
             opts.setReconnectionAttempts(5);
         }
-
-        Socket mSocket = null;
 
         try {
             mSocket = IO.socket(url, opts);
@@ -142,6 +175,56 @@ public class SocketIOManager implements com.franger.socket.Socket {
         return url;
     }
 
+    public void addEventsToBeListened(final List<String> eventsToBeListened, final SocketIOCallbacks callbacks) {
+
+        if (eventsToBeListened == null) {
+            throw new NullPointerException("eventsToBeListened is null");
+        } else if (socketIOCallbacks == null) {
+            throw new NullPointerException("socketIOCallbacks is null");
+        }
+
+        //Finally establish connection
+        try {
+            mSocket.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            callbacks.onError(url, SocketHelper.UNKNOWN_ERROR_WHILE_CONNECTING);
+        }
+        // Register for required event
+        for (final String eventToBeListened : eventsToBeListened) {
+            mSocket.on(eventToBeListened, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    callbacks.on(url, eventToBeListened, args);
+                }
+            });
+        }
+    }
+
+    public void emitAndListenEvents(String tag, String event, final List<String> eventsToBeListened, final SocketIOCallbacks callbacks, Object... message) {
+        if (tag == null) {
+            throw new NullPointerException("Trying to close a socket with null tag");
+        }
+
+        Socket mSocket = mSocketMap.get(tag);
+        if (mSocket != null) {
+            mSocket.connect();
+            mSocket.emit(event, message);
+            for (final String eventToBeListened : eventsToBeListened) {
+                mSocket.on(eventToBeListened, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        callbacks.on(url, eventToBeListened, args);
+                    }
+                });
+            }
+        } else {
+            Log.d(DEBUG_TAG, "Cannot emit. Unable to retrieve socket");
+//            if (callbacks != null)
+                callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
+        }
+    }
+
     /**
      * Emits an event through the socket channel
      *
@@ -149,7 +232,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      * @param event
      * @param message
      */
-    @Override
     public void emitEvent(String tag, String event, Object... message) {
         if (tag == null) {
             throw new NullPointerException("Trying to close a socket with null tag");
@@ -170,7 +252,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      *
      * @param TAG identifier for the socket
      */
-    @Override
     public void closeASocket(String tag) {
 
         if (tag == null) {
@@ -195,7 +276,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      *
      * @param TAG identifier for the socket
      */
-    @Override
     public void stopListening(String tag) {
 
         if (tag == null) {
@@ -217,7 +297,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      * @param TAG   identifier for the socket
      * @param event the event to which the socket must listen to
      */
-    @Override
     public void startListening(final String tag, final String event) {
 
         if (tag == null) {
@@ -250,7 +329,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      * @param TAG identifier for the socket
      * @return if socket is connected
      */
-    @Override
     public boolean isConnected(String tag) {
         if (mSocketMap.containsKey(tag)) {
             return mSocketMap.get(tag).connected();
@@ -265,7 +343,6 @@ public class SocketIOManager implements com.franger.socket.Socket {
      * Can be used on the onDestroy method of the application class when there isn't a need to
      * keep any socket connection open in a service/background thread.
      */
-    @Override
     public void clearAllSockets() {
         for (Socket socket : mSocketMap.values()) {
             socket.close();

@@ -12,6 +12,7 @@ import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
+import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
@@ -63,9 +64,14 @@ public class ContactViewModel extends UserBaseViewModel {
 
 
     private void syncContacts() {
-        if (itemViewModels.size() <= 0)
+        if (itemViewModels.size() == 0)
             showLoading.set(true);
         profileInteractor.clearUsersList();
+
+        /**
+         * TODO Move the logic of loading from db or api to interactor layer
+         * https://proandroiddev.com/the-missing-google-sample-of-android-architecture-components-guide-c7d6e7306b8f
+         */
         profileInteractor.syncContacts(user.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
@@ -75,6 +81,7 @@ public class ContactViewModel extends UserBaseViewModel {
 
     private void onContactsFetchCompleted() {
         FRLogger.msg("onContactsFetchCompleted");
+        itemViewModels = new ArrayList<>();
 
         profileInteractor.getSortedUsersList()
                 .concatMapIterable(user -> user)
@@ -110,7 +117,7 @@ public class ContactViewModel extends UserBaseViewModel {
 
     public final BaseBindingAdapters.ItemClickHandler<ContactListItemViewModel> itemClickHandler = (position, item) -> {
         FRLogger.msg("item " + item);
-        if (item.getUserId() != null) {
+        if (item.getUserId() != null && Long.parseLong(item.getUserId()) != 0) {
             ContactEvent contactEvent = new ContactEvent();
             contactEvent.setId(ContactPresentaionConstants.ON_CONTACT_ITEM_CLCKD);
             contactEvent.setContactObj(item);
@@ -118,6 +125,9 @@ public class ContactViewModel extends UserBaseViewModel {
         }
     };
 
+    public ChatContact getContactModel(ContactListItemViewModel contactListItemViewModel){
+        return new ChatContact(contactListItemViewModel);
+    }
     public void onQueryTextChanged(@Nullable String newText) {
         searchTxt.set(newText);
     }

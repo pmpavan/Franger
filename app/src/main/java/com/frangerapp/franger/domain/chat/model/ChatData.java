@@ -1,4 +1,4 @@
-package com.frangerapp.franger.domain.user.model.socket;
+package com.frangerapp.franger.domain.chat.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Pavan on 15/01/18.
  */
 
-public class Data {
+public class ChatData {
 
     @SerializedName("fromId")
     @Expose
@@ -37,7 +37,7 @@ public class Data {
 
     @Override
     public String toString() {
-        return "Data{" +
+        return "ChatData{" +
                 "fromId='" + fromId + '\'' +
                 ", toId='" + toId + '\'' +
                 ", userId='" + userId + '\'' +

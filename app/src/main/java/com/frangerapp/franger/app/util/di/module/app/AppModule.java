@@ -3,7 +3,6 @@ package com.frangerapp.franger.app.util.di.module.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.franger.socket.socketio.SocketIOManager;
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.app.util.db.AppDatabase;
@@ -96,12 +95,8 @@ public class AppModule {
     @Provides
     @Singleton
     AppDatabase getDatabase() {
+        // TODO https://android.jlelse.eu/introduction-to-android-architecture-components-with-kotlin-room-livedata-1839c17597e
         return appDatabase;
     }
 
-//    @Provides
-//    @Singleton
-//    SocketIOManager socketIOManager() {
-//        return SocketIOManager.getInstance(app);
-//    }
 }

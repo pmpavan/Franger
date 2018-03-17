@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.data.common.UserStore;
-import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
+import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel;
@@ -32,7 +32,7 @@ public class ChatModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull User user, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ProfileInteractor profileInteractor) {
+    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull User user, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor) {
         return new ChatViewModel.Factory(context, eventBus, userStore, user, profileInteractor);
     }
 }

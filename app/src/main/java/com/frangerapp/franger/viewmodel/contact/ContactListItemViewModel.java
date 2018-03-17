@@ -23,8 +23,7 @@ public class ContactListItemViewModel extends UserBaseViewModel {
     ContactListItemViewModel(User user) {
         if (user != null) {
             this.phoneNumber = user.phoneNumber;
-            this.userId = user.userId;
-            setIsExistingUser();
+            setUserId(user.userId);
             this.displayName = user.displayName;
         }
     }
@@ -41,6 +40,10 @@ public class ContactListItemViewModel extends UserBaseViewModel {
         return userId;
     }
 
+    public String getUserIdTxt() {
+        return userId != null ? (Long.parseLong(userId) != 0L ? userId : "") : "";
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
         setIsExistingUser();
@@ -55,7 +58,7 @@ public class ContactListItemViewModel extends UserBaseViewModel {
     }
 
     private void setIsExistingUser() {
-        if (userId != null) {
+        if (!userId.equalsIgnoreCase("0")) {
             isExistingUser.set(true);
         } else {
             isExistingUser.set(false);

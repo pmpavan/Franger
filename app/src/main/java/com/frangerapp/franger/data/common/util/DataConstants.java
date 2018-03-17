@@ -31,13 +31,9 @@ public class DataConstants {
     public static final String API_HEADER_KEY_APP_VERSION = "app_version";
     public static final String API_HEADER_KEY_API_VERSION = "api_version";
     public static final String API_HEADER_VALUE_API_VERSION = "1";
-    public static final String API_HEADER_KEY_DOMAIN_NAME = "domain_name";
     public static final String API_HEADER_KEY_REQUEST_ID = "Request-Id";
     public static final String PROTOCOL = "http://";
     public static final String EMPTY = "";
 
 
-    public static final String DOMAIN_URL = "http://139.59.46.115:8080/";
-    public static final String USERS_URL = "users";
-    public static final String SOCKET_URL = "socket";
 }

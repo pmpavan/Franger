@@ -16,7 +16,7 @@ public class User {
     public String phoneNumber;
     @NotNull
     public String cleanedPhoneNumber;
-    public String userId;
+    public String userId = "0";
     public String displayName;
     public String phoneNumberType;
 

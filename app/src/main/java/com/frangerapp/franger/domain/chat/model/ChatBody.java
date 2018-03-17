@@ -1,4 +1,4 @@
-package com.frangerapp.franger.domain.user.model.socket;
+package com.frangerapp.franger.domain.chat.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -17,7 +17,7 @@ public class ChatBody {
     private String type;
     @SerializedName("data")
     @Expose
-    private Data data;
+    private ChatData data;
 
     public String getName() {
         return name;
@@ -35,11 +35,11 @@ public class ChatBody {
         this.type = type;
     }
 
-    public Data getData() {
+    public ChatData getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(ChatData data) {
         this.data = data;
     }
 
