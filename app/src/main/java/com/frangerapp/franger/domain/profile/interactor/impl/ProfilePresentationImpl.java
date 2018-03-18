@@ -71,7 +71,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     @Override
     public Observable<ContactSyncResponse> syncContacts(@NonNull String userId) {
         return RxContacts.fetch(context)
-                .buffer(25)
+                .buffer(50)
                 .concatMap(lists -> {
                     addUserToDb(lists);
                     Single<ContactSyncResponse> contactSyncResponseSingle = profileApi.syncContacts(userId, lists, false)

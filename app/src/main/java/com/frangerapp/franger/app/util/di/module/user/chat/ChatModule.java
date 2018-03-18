@@ -11,6 +11,7 @@ import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,7 @@ public class ChatModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull User user, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor) {
-        return new ChatViewModel.Factory(context, eventBus, userStore, user, profileInteractor);
+    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull User user, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor, Gson gson) {
+        return new ChatViewModel.Factory(context, eventBus, userStore, user, profileInteractor, gson);
     }
 }

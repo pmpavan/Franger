@@ -45,21 +45,20 @@ public class ProfileDataUtil {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
             for (Contact phoneNumber : phoneNumberHashMap) {
                 ContactSyncRequestData contactSyncRequestData = new ContactSyncRequestData();
-                if (!phoneNumber.getPhoneNumbers().isEmpty()) {
-                    for (PhoneNumber phoneNum : phoneNumber.getPhoneNumbers()) {
-                        contactSyncRequestData.setOriginalNumber(phoneNum.getPhoneNumber());
-                        try {
-                            Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum.getPhoneNumber(), "IN");
-                            String number = "";
-                            if (cleanedPhoneNumber.hasNationalNumber()) {
-                                number = String.valueOf(cleanedPhoneNumber.getNationalNumber());
-                            }
-                            contactSyncRequestData.setPureNumber(number);
-                        } catch (NumberParseException e) {
-                            contactSyncRequestData.setPureNumber(phoneNum.getPhoneNumber());
+                if (phoneNumber.getPhoneNumber() != null) {
+                    PhoneNumber phoneNum = phoneNumber.getPhoneNumber();
+                    contactSyncRequestData.setOriginalNumber(phoneNum.getPhoneNumber());
+                    try {
+                        Phonenumber.PhoneNumber cleanedPhoneNumber = phoneUtil.parse(phoneNum.getPhoneNumber(), "IN");
+                        String number = "";
+                        if (cleanedPhoneNumber.hasNationalNumber()) {
+                            number = String.valueOf(cleanedPhoneNumber.getNationalNumber());
                         }
-                        contactSyncRequestDataList.add(contactSyncRequestData);
+                        contactSyncRequestData.setPureNumber(number);
+                    } catch (NumberParseException e) {
+                        contactSyncRequestData.setPureNumber(phoneNum.getPhoneNumber());
                     }
+                    contactSyncRequestDataList.add(contactSyncRequestData);
                 }
             }
         }

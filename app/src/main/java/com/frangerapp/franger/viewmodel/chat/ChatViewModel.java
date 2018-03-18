@@ -12,10 +12,13 @@ import com.franger.socket.SocketIOCallbacks;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
+import com.frangerapp.franger.domain.chat.model.ChatMessage;
+import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
@@ -33,16 +36,17 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
     private ChatInteractor chatInteractor;
     private ChatContact chatContact;
     private boolean isIncoming;
+    private Gson gson;
 
     public ObservableField<String> messageTxt = new ObservableField<>("");
 
-    public ChatViewModel(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor) {
+    public ChatViewModel(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor, Gson gson) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
         this.user = user;
-
+        this.gson = gson;
     }
 
     public void onPageLoaded(ChatContact chatContact, boolean isIncoming) {
@@ -91,8 +95,10 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
         JSONObject data = (JSONObject) args[0];
         FRLogger.msg("Chat on " + TAG + ' ' + event + " " + data);
 
-//        String json = gson.fromJson(data.toString(), FeedNewMessageResponse::class.java)
-//        FrLogger.msg("message is $args ${json.channel}")
+        if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
+            ChatMessage json = gson.fromJson(data.toString(), ChatMessage.class);
+            FRLogger.msg("message is $args ${json.channel}" + json.getChannel());
+        }
 //
     }
 
@@ -121,12 +127,14 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
         private User user;
         private Context context;
         private UserStore userStore;
+        private Gson gson;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor, Gson gson) {
             this.context = context;
             this.user = user;
             this.eventBus = eventBus;
             this.userStore = userStore;
+            this.gson = gson;
             this.chatInteractor = chatInteractor;
         }
 
@@ -134,7 +142,7 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ChatViewModel.class)) {
-                return (T) new ChatViewModel(context, eventBus, userStore, user, chatInteractor);
+                return (T) new ChatViewModel(context, eventBus, userStore, user, chatInteractor, gson);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

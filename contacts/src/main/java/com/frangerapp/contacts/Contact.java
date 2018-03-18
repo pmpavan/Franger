@@ -23,6 +23,7 @@ public class Contact implements Comparable<Contact> {
     private Uri mThumbnail;
     private Set<String> mEmails = new HashSet<>();
     private Set<PhoneNumber> mPhoneNumbers = new HashSet<>();
+    private PhoneNumber phoneNumber;
 
     Contact(long id) {
         this.mId = id;
@@ -111,5 +112,13 @@ public class Contact implements Comparable<Contact> {
         }
         Contact contact = (Contact) o;
         return mId == contact.mId;
+    }
+
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

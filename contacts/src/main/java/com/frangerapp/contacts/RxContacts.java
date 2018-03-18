@@ -7,6 +7,8 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -88,8 +90,14 @@ public class RxContacts {
         }
         cursor.close();
         for (Long key : contacts.keySet()) {
-            if (!contacts.get(key).getPhoneNumbers().isEmpty())
-                emitter.onNext(contacts.get(key));
+            if (!contacts.get(key).getPhoneNumbers().isEmpty()) {
+                Contact contact = contacts.get(key);
+                Set<PhoneNumber> phoneNumberList = contact.getPhoneNumbers();
+                for (PhoneNumber phoneNumber : phoneNumberList) {
+                    contact.setPhoneNumber(phoneNumber);
+                    emitter.onNext(contacts.get(key));
+                }
+            }
         }
         emitter.onComplete();
     }
