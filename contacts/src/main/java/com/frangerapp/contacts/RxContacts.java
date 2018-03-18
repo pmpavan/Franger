@@ -64,15 +64,15 @@ public class RxContacts {
 
         while (!cursor.isAfterLast()) {
             long id = cursor.getLong(idColumnIndex);
-            Contact contact;
-//            if (contact == null) {
-            contact = new Contact(id);
-            mapInVisibleGroup(cursor, contact, inVisibleGroupColumnIndex);
-            mapDisplayName(cursor, contact, displayNamePrimaryColumnIndex);
-            mapPhoto(cursor, contact, photoColumnIndex);
-            mapThumbnail(cursor, contact, thumbnailColumnIndex);
-            contacts.put(id, contact);
-//            }
+            Contact contact = contacts.get(id);
+            if (contact == null) {
+                contact = new Contact(id);
+                mapInVisibleGroup(cursor, contact, inVisibleGroupColumnIndex);
+                mapDisplayName(cursor, contact, displayNamePrimaryColumnIndex);
+                mapPhoto(cursor, contact, photoColumnIndex);
+                mapThumbnail(cursor, contact, thumbnailColumnIndex);
+                contacts.put(id, contact);
+            }
             String mimetype = cursor.getString(mimetypeColumnIndex);
             switch (mimetype) {
                 case ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE: {
@@ -88,8 +88,8 @@ public class RxContacts {
         }
         cursor.close();
         for (Long key : contacts.keySet()) {
-            if(!contacts.get(key).getPhoneNumbers().isEmpty())
-            emitter.onNext(contacts.get(key));
+            if (!contacts.get(key).getPhoneNumbers().isEmpty())
+                emitter.onNext(contacts.get(key));
         }
         emitter.onComplete();
     }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.franger.socket.socketio.SocketIOManager;
+import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.scope.UserScope;
 import com.frangerapp.franger.data.chat.ChatApi;
@@ -71,7 +72,7 @@ public class UserModule {
 
     @Provides
     @UserScope
-    SocketIOManager socketIOManager(Context app) {
-        return SocketIOManager.getInstance(app, ChatDataUtil.getDomainName());
+    SocketIOManager socketIOManager(FrangerApp app, Context context) {
+        return SocketIOManager.getInstance(context, ChatDataUtil.getDomainName(), app);
     }
 }

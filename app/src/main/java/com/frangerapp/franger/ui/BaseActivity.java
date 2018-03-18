@@ -8,10 +8,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.frangerapp.franger.R;
+
 
 /**
  * Created by Pavan on 20/01/18.
@@ -38,6 +41,42 @@ public class BaseActivity extends AppCompatActivity {
                 window.setStatusBarColor(statusbarColor);
             }
         }
+    }
+
+    public void manageActionBarWithTitle(Toolbar toolbar, String title) {
+        manageActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        setActionBarTitle(actionBar, title, getColorById(R.color.white));
+    }
+
+    public void manageActionBarWithTitle(Toolbar toolbar, String title, int colorId) {
+        manageActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        setActionBarTitle(actionBar, title, colorId);
+    }
+
+    public void setActionBarTitle(ActionBar actionBar, String title, int colorId) {
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+
+        LayoutInflater inflator = LayoutInflater.from(this);
+        View v = inflator.inflate(R.layout.toolbar_title_layout, null);
+        TextView titleTxt = v.findViewById(R.id.filter_txt);
+        titleTxt.setTextColor(colorId);
+        titleTxt.setText(title);
+        actionBar.setCustomView(v);
+    }
+
+    public void manageActionBar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.show();
+        actionBar.setElevation(2);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
     }
 
     public void setHomeIndicatorButton(int drawable) {

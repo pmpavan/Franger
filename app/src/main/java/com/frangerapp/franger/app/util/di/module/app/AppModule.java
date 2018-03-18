@@ -40,6 +40,12 @@ public class AppModule {
 
     @Singleton
     @Provides
+    FrangerApp frangerApp() {
+        return app;
+    }
+
+    @Singleton
+    @Provides
     Context application() {
         return app;
     }

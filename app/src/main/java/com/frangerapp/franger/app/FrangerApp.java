@@ -20,6 +20,8 @@ import com.frangerapp.franger.app.util.di.module.user.UserModule;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.network.HttpClientException;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -154,41 +156,47 @@ public class FrangerApp extends Application implements SocketIOCallbacks {
 
     @Override
     public void onConnecting(String TAG) {
-
+        FRLogger.msg("app onConnecting " + TAG);
     }
 
     @Override
     public void onSocketCreated(String TAG) {
-
+        FRLogger.msg("app onSocketCreated " + TAG);
     }
 
     @Override
     public void onMessage(String TAG, String message) {
-
+        FRLogger.msg("app onMessage " + TAG + ' ' + message);
     }
 
     @Override
     public void progressChanged(String TAG, int progress) {
-
+        FRLogger.msg("app progressChanged " + TAG + ' ' + progress);
     }
 
     @Override
     public void on(String TAG, String event, Object... args) {
+        FRLogger.msg("app on " + TAG + ' ' + event + " " + args);
+        JSONObject data = (JSONObject) args[0];
+        FRLogger.msg("app feed is  data " + data);
 
+//        String json = gson.fromJson(data.toString(), FeedNewMessageResponse::class.java)
+//        FrLogger.msg("message is $args ${json.channel}")
+//
     }
 
     @Override
     public void onError(String TAG, SocketHelper errorCode) {
-
+        FRLogger.msg("app onError " + TAG + ' ' + errorCode.getMessage());
     }
 
     @Override
     public void onDisconnecting(String TAG) {
-
+        FRLogger.msg("app onDisconnecting " + TAG);
     }
 
     @Override
     public void onSocketDestroyed(String TAG) {
-
+        FRLogger.msg("app onSocketDestroyed " + TAG);
     }
 }

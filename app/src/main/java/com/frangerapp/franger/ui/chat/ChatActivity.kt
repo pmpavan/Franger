@@ -13,15 +13,20 @@ import com.frangerapp.franger.databinding.ActivityChatBinding
 import com.frangerapp.franger.domain.chat.model.ChatContact
 import com.frangerapp.franger.ui.user.UserBaseActivity
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel
+import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent
+import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants
+import kotlinx.android.synthetic.main.activity_chat.*
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 class ChatActivity : UserBaseActivity() {
 
 
     companion object {
-        private val ARG_CONTACT = "arg_contact"
-        private val ARG_IS_INCOMING = "arg_is_incoming"
+        private const val ARG_CONTACT = "arg_contact"
+        private const val ARG_IS_INCOMING = "arg_is_incoming"
         fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean): Intent {
             val intent = Intent(activity, ChatActivity::class.java)
             intent.putExtra(ARG_CONTACT, user)
@@ -44,11 +49,18 @@ class ChatActivity : UserBaseActivity() {
                 .plus(ChatModule(this@ChatActivity))
                 .inject(this@ChatActivity)
 
+        eventBus.register(this)
         messageFromAliens()
         invokeDataBinding()
         setupViews()
         setupControllers()
         onPageLoaded()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        eventBus.unregister(this)
     }
 
     private lateinit var chatContact: ChatContact
@@ -71,7 +83,10 @@ class ChatActivity : UserBaseActivity() {
 
 
     private fun setupViews() {
-
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        manageStatusBar(R.color.colorAccent)
+        manageActionBarWithTitle(toolbar, "")
     }
 
     private fun setupControllers() {
@@ -79,5 +94,14 @@ class ChatActivity : UserBaseActivity() {
 
     private fun onPageLoaded() {
         viewModel.onPageLoaded(chatContact, isIncoming)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onViewModelInteraction(event: ChatEvent) {
+        when (event.id) {
+            ChatPresentationConstants.SET_TOOLBAR_TXT ->
+                manageActionBarWithTitle(toolbar, event.message)
+
+        }
     }
 }

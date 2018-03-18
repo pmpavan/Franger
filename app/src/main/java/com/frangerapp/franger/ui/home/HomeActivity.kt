@@ -10,17 +10,23 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
 import com.frangerapp.franger.databinding.ActivityHomeBinding
+import com.frangerapp.franger.ui.chat.IncomingFragment
+import com.frangerapp.franger.ui.chat.OutgoingFragment
 import com.frangerapp.franger.ui.contact.ContactActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
 import com.frangerapp.franger.viewmodel.home.HomeViewModel
+import com.frangerapp.franger.viewmodel.home.eventbus.HomeEvent
+import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants
 import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 class HomeActivity : UserBaseActivity() {
@@ -59,11 +65,17 @@ class HomeActivity : UserBaseActivity() {
                 .plus(HomeModule(this@HomeActivity))
                 .inject(this@HomeActivity)
 
+        eventBus.register(this)
 
         invokeDataBinding()
         setupViews()
         setupControllers()
         onPageLoaded()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        eventBus.unregister(this)
     }
 
     private fun invokeDataBinding() {
@@ -94,9 +106,6 @@ class HomeActivity : UserBaseActivity() {
     }
 
     private fun setupControllers() {
-        fab.setOnClickListener { _ ->
-            goToContactsPage()
-        }
     }
 
     private fun onPageLoaded() {
@@ -131,9 +140,12 @@ class HomeActivity : UserBaseActivity() {
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1)
+            var fragment: Fragment = IncomingFragment.newInstance()
+            when (position) {
+                0 -> fragment = IncomingFragment.newInstance()
+                1 -> fragment = OutgoingFragment.newInstance()
+            }
+            return fragment
         }
 
         override fun getCount(): Int {
@@ -142,35 +154,11 @@ class HomeActivity : UserBaseActivity() {
         }
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    class PlaceholderFragment : Fragment() {
-
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_home, container, false)
-            rootView.section_label.text = getString(R.string.section_format, arguments!!.getInt(ARG_SECTION_NUMBER))
-            return rootView
-        }
-
-        companion object {
-            /**
-             * The fragment argument representing the section number for this
-             * fragment.
-             */
-            private val ARG_SECTION_NUMBER = "section_number"
-
-            /**
-             * Returns a new instance of this fragment for the given section
-             * number.
-             */
-            fun newInstance(sectionNumber: Int): PlaceholderFragment {
-                val fragment = PlaceholderFragment()
-                val args = Bundle()
-                args.putInt(ARG_SECTION_NUMBER, sectionNumber)
-                fragment.arguments = args
-                return fragment
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onViewModelInteraction(event: HomeEvent) {
+        when (event.id) {
+            HomePresentationConstants.ON_FAB_CLICKED -> {
+                goToContactsPage()
             }
         }
     }

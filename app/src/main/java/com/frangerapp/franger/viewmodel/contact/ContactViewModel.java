@@ -81,15 +81,15 @@ public class ContactViewModel extends UserBaseViewModel {
 
     private void onContactsFetchCompleted() {
         FRLogger.msg("onContactsFetchCompleted");
-        itemViewModels = new ArrayList<>();
+            itemViewModels = new ArrayList<>();
 
-        profileInteractor.getSortedUsersList()
-                .concatMapIterable(user -> user)
-                .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
-                .toList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
+            profileInteractor.getSortedUsersList()
+                    .concatMapIterable(user -> user)
+                    .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
+                    .toList()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
     }
 
 
@@ -125,9 +125,10 @@ public class ContactViewModel extends UserBaseViewModel {
         }
     };
 
-    public ChatContact getContactModel(ContactListItemViewModel contactListItemViewModel){
+    public ChatContact getContactModel(ContactListItemViewModel contactListItemViewModel) {
         return new ChatContact(contactListItemViewModel);
     }
+
     public void onQueryTextChanged(@Nullable String newText) {
         searchTxt.set(newText);
     }
@@ -142,7 +143,10 @@ public class ContactViewModel extends UserBaseViewModel {
         FRLogger.msg("search Txt " + searchTxt);
         Observable.just(itemViewModels)
                 .concatMapIterable(list -> list)
-                .filter(contact -> searchTxt.isEmpty() || (contact.getDisplayName() != null && contact.getDisplayName().toLowerCase().contains(searchTxt.toLowerCase())))
+                .filter(contact ->
+                        searchTxt.isEmpty()
+                                || (contact.getDisplayName() != null && contact.getDisplayName().toLowerCase().contains(searchTxt.toLowerCase()))
+                                || (contact.getPhoneNumber() != null && contact.getPhoneNumber().contains(searchTxt.toLowerCase())))
                 .toList()
                 .compose(SchedulerUtils.ioToMainSingleScheduler())
                 .subscribe(this::onListFiltered, t -> FRLogger.msg("Error " + t.getMessage()));

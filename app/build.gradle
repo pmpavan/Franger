@@ -117,11 +117,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     //Socket
-    implementation ('com.github.nkzawa:socket.io-client:0.3.0') {
+    implementation('com.github.nkzawa:socket.io-client:0.3.0') {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
-    kapt ('com.github.nkzawa:socket.io-client:0.3.0') {
+    kapt('com.github.nkzawa:socket.io-client:0.3.0') {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }

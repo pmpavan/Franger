@@ -3,7 +3,6 @@ package com.frangerapp.franger.ui.user;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.ui.BaseActivity;

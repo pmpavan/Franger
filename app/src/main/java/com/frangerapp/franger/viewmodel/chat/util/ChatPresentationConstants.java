@@ -5,4 +5,7 @@ package com.frangerapp.franger.viewmodel.chat.util;
  */
 
 public class ChatPresentationConstants {
+
+    public static final int SET_TOOLBAR_TXT = 1001;
+
 }

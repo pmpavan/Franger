@@ -69,6 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{vm::onFabClicked}"
             app:srcCompat="@android:drawable/sym_action_chat" />
 
     </android.support.design.widget.CoordinatorLayout>

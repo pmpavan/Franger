@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 
 public class ChatDataUtil {
 
-    public static String getFeedChannelName(String userId) {
+    public static String getFeedChannelNameJson(String userId) {
         ChatBody chatBody = new ChatBody();
         ChatData data = new ChatData();
 
@@ -29,11 +29,11 @@ public class ChatDataUtil {
         return DataConstants.PROTOCOL + DataConstants.BASE_DOMAIN_URL + "/" + ChatDataConstants.SOCKET_URL;
     }
 
-    public static String getChatChannelName(String fromUserId, String toUserId,Gson gson) {
+    public static String getChatChannelNameJson(String fromUserId, String toUserId, Gson gson) {
         ChatBody chatBody = new ChatBody();
         ChatData data = new ChatData();
 
-        chatBody.setName("chat_" + fromUserId + "_" + toUserId);
+        chatBody.setName(getChatChannelName(fromUserId, toUserId));
         chatBody.setType("chat");
         data.setFromId(fromUserId);
         data.setToId(toUserId);
@@ -42,10 +42,14 @@ public class ChatDataUtil {
         return gson.toJson(chatBody, ChatBody.class);
     }
 
+    public static String getChatChannelName(String fromUserId, String toUserId) {
+        return "chat_" + fromUserId + "_" + toUserId;
+    }
+
     public static String getChatMessageBody(String chatChannelId, String message, Gson gson) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChannel(chatChannelId);
         chatMessage.setMessage(message);
-        return gson.toJson(message);
+        return gson.toJson(chatMessage);
     }
 }
