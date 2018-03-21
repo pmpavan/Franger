@@ -16,6 +16,8 @@ import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
 import com.frangerapp.franger.databinding.ActivityHomeBinding
+import com.frangerapp.franger.domain.chat.model.ChatContact
+import com.frangerapp.franger.ui.chat.ChatActivity
 import com.frangerapp.franger.ui.chat.IncomingFragment
 import com.frangerapp.franger.ui.chat.OutgoingFragment
 import com.frangerapp.franger.ui.contact.ContactActivity
@@ -109,7 +111,7 @@ class HomeActivity : UserBaseActivity() {
     }
 
     private fun onPageLoaded() {
-
+        viewModel.onPageLoaded()
     }
 
     private fun goToContactsPage() {
@@ -154,11 +156,20 @@ class HomeActivity : UserBaseActivity() {
         }
     }
 
+    private fun goToChatActivity() {
+        val contactModel = ChatContact("8", "+919445589121", "9445589121", "Bsnl", "mobile")
+        val intent = ChatActivity.newInstance(this@HomeActivity, contactModel, false,"chat_8_31")
+        startActivity(intent)
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(event: HomeEvent) {
         when (event.id) {
             HomePresentationConstants.ON_FAB_CLICKED -> {
                 goToContactsPage()
+            }
+            1 -> {
+                goToChatActivity()
             }
         }
     }

@@ -5,29 +5,32 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.franger.mobile.logger.FRLogger;
-import com.franger.socket.SocketHelper;
-import com.franger.socket.SocketIOCallbacks;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
+import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.chat.model.ChatMessage;
-import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
+import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
+import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONObject;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by pavanm on 13/03/18.
  */
 
-public class ChatViewModel extends UserBaseViewModel implements SocketIOCallbacks {
+public class ChatViewModel extends UserBaseViewModel implements ChatPresentationImpl.ChatPresentationCallbacks {
 
     private User user;
     private Context context;
@@ -36,6 +39,7 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
     private ChatInteractor chatInteractor;
     private ChatContact chatContact;
     private boolean isIncoming;
+    private String channelName;
     private Gson gson;
 
     public ObservableField<String> messageTxt = new ObservableField<>("");
@@ -47,13 +51,18 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
         this.chatInteractor = chatInteractor;
         this.user = user;
         this.gson = gson;
+        chatInteractor.setCallbacks(this);
     }
 
-    public void onPageLoaded(ChatContact chatContact, boolean isIncoming) {
+    public void onPageLoaded(ChatContact chatContact, boolean isIncoming, String channelName) {
         this.isIncoming = isIncoming;
         this.chatContact = chatContact;
+        this.channelName = channelName;
+        if (channelName == null || channelName.isEmpty()) {
+            this.channelName = chatInteractor.getChatEventName(chatContact.getUserId(), isIncoming);
+        }
         sendSetToolbarTitleTxtEvent();
-        chatInteractor.addChatEvent(chatContact.getUserId(), isIncoming, this);
+        chatInteractor.getMessageEvent().subscribe(getFirstObserver());
     }
 
     private void sendSetToolbarTitleTxtEvent() {
@@ -63,61 +72,51 @@ public class ChatViewModel extends UserBaseViewModel implements SocketIOCallback
         eventBus.post(event);
     }
 
+    private Observer<MessageEvent> getFirstObserver() {
+        return new Observer<MessageEvent>() {
+
+            @Override
+            public void onSubscribe(Disposable d) {
+                FRLogger.msg("chat First onSubscribe : " + d.isDisposed());
+            }
+
+            @Override
+            public void onNext(MessageEvent messageEvent) {
+                FRLogger.msg("chat First onNext value : " + messageEvent);
+//                Toast.makeText(context, "chat " + messageEvent.toString(), Toast.LENGTH_SHORT).show();
+//                chatInteractor.sendMessage(messageEvent.getChannel(), isIncoming, "new message");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                FRLogger.msg("chat First onError : " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                FRLogger.msg("chat First onComplete");
+            }
+        };
+    }
+
     public void onSendButtonClicked() {
         if (!messageTxt.get().isEmpty()) {
-            chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, messageTxt.get(), this);
+            chatInteractor.addChatEvent(chatContact.getUserId(), isIncoming);
+            chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, messageTxt.get());
             messageTxt.set("");
         }
     }
 
     @Override
-    public void onConnecting(String TAG) {
-        FRLogger.msg("Chat onConnecting " + TAG);
+    public void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming) {
+        FRLogger.msg("chat message is $args " + feedNewMessageResponse.getChannel());
+        chatInteractor.addChatEvent(channelName, isIncoming);
+        chatInteractor.sendMessage(channelName, isIncoming, "received message");
     }
 
     @Override
-    public void onSocketCreated(String TAG) {
-        FRLogger.msg("Chat onSocketCreated " + TAG);
-    }
-
-    @Override
-    public void onMessage(String TAG, String message) {
-        FRLogger.msg("Chat onMessage " + TAG + ' ' + message);
-    }
-
-    @Override
-    public void progressChanged(String TAG, int progress) {
-        FRLogger.msg("Chat progressChanged " + TAG + ' ' + progress);
-    }
-
-    @Override
-    public void on(String TAG, String event, Object... args) {
-        JSONObject data = (JSONObject) args[0];
-        FRLogger.msg("Chat on " + TAG + ' ' + event + " " + data);
-
-        if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
-            ChatMessage json = gson.fromJson(data.toString(), ChatMessage.class);
-            FRLogger.msg("message is $args ${json.channel}" + json.getChannel());
-        }
-//
-    }
-
-    @Override
-    public void onError(String TAG, SocketHelper errorCode) {
-        FRLogger.msg("Chat onError " + TAG + ' ' + errorCode.getMessage());
-
-    }
-
-    @Override
-    public void onDisconnecting(String TAG) {
-        FRLogger.msg("Chat onDisconnecting " + TAG);
-
-    }
-
-    @Override
-    public void onSocketDestroyed(String TAG) {
-        FRLogger.msg("Chat onSocketDestroyed " + TAG);
-
+    public void onChatMessageEventReceived(ChatMessage chatMessage) {
+        FRLogger.msg("chat message is $args ${json.channel}" + chatMessage.getChannel());
     }
 
     public static class Factory implements ViewModelProvider.Factory {

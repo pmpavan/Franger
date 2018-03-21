@@ -1,4 +1,4 @@
-package com.frangerapp.franger.viewmodel.chat.model;
+package com.frangerapp.franger.domain.chat.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

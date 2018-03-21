@@ -4,30 +4,34 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.franger.mobile.logger.FRLogger;
-import com.franger.socket.SocketHelper;
-import com.franger.socket.SocketIOCallbacks;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
-import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
-import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
+import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
+import com.frangerapp.franger.domain.chat.model.ChatContact;
+import com.frangerapp.franger.domain.chat.model.ChatMessage;
+import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.BaseViewModel;
-import com.frangerapp.franger.viewmodel.chat.model.FeedNewMessageResponse;
-import com.frangerapp.franger.viewmodel.contact.ContactViewModel;
+import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
+import com.frangerapp.franger.viewmodel.contact.ContactListItemViewModel;
 import com.frangerapp.franger.viewmodel.home.eventbus.HomeEvent;
 import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Pavan on 24/01/18.
  */
 
-public class HomeViewModel extends BaseViewModel implements SocketIOCallbacks {
+public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl.ChatPresentationCallbacks {
 
     private EventBus eventBus;
     private User user;
@@ -43,7 +47,8 @@ public class HomeViewModel extends BaseViewModel implements SocketIOCallbacks {
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
         this.gson = gson;
-        chatInteractor.addFeedEvent(this);
+        chatInteractor.setCallbacks(this);
+        chatInteractor.addFeedEvent();
     }
 
     public void onFabClicked() {
@@ -52,66 +57,56 @@ public class HomeViewModel extends BaseViewModel implements SocketIOCallbacks {
         eventBus.post(event);
     }
 
-    @Override
-    public void onConnecting(String TAG) {
-        FRLogger.msg("onConnecting " + TAG);
+
+    public void onPageLoaded() {
+        chatInteractor.getMessageEvent().subscribe(getFirstObserver());
     }
 
     @Override
-    public void onSocketCreated(String TAG) {
-        FRLogger.msg("onSocketCreated " + TAG);
+    public void onViewDestroyed() {
+        super.onViewDestroyed();
+
     }
 
     @Override
-    public void onMessage(String TAG, String message) {
-        FRLogger.msg("onMessage " + TAG + ' ' + message);
+    public void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming) {
+        FRLogger.msg("home message is $args " + feedNewMessageResponse.getChannel());
+        chatInteractor.addChatEvent(channelName, isIncoming);
     }
 
     @Override
-    public void progressChanged(String TAG, int progress) {
-        FRLogger.msg("progressChanged " + TAG + ' ' + progress);
+    public void onChatMessageEventReceived(ChatMessage chatMessage) {
+        FRLogger.msg("home message is $args ${json.channel}" + chatMessage.getChannel());
     }
 
-    @Override
-    public void on(String TAG, String event, Object... args) {
-        FRLogger.msg("on " + TAG + ' ' + event + " " + args);
-        JSONObject data = (JSONObject) args[0];
-        FRLogger.msg("feed is  data " + data);
+    private Observer<MessageEvent> getFirstObserver() {
+        return new Observer<MessageEvent>() {
 
-        if(event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
-            FeedNewMessageResponse json = gson.fromJson(data.toString(), FeedNewMessageResponse.class);
-            if (json != null) {
-                FRLogger.msg("message is $args " + json.getChannel());
-                boolean isIncoming = true;
-                if (json.getChannel() != null && json.getChannel().split("_")[1].equals(user.getUserId())) {
-                    isIncoming = false;
-                }
-                if (json.getMessageFrom() != null) {
-                    chatInteractor.addChatEvent(json.getMessageFrom().getId(), isIncoming, this);
-                    chatInteractor.sendMessage(json.getMessageFrom().getId(), isIncoming, "received message", this);
-                }
+            @Override
+            public void onSubscribe(Disposable d) {
+                FRLogger.msg(" First onSubscribe : " + d.isDisposed());
             }
-        }
+
+            @Override
+            public void onNext(MessageEvent messageEvent) {
+                FRLogger.msg("home First onNext value : " + messageEvent);
+//                Toast.makeText(context, "home " + messageEvent.toString(), Toast.LENGTH_SHORT).show();
+                HomeEvent event = new HomeEvent();
+                event.setId(1);
+                eventBus.post(event);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                FRLogger.msg(" First onError : " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                FRLogger.msg(" First onComplete");
+            }
+        };
     }
-
-    @Override
-    public void onError(String TAG, SocketHelper errorCode) {
-        FRLogger.msg("onError " + TAG + ' ' + errorCode.getMessage());
-
-    }
-
-    @Override
-    public void onDisconnecting(String TAG) {
-        FRLogger.msg("onDisconnecting " + TAG);
-
-    }
-
-    @Override
-    public void onSocketDestroyed(String TAG) {
-        FRLogger.msg("onSocketDestroyed " + TAG);
-
-    }
-
 
     public static class Factory implements ViewModelProvider.Factory {
 

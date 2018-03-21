@@ -1,10 +1,9 @@
 package com.frangerapp.franger.domain.profile.interactor;
 
-import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.app.util.db.entity.User;
-import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
+import com.frangerapp.franger.data.profile.model.Joined;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,9 +21,9 @@ public interface ProfileInteractor {
 
     Completable submitProfile(@NotNull String userId, @NotNull String userName);
 
-    Observable<ContactSyncResponse> syncContacts(@NonNull final String userId);
+    Observable<List<Joined>> syncContacts(@NonNull final String userId);
 
-    Single<List<User>> getExistingUsersList();
+    Single<List<User>> getFrangerUsersList();
 
     Single<List<User>> getNonFrangerUsersList();
 

@@ -14,6 +14,7 @@ import com.crashlytics.android.answers.InviteEvent;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
+import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
@@ -107,7 +108,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     }
 
-    private void onSuccess(ContactSyncResponse contactSyncResponse) {
+    private void onSuccess(List<Joined> contactSyncResponse) {
         FRLogger.msg("onSuccess " + contactSyncResponse);
 
     }
@@ -125,7 +126,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
     }
 
     public final BaseBindingAdapters.ItemClickHandler<InviteUserListItemViewModel> itemClickHandler = (position, item) -> {
-        FRLogger.msg("item " + item);
+        FRLogger.msg("invite item " + item);
 //        CountriesViewEvent countriesViewEvent = CountriesViewEvent.builder();
 //        countriesViewEvent.setId(CountriesPresentationConstants.COUNTRY_ITEM_CLICKED);
 //        countriesViewEvent.setCountriesListItemViewModel(item);

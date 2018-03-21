@@ -7,7 +7,7 @@ package com.franger.socket;
  * Each socket will be associated with a TAG. Operations on it can be carried by using this
  * identifer
  */
-public interface SocketIOCallbacks {
+public interface SocketCallbacks {
 
     /**
      * Initial state after socket.connect() is called. Trying to open a socket connection

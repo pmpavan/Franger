@@ -1,22 +1,40 @@
 package com.frangerapp.franger.domain.chat.interactor;
 
-import com.franger.socket.SocketIOCallbacks;
+import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
+import com.frangerapp.franger.domain.chat.model.MessageEvent;
+
+import java.util.List;
+
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by pavanm on 14/03/18.
+ *
+ * TODO split this class into feed and chat events so we can handle them separately.
+ * This gives us teh advantage of not having to handle feed events in chat viewmodel
  */
 
 public interface ChatInteractor {
 
-    void addEventToBeListened(String event, SocketIOCallbacks callbacks);
+    PublishSubject<MessageEvent> getMessageEvent();
+
+    void setCallbacks(ChatPresentationImpl.ChatPresentationCallbacks callbacks);
+
+    void addEventToBeListened(String event);
 
     String getFeedEventName();
 
-    void addFeedEvent(SocketIOCallbacks callbacks);
+    void addFeedEvent();
 
     String getChatEventName(String userId, boolean isIncoming);
 
-    void addChatEvent(String userId, boolean isIncoming, SocketIOCallbacks callbacks);
+    void addChatEvent(String userId, boolean isIncoming);
 
-    void sendMessage(String userId, boolean isIncoming, String message, SocketIOCallbacks callbacks);
+    void addChatEvent(String channelName);
+
+    void sendMessage(String userId, boolean isIncoming, String message);
+
+    void sendMessage(String channel, String message);
+
+    List<String> getChatEventsBeingListened();
 }

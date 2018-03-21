@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.franger.mobile.logger.FRLogger;
 import com.franger.socket.SocketHelper;
-import com.franger.socket.SocketIOCallbacks;
+import com.franger.socket.SocketCallbacks;
 import com.frangerapp.franger.app.util.AppConstants;
 import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.component.AppComponent;
@@ -33,7 +33,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  * Created by Pavan on 15/01/18.
  */
 
-public class FrangerApp extends Application implements SocketIOCallbacks {
+public class FrangerApp extends Application implements SocketCallbacks {
 
     private AppComponent appComponent;
     private LoginComponent loginComponent;

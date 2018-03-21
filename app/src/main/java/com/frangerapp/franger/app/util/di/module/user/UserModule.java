@@ -3,7 +3,7 @@ package com.frangerapp.franger.app.util.di.module.user;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.franger.socket.socketio.SocketIOManager;
+import com.franger.socket.socketio.SocketManager;
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.scope.UserScope;
@@ -53,8 +53,8 @@ public class UserModule {
 
     @UserScope
     @Provides
-    ChatApi chatApi(Context context, SocketIOManager socketIOManager, Gson gson) {
-        return new ChatApi(context, gson, socketIOManager);
+    ChatApi chatApi(Context context, SocketManager socketManager, Gson gson) {
+        return new ChatApi(context, gson, socketManager);
     }
 
     @UserScope
@@ -66,13 +66,13 @@ public class UserModule {
 
     @UserScope
     @Provides
-    ChatInteractor chatInteractor(@NonNull Context context, @NonNull ChatApi loginApi, @NotNull User user, AppDatabase appDatabase, SocketIOManager socketIOManager, Gson gson) {
-        return new ChatPresentationImpl(context, loginApi, user, appDatabase, socketIOManager, gson);
+    ChatInteractor chatInteractor(@NonNull Context context, @NonNull ChatApi loginApi, @NotNull User user, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
+        return new ChatPresentationImpl(context, loginApi, user, appDatabase, socketManager, gson);
     }
 
     @Provides
     @UserScope
-    SocketIOManager socketIOManager(FrangerApp app, Context context) {
-        return SocketIOManager.getInstance(context, ChatDataUtil.getDomainName(), app);
+    SocketManager socketIOManager(FrangerApp app, Context context) {
+        return SocketManager.getInstance(context, ChatDataUtil.getDomainName(), app);
     }
 }

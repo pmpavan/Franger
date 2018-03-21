@@ -12,6 +12,7 @@ import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
+import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.User;
@@ -79,6 +80,11 @@ public class ContactViewModel extends UserBaseViewModel {
 
     }
 
+    private void onSuccess(List<Joined> joinedList) {
+        FRLogger.msg("onSuccess " + joinedList);
+
+    }
+
     private void onContactsFetchCompleted() {
         FRLogger.msg("onContactsFetchCompleted");
             itemViewModels = new ArrayList<>();
@@ -105,10 +111,6 @@ public class ContactViewModel extends UserBaseViewModel {
 
     }
 
-    private void onSuccess(ContactSyncResponse contactSyncResponse) {
-        FRLogger.msg("onSuccess " + contactSyncResponse);
-
-    }
 
     private void onFailure(Throwable throwable) {
         FRLogger.msg("onfailure " + throwable.getMessage());

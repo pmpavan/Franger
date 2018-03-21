@@ -3,8 +3,8 @@ package com.franger.socket.socketio;
 import android.content.Context;
 import android.util.Log;
 
+import com.franger.socket.SocketCallbacks;
 import com.franger.socket.SocketHelper;
-import com.franger.socket.SocketIOCallbacks;
 import com.franger.socket.SocketOptions;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -18,16 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Vignesh Ramachandra.
  * Wrapper for Socket.io for handling all socket related operations.
- * Makes use of the SocketIOCallbacks interface to deliver callbacks.
+ * Makes use of the SocketCallbacks interface to deliver callbacks.
  */
-public class SocketIOManager {
+public class SocketManager {
 
-    private static SocketIOManager socketIOManager;
+    private static SocketManager socketManager;
     private String url;
 
-    private List<SocketIOCallbacks> socketIOCallbacks;
+    private List<SocketCallbacks> socketCallbacks;
 
-    private String DEBUG_TAG = "FR_LOGGER";
+    private String DEBUG_TAG = "SocketManager";
 
     private Context context;
 
@@ -40,27 +40,27 @@ public class SocketIOManager {
      * private Constructor
      *
      * @param context
-     * @param socketIOCallbacks
+     * @param socketCallbacks
      */
-    private SocketIOManager(Context context, String url, SocketIOCallbacks socketIOCallbacks) {
+    private SocketManager(Context context, String url, SocketCallbacks socketCallbacks) {
         this.context = context;
         this.url = url;
-//        setCallBacks(socketIOCallbacks);
+//        setCallBacks(socketCallbacks);
         this.mSocket = getSocket(url);
     }
 
     /**
-     * Provides a singleton SocketIOManager instance
+     * Provides a singleton SocketManager instance
      *
      * @param context
      * @param url
-     * @return SocketIOManager
+     * @return SocketManager
      */
-    public static SocketIOManager getInstance(Context context, String url, SocketIOCallbacks socketIOCallbacks) {
-        if (socketIOManager == null) {
-            socketIOManager = new SocketIOManager(context, url, socketIOCallbacks);
+    public static SocketManager getInstance(Context context, String url, SocketCallbacks socketCallbacks) {
+        if (socketManager == null) {
+            socketManager = new SocketManager(context, url, socketCallbacks);
         }
-        return socketIOManager;
+        return socketManager;
     }
 
     /**
@@ -68,13 +68,13 @@ public class SocketIOManager {
      *
      * @param callbacks
      */
-    public void setCallBacks(SocketIOCallbacks callbacks) {
-        if (this.socketIOCallbacks == null) {
-            this.socketIOCallbacks = new ArrayList<>();
+    public void setCallBacks(SocketCallbacks callbacks) {
+        if (this.socketCallbacks == null) {
+            this.socketCallbacks = new ArrayList<>();
         }
-        if (!socketIOCallbacks.contains(callbacks))
-            this.socketIOCallbacks.add(callbacks);
-//        this.socketIOCallbacks = callbacks;
+        if (!socketCallbacks.contains(callbacks))
+            this.socketCallbacks.add(callbacks);
+//        this.socketCallbacks = callbacks;
     }
 
     /*
@@ -99,8 +99,8 @@ public class SocketIOManager {
             // Put the created socket into the hashmap
             mSocketMap.put(url, mSocket);
             Log.d(DEBUG_TAG, "Socket created with the given TAG : " + url);
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onSocketCreated(url);
         } catch (URISyntaxException e) {
             /**
@@ -109,8 +109,8 @@ public class SocketIOManager {
              */
             mSocketMap.remove(url);
             Log.d(DEBUG_TAG, "Error creating socket with the given URI : " + url);
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onError(url, SocketHelper.MALFORMED_URI);
         }
 
@@ -130,12 +130,12 @@ public class SocketIOManager {
 //            throw new NullPointerException("URL is null");
 //        } else if (eventsToBeListened == null) {
 //            throw new NullPointerException("eventsToBeListened is null");
-//        } else if (socketIOCallbacks == null) {
-//            throw new NullPointerException("Please set socketIOCallbacks ( i.e socketManger.setCallBacks()) and then try creating a socket");
+//        } else if (socketCallbacks == null) {
+//            throw new NullPointerException("Please set socketCallbacks ( i.e socketManger.setCallBacks()) and then try creating a socket");
 //        }
 //
-//        if (socketIOCallbacks != null)
-//            for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//        if (socketCallbacks != null)
+//            for (SocketCallbacks callbacks : socketCallbacks)
 //                callbacks.onConnecting(url);
 //
 //        // Also available is options param to create a socket
@@ -156,24 +156,24 @@ public class SocketIOManager {
 //             */
 //            mSocketMap.remove(url);
 //            Log.d(DEBUG_TAG, "Error creating socket with the given URI : " + url);
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onError(url, SocketHelper.MALFORMED_URI);
 //        }
 //
 //        // Put the created socket into the hashmap
 //        mSocketMap.put(url, mSocket);
 //        Log.d(DEBUG_TAG, "Socket created with the given TAG : " + url);
-//        if (socketIOCallbacks != null)
-//            for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//        if (socketCallbacks != null)
+//            for (SocketCallbacks callbacks : socketCallbacks)
 //                callbacks.onSocketCreated(url);
 //
 //        for (final String eventToBeListened : eventsToBeListened) {
 //            mSocket.on(eventToBeListened, new Emitter.Listener() {
 //                @Override
 //                public void call(Object... args) {
-//                    if (socketIOCallbacks != null)
-//                        for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//                    if (socketCallbacks != null)
+//                        for (SocketCallbacks callbacks : socketCallbacks)
 //                            callbacks.on(url, eventToBeListened, args);
 //                }
 //            });
@@ -184,8 +184,8 @@ public class SocketIOManager {
 //            mSocket.connect();
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onError(url, SocketHelper.UNKNOWN_ERROR_WHILE_CONNECTING);
 //        }
 //        // Register for required event
@@ -197,12 +197,12 @@ public class SocketIOManager {
      * @param eventsToBeListened
      * @param callbacks
      */
-    public void addEventsToBeListened(final List<String> eventsToBeListened, final SocketIOCallbacks callbacks) {
+    public void addEventsToBeListened(final List<String> eventsToBeListened, final SocketCallbacks callbacks) {
 
         if (eventsToBeListened == null) {
             throw new NullPointerException("eventsToBeListened is null");
         } else if (callbacks == null) {
-            throw new NullPointerException("socketIOCallbacks is null");
+            throw new NullPointerException("socketCallbacks is null");
         }
 
         setCallBacks(callbacks);
@@ -211,8 +211,8 @@ public class SocketIOManager {
             mSocket.on(eventToBeListened, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (socketIOCallbacks != null)
-                        for (SocketIOCallbacks callback : socketIOCallbacks)
+                    if (socketCallbacks != null)
+                        for (SocketCallbacks callback : socketCallbacks)
                             callback.on(url, eventToBeListened, args);
                 }
             });
@@ -222,8 +222,8 @@ public class SocketIOManager {
             mSocket.connect();
         } catch (Exception e) {
             e.printStackTrace();
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onError(url, SocketHelper.UNKNOWN_ERROR_WHILE_CONNECTING);
         }
     }
@@ -235,7 +235,7 @@ public class SocketIOManager {
      * @param callbacks
      * @param message
      */
-    public void emitAndListenEvents(String tag, String event, final List<String> eventsToBeListened, final SocketIOCallbacks callbacks, Object... message) {
+    public void emitAndListenEvents(String tag, String event, final List<String> eventsToBeListened, final SocketCallbacks callbacks, Object... message) {
         if (tag == null) {
             throw new NullPointerException("Trying to close a socket with null tag");
         }
@@ -251,16 +251,16 @@ public class SocketIOManager {
                     @Override
                     public void call(Object... args) {
                         Log.d(DEBUG_TAG, eventToBeListened + " " + args);
-                        if (socketIOCallbacks != null)
-                            for (SocketIOCallbacks callback : socketIOCallbacks)
+                        if (socketCallbacks != null)
+                            for (SocketCallbacks callback : socketCallbacks)
                                 callback.on(url, eventToBeListened, args);
                     }
                 });
             }
         } else {
             Log.d(DEBUG_TAG, "Cannot emit. Unable to retrieve socket");
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
         }
     }
@@ -272,7 +272,7 @@ public class SocketIOManager {
      * @param event
      * @param message
      */
-    public void emitEvent(String tag, String event, final SocketIOCallbacks callbacks, Object... message) {
+    public void emitEvent(String tag, String event, final SocketCallbacks callbacks, Object... message) {
         if (tag == null) {
             throw new NullPointerException("Trying to close a socket with null tag");
         }
@@ -284,8 +284,8 @@ public class SocketIOManager {
             mSocket.emit(event, message);
         } else {
             Log.d(DEBUG_TAG, "Cannot emit. Unable to retrieve socket");
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
         }
     }
@@ -302,20 +302,20 @@ public class SocketIOManager {
 //        }
 //
 //        if (!mSocketMap.containsKey(tag)) {
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
 //            Log.d(DEBUG_TAG, "Trying to close a socket that doesn't exist. TAG : " + tag);
 //        } else {
 //            Socket socketToBeClosed = mSocketMap.get(tag);
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onDisconnecting(tag);
 //            socketToBeClosed.close();
 //            mSocketMap.remove(tag);
 //            Log.d(DEBUG_TAG, "Socket with TAG : " + tag + "has successfully been closed/destroyed");
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onSocketDestroyed(tag);
 //        }
 //    }
@@ -332,8 +332,8 @@ public class SocketIOManager {
 //        }
 //
 //        if (!mSocketMap.containsKey(tag)) {
-//            if (socketIOCallbacks != null)
-//                for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//            if (socketCallbacks != null)
+//                for (SocketCallbacks callbacks : socketCallbacks)
 //                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
 //        } else {
 //            Socket socket = mSocketMap.get(tag);
@@ -348,7 +348,7 @@ public class SocketIOManager {
      * @param tag   identifier for the socket
      * @param event the event to which the socket must listen to
      */
-    public void startListening(final String tag, final String event, final SocketIOCallbacks callbacks) {
+    public void startListening(final String tag, final String event, final SocketCallbacks callbacks) {
 
         if (tag == null) {
             throw new NullPointerException("Trying to listen a socket with null tag");
@@ -359,8 +359,8 @@ public class SocketIOManager {
         setCallBacks(callbacks);
 
         if (!mSocketMap.containsKey(tag)) {
-            if (socketIOCallbacks != null)
-                for (SocketIOCallbacks callback : socketIOCallbacks)
+            if (socketCallbacks != null)
+                for (SocketCallbacks callback : socketCallbacks)
                     callback.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
             Log.d(DEBUG_TAG, "Trying to close a socket which is not found. TAG : " + tag);
         } else {
@@ -368,8 +368,8 @@ public class SocketIOManager {
             socket.on(event, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (socketIOCallbacks != null)
-                        for (SocketIOCallbacks callback : socketIOCallbacks)
+                    if (socketCallbacks != null)
+                        for (SocketCallbacks callback : socketCallbacks)
                             callback.on(tag, event, args);
                 }
             });
@@ -391,8 +391,8 @@ public class SocketIOManager {
 //            return mSocketMap.get(tag).connected();
 //        }
 //        Log.d(DEBUG_TAG, "Trying to close a socket which is not found. TAG : " + tag);
-//        if (socketIOCallbacks != null)
-//            for (SocketIOCallbacks callbacks : socketIOCallbacks)
+//        if (socketCallbacks != null)
+//            for (SocketCallbacks callbacks : socketCallbacks)
 //                callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
 //        return false;
 //    }

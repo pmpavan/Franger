@@ -22,5 +22,5 @@ public interface Socket {
 
     void clearAllSockets();
 
-    void setCallBacks(SocketIOCallbacks socketIOCallbacks);
+    void setCallBacks(SocketCallbacks socketCallbacks);
 }

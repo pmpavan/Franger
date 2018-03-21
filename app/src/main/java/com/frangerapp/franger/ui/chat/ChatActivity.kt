@@ -27,10 +27,12 @@ class ChatActivity : UserBaseActivity() {
     companion object {
         private const val ARG_CONTACT = "arg_contact"
         private const val ARG_IS_INCOMING = "arg_is_incoming"
-        fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean): Intent {
+        private const val ARG_CHANNEL = "arg_channel"
+        fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean, channelName: String): Intent {
             val intent = Intent(activity, ChatActivity::class.java)
             intent.putExtra(ARG_CONTACT, user)
             intent.putExtra(ARG_IS_INCOMING, isIncoming)
+            intent.putExtra(ARG_CHANNEL, channelName)
             return intent
         }
     }
@@ -67,10 +69,13 @@ class ChatActivity : UserBaseActivity() {
 
     private var isIncoming: Boolean = false
 
+    private var channelName: String? = ""
+
     private fun messageFromAliens() {
         if (intent != null) {
             chatContact = intent.getParcelableExtra(ARG_CONTACT)
             isIncoming = intent.getBooleanExtra(ARG_IS_INCOMING, false)
+            channelName = intent.getStringExtra(ARG_CHANNEL)
         }
     }
 
@@ -93,7 +98,7 @@ class ChatActivity : UserBaseActivity() {
     }
 
     private fun onPageLoaded() {
-        viewModel.onPageLoaded(chatContact, isIncoming)
+        viewModel.onPageLoaded(chatContact, isIncoming,channelName)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

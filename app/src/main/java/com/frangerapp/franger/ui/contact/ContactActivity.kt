@@ -9,7 +9,6 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.SearchView
 import android.view.Menu
-import android.widget.Toast
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.contact.ContactModule
@@ -110,7 +109,7 @@ class ContactActivity : UserBaseActivity() {
     }
 
     private fun goToChatActivity(contact: ContactListItemViewModel) {
-        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false)
+        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false, "chat_8_31")
         startActivity(intent)
     }
 

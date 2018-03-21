@@ -40,7 +40,7 @@ public class InviteUserListItemViewModel extends BaseViewModel {
     public String userId = "";
     public String displayName;
 
-    public ObservableBoolean isExistingUser = new ObservableBoolean(false);
+    public ObservableBoolean isExistingUser = new ObservableBoolean(true);
 
     InviteUserListItemViewModel(User user) {
         if (user != null) {
@@ -54,6 +54,7 @@ public class InviteUserListItemViewModel extends BaseViewModel {
     public String getUserIdTxt() {
         return userId != null ? (Long.parseLong(userId) != 0L ? userId : "") : "";
     }
+
     private void setIsExistingUser() {
         if (!userId.equalsIgnoreCase("0")) {
             isExistingUser.set(true);
