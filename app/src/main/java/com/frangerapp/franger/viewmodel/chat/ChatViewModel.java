@@ -61,7 +61,8 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
             this.channelName = chatInteractor.getChatEventName(chatContact.getUserId(), isIncoming);
         }
         sendSetToolbarTitleTxtEvent();
-        chatInteractor.getMessageEvent().subscribe(getChatMsgObserver());
+        chatInteractor.getMessageEvent()
+                .subscribe(getChatMsgObserver());
     }
 
     private void sendSetToolbarTitleTxtEvent() {

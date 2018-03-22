@@ -53,7 +53,6 @@ public class BaseActivity extends AppCompatActivity {
     public void manageActionBarWithTitle(Toolbar toolbar, String title, int colorId) {
         manageActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
         setActionBarTitle(actionBar, title, colorId);
     }
 
