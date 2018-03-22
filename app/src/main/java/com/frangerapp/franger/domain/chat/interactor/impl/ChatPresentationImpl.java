@@ -8,6 +8,7 @@ import com.franger.socket.SocketCallbacks;
 import com.franger.socket.SocketHelper;
 import com.franger.socket.socketio.SocketManager;
 import com.frangerapp.franger.app.util.db.AppDatabase;
+import com.frangerapp.franger.app.util.db.entity.Message;
 import com.frangerapp.franger.data.chat.ChatApi;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatMessage;
@@ -16,20 +17,26 @@ import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.chat.util.ChatDataUtil;
 import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by pavanm on 14/03/18.
  */
 
+/**
+ * TODO split classes into feed and message chat classes
+ */
 public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private static final String TAG = ChatPresentationImpl.class.getName();
 
@@ -49,6 +56,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private PublishSubject<MessageEvent> messageEvent = PublishSubject.create();
 
     private List<String> chatEventsBeingListened = new ArrayList<>();
+    private List<String> channelsBeingListened = new ArrayList<>();
 
     private ArrayList<ChatPresentationCallbacks> callbacks = new ArrayList<>();
 
@@ -86,6 +94,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 //        socketManager.startListening(ChatDataUtil.getDomainName(), ChatDataConstants.INITIATE_CHAT, callbacks);
         socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, event);
         chatEventsBeingListened.add(ChatDataConstants.INITIATE_CHAT);
+        channelsBeingListened.add(event);
     }
 
     @Override
@@ -107,10 +116,13 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public void addChatEvent(String channelName) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add(ChatDataConstants.MESSAGE);
-        socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, channelName);
-        chatEventsBeingListened.add(ChatDataConstants.MESSAGE);
+        if (!chatEventsBeingListened.contains(channelName)) {
+            ArrayList<String> list = new ArrayList<>();
+            list.add(ChatDataConstants.MESSAGE);
+            socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, channelName);
+            chatEventsBeingListened.add(ChatDataConstants.MESSAGE);
+            channelsBeingListened.add(channelName);
+        }
     }
 
     private String getChatName(String userId, boolean isIncoming) {
@@ -125,11 +137,27 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public void sendMessage(String userId, boolean isIncoming, String message) {
-        sendMessage(getChatName(userId, isIncoming), message);
+        String channelName = getChatName(userId, isIncoming);
+        sendMessage(channelName, message);
+        addMessageToDb(channelName, message);
     }
 
-    @Override
-    public void sendMessage(String channel, String message) {
+    private void addMessageToDb(String channelName, String msg) {
+        Message message = new Message();
+        if (channelName != null) {
+            int indexOfOtherUser = 1;
+            String[] splitChannelName = channelName.split("_");
+            if (splitChannelName[1].equals(user.getUserId())) {
+                indexOfOtherUser = 2;
+            }
+            message.userId = splitChannelName[indexOfOtherUser];
+        }
+        message.message = msg;
+        message.sentAt = new Date();
+        appDatabase.messageDao().addMessage(message);
+    }
+
+    private void sendMessage(String channel, String message) {
         String jsonInString = ChatDataUtil.getChatMessageBody(channel, message, gson);
         FRLogger.msg("message " + jsonInString);
         socketManager.emitEvent(ChatDataUtil.getDomainName(), ChatDataConstants.MESSAGE, this, jsonInString);
@@ -172,37 +200,64 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         JSONObject data = (JSONObject) args[0];
 
         if (event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
-            FeedNewMessageResponse json = gson.fromJson(data.toString(), FeedNewMessageResponse.class);
-            if (json != null) {
-                boolean isIncoming = true;
-                if (json.getChannel() != null && json.getChannel().split("_")[1].equals(user.getUserId())) {
-                    isIncoming = false;
-                }
-                if (json.getMessageFrom() != null) {
-                    for (ChatPresentationCallbacks callback :
-                            callbacks) {
-//                        callback.onChatInitiateEventReceived(json, json.getMessageFrom().getId(), isIncoming);
-                    }
-                    MessageEvent messageEvent = new MessageEvent();
-                    messageEvent.setEventType(1);
-                    messageEvent.setIncoming(isIncoming);
-                    messageEvent.setChannel(json.getMessageFrom().getId());
-                    getMessageEvent().onNext(messageEvent);
-
-                }
-            }
+//            FeedNewMessageResponse feedNewMessageResponse = gson.fromJson(data.toString(), FeedNewMessageResponse.class);
+//            if (feedNewMessageResponse != null) {
+//            for (ChatPresentationCallbacks callback : callbacks) {
+//                callback.onChatInitiateEventReceived(json, json.getMessageFrom().getId(), isIncoming);
+//            }
+//                broadcastFeedEvent(feedNewMessageResponse);
+//
+//            }
+            Observable.just(data)
+                    .map(JSONObject::toString)
+                    .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
+//                    .map(this::addMessageToDb)
+                    .map(this::broadcastFeedEvent)
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
         } else if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
-            ChatMessage json = gson.fromJson(data.toString(), ChatMessage.class);
-            for (ChatPresentationCallbacks callback :
-                    callbacks) {
+//            ChatMessage chatMessage = gson.fromJson(data.toString(), ChatMessage.class);
+//            for (ChatPresentationCallbacks callback : callbacks) {
 //                callback.onChatMessageEventReceived(json);
-            }
-            MessageEvent messageEvent = new MessageEvent();
-            messageEvent.setEventType(2);
-            messageEvent.setMessage(json.getMessage());
-            messageEvent.setChannel(json.getChannel());
-            getMessageEvent().onNext(messageEvent);
+//            }
+            Observable.just(data)
+                    .map(JSONObject::toString)
+                    .map(s -> gson.fromJson(s, ChatMessage.class))
+                    .map(this::addMessageToDb)
+                    .map(this::broadcastMessageEvent)
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(chatMessage -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
+
         }
+    }
+
+    private FeedNewMessageResponse broadcastFeedEvent(FeedNewMessageResponse feedNewMessageResponse) {
+        boolean isIncoming = true;
+        if (feedNewMessageResponse.getMessageFrom() != null) {
+            if (feedNewMessageResponse.getChannel() != null && feedNewMessageResponse.getChannel().split("_")[1].equals(user.getUserId())) {
+                isIncoming = false;
+            }
+        }
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id);
+        messageEvent.setIncoming(isIncoming);
+        messageEvent.setChannel(feedNewMessageResponse.getMessageFrom().getId());
+        getMessageEvent().onNext(messageEvent);
+        return feedNewMessageResponse;
+    }
+
+    private ChatMessage broadcastMessageEvent(ChatMessage chatMessage) {
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id);
+        messageEvent.setMessage(chatMessage.getMessage());
+        messageEvent.setChannel(chatMessage.getChannel());
+        getMessageEvent().onNext(messageEvent);
+        return chatMessage;
+    }
+
+    private ChatMessage addMessageToDb(ChatMessage chatMessage) {
+        addMessageToDb(chatMessage.getChannel(), chatMessage.getMessage());
+        return chatMessage;
     }
 
     @Override

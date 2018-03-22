@@ -75,7 +75,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     private void syncContacts(User user) {
         showLoading.set(true);
-        profileInteractor.clearUsersList();
+//        profileInteractor.clearUsersList();
         profileInteractor.syncContacts(user.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
@@ -87,6 +87,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
         FRLogger.msg("onComplete");
         itemViewModels = new ArrayList<>();
         profileInteractor.getSortedUsersList()
+                .toObservable()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
                 .toList()
@@ -118,9 +119,9 @@ public class InviteUserViewModel extends UserBaseViewModel {
         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    public void onNextClicked(){
+    public void onNextClicked() {
         profileInteractor.setUserInviteCompleted();
-        InviteUserEvent event =new InviteUserEvent();
+        InviteUserEvent event = new InviteUserEvent();
         event.setId(InviteUserPresentationConstants.ON_NEXT_BTN_CLICKED);
         eventBus.post(event);
     }

@@ -77,6 +77,10 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     @Override
     public Observable<List<Joined>> syncContacts(@NonNull String userId) {
         return RxContacts.fetch(context)
+                .map(contact -> {
+                    clearUsersList();
+                    return contact;
+                })
                 .buffer(50)
                 .flatMapSingle(this::addUserToDb)
                 .flatMapSingle(lists -> profileApi.syncContacts(userId, lists, false))
@@ -155,8 +159,16 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     }
 
     @Override
-    public Observable<List<User>> getSortedUsersList() {
-        return Observable.zip(getFrangerUsersList().toObservable(), getNonFrangerUsersList().toObservable(),
+    public Single<List<User>> getSortedUsersList() {
+//        MediatorLiveData mediatorLiveData = new MediatorLiveData<User>();
+//        mediatorLiveData.addSource(getFrangerUsersList(),value -> {
+//            mediatorLiveData.setValue(value);
+//        });
+//        mediatorLiveData.addSource(getNonFrangerUsersList(),value -> {
+//            mediatorLiveData.setValue(value);
+//        });
+
+        return Single.zip(getFrangerUsersList(), getNonFrangerUsersList(),
                 (users, users2) -> {
                     List<com.frangerapp.franger.app.util.db.entity.User> list = new ArrayList<>(users);
                     list.addAll(users2);

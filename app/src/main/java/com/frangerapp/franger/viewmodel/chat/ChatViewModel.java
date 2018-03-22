@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
@@ -62,7 +61,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
             this.channelName = chatInteractor.getChatEventName(chatContact.getUserId(), isIncoming);
         }
         sendSetToolbarTitleTxtEvent();
-        chatInteractor.getMessageEvent().subscribe(getFirstObserver());
+        chatInteractor.getMessageEvent().subscribe(getChatMsgObserver());
     }
 
     private void sendSetToolbarTitleTxtEvent() {
@@ -72,7 +71,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
         eventBus.post(event);
     }
 
-    private Observer<MessageEvent> getFirstObserver() {
+    private Observer<MessageEvent> getChatMsgObserver() {
         return new Observer<MessageEvent>() {
 
             @Override
@@ -83,7 +82,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
             @Override
             public void onNext(MessageEvent messageEvent) {
                 FRLogger.msg("chat First onNext value : " + messageEvent);
-//                Toast.makeText(context, "chat " + messageEvent.toString(), Toast.LENGTH_SHORT).show();
+                handleChatMessages(messageEvent);
 //                chatInteractor.sendMessage(messageEvent.getChannel(), isIncoming, "new message");
             }
 
@@ -99,6 +98,12 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
         };
     }
 
+    private void handleChatMessages(MessageEvent messageEvent) {
+        if (messageEvent.getChannel().equalsIgnoreCase(channelName)) {
+            // update in list
+        }
+    }
+
     public void onSendButtonClicked() {
         if (!messageTxt.get().isEmpty()) {
             chatInteractor.addChatEvent(chatContact.getUserId(), isIncoming);
@@ -111,7 +116,6 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
     public void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming) {
         FRLogger.msg("chat message is $args " + feedNewMessageResponse.getChannel());
         chatInteractor.addChatEvent(channelName, isIncoming);
-        chatInteractor.sendMessage(channelName, isIncoming, "received message");
     }
 
     @Override

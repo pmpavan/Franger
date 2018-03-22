@@ -67,7 +67,7 @@ public class ContactViewModel extends UserBaseViewModel {
     private void syncContacts() {
         if (itemViewModels.size() == 0)
             showLoading.set(true);
-        profileInteractor.clearUsersList();
+//        profileInteractor.clearUsersList();
 
         /**
          * TODO Move the logic of loading from db or api to interactor layer
@@ -82,24 +82,26 @@ public class ContactViewModel extends UserBaseViewModel {
 
     private void onSuccess(List<Joined> joinedList) {
         FRLogger.msg("onSuccess " + joinedList);
-
+        //TODO update the progress in ui
     }
 
     private void onContactsFetchCompleted() {
         FRLogger.msg("onContactsFetchCompleted");
-            itemViewModels = new ArrayList<>();
+        itemViewModels = new ArrayList<>();
 
-            profileInteractor.getSortedUsersList()
-                    .concatMapIterable(user -> user)
-                    .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
-                    .toList()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
+        profileInteractor.getSortedUsersList()
+                .toObservable()
+                .concatMapIterable(user -> user)
+                .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
     }
 
 
     private void onAllPhoneNumbersAssociationFailed(Throwable throwable) {
+        //TODO move this to ui
         Toast.makeText(context, R.string.common_error_msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -108,7 +110,6 @@ public class ContactViewModel extends UserBaseViewModel {
         itemViewModels.addAll(inviteUserListItemViewModels);
         if (searchTxt.get().isEmpty())
             inviteUserList.set(itemViewModels);
-
     }
 
 

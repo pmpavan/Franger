@@ -7,13 +7,15 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.frangerapp.franger.app.util.db.converter.DateConverter;
+import com.frangerapp.franger.app.util.db.dao.MessageDao;
 import com.frangerapp.franger.app.util.db.dao.UserDao;
+import com.frangerapp.franger.app.util.db.entity.Message;
 import com.frangerapp.franger.app.util.db.entity.User;
 
 /**
  * Created by pavanm on 22/02/18.
  */
-@Database(entities = {User.class},
+@Database(entities = {User.class, Message.class},
         version = 1, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -21,6 +23,8 @@ public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase INSTANCE;
 
     public abstract UserDao userDao();
+
+    public abstract MessageDao messageDao();
 
 
     public static AppDatabase getDatabase(Context context) {

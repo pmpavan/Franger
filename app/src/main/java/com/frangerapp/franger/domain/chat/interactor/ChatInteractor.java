@@ -34,7 +34,5 @@ public interface ChatInteractor {
 
     void sendMessage(String userId, boolean isIncoming, String message);
 
-    void sendMessage(String channel, String message);
-
     List<String> getChatEventsBeingListened();
 }

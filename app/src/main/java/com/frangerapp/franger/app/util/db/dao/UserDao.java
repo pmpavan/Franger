@@ -1,6 +1,8 @@
 package com.frangerapp.franger.app.util.db.dao;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -37,12 +39,12 @@ public interface UserDao {
     Single<List<User>> getAllUser();
 
     @Query("select * from user where userId = :userId")
-    LiveData<User> getUser(String userId);
+    Single<User> getUser(String userId);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateUser(User user);
 
-    @Query("UPDATE User SET userId = :userId  WHERE phoneNumber = :phoneNumber")
+    @Query("update User set userId = :userId  where phoneNumber = :phoneNumber")
     int updateUser(String userId, String phoneNumber);
 
     @Query("delete from user")

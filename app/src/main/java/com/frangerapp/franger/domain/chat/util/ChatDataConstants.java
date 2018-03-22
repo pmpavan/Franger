@@ -12,4 +12,15 @@ public class ChatDataConstants {
     public static final String INITIATE_CHAT = "initiate_chat";
     public static final String JOIN = "join";
     public static final String MESSAGE = "message";
+
+    public enum SOCKET_EVENT_TYPE {
+        FEED(1),
+        MESSAGE(2);
+
+        public int id;
+
+        SOCKET_EVENT_TYPE(int id) {
+            this.id = id;
+        }
+    }
 }
