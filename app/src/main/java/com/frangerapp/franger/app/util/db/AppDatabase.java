@@ -9,14 +9,14 @@ import android.content.Context;
 import com.frangerapp.franger.app.util.db.converter.DateConverter;
 import com.frangerapp.franger.app.util.db.dao.MessageDao;
 import com.frangerapp.franger.app.util.db.dao.UserDao;
-import com.frangerapp.franger.app.util.db.entity.Group;
+import com.frangerapp.franger.app.util.db.entity.Channel;
 import com.frangerapp.franger.app.util.db.entity.Message;
 import com.frangerapp.franger.app.util.db.entity.User;
 
 /**
  * Created by pavanm on 22/02/18.
  */
-@Database(entities = {User.class, Message.class,Group.class},
+@Database(entities = {User.class, Message.class,Channel.class},
         version = 2, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {

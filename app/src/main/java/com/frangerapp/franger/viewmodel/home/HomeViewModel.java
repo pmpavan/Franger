@@ -4,25 +4,19 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
-import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
-import com.frangerapp.franger.domain.chat.model.ChatContact;
-import com.frangerapp.franger.domain.chat.model.ChatMessage;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
+import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.User;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
-import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
-import com.frangerapp.franger.viewmodel.contact.ContactListItemViewModel;
 import com.frangerapp.franger.viewmodel.home.eventbus.HomeEvent;
 import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
+import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
-import org.jetbrains.annotations.NotNull;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -31,7 +25,7 @@ import io.reactivex.disposables.Disposable;
  * Created by Pavan on 24/01/18.
  */
 
-public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl.ChatPresentationCallbacks {
+public class HomeViewModel extends UserBaseViewModel {
 
     private EventBus eventBus;
     private User user;
@@ -47,7 +41,6 @@ public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
         this.gson = gson;
-        chatInteractor.setCallbacks(this);
         chatInteractor.addFeedEvent();
     }
 
@@ -59,7 +52,7 @@ public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl
 
 
     public void onPageLoaded() {
-        chatInteractor.getMessageEvent().subscribe(getFirstObserver());
+        chatInteractor.getMessageEvent().subscribe(getChatObserver());
     }
 
     @Override
@@ -68,18 +61,7 @@ public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl
 
     }
 
-    @Override
-    public void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming) {
-        FRLogger.msg("home message is $args " + feedNewMessageResponse.getChannel());
-        chatInteractor.addChatEvent(channelName, isIncoming);
-    }
-
-    @Override
-    public void onChatMessageEventReceived(ChatMessage chatMessage) {
-        FRLogger.msg("home message is $args ${json.channel}" + chatMessage.getChannel());
-    }
-
-    private Observer<MessageEvent> getFirstObserver() {
+    private Observer<MessageEvent> getChatObserver() {
         return new Observer<MessageEvent>() {
 
             @Override
@@ -90,10 +72,10 @@ public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl
             @Override
             public void onNext(MessageEvent messageEvent) {
                 FRLogger.msg("home First onNext value : " + messageEvent);
-//                Toast.makeText(context, "home " + messageEvent.toString(), Toast.LENGTH_SHORT).show();
-                HomeEvent event = new HomeEvent();
-                event.setId(1);
-                eventBus.post(event);
+                handleMessageEventReceived(messageEvent);
+//                HomeEvent event = new HomeEvent();
+//                event.setId(1);
+//                eventBus.post(event);
             }
 
             @Override
@@ -106,6 +88,15 @@ public class HomeViewModel extends BaseViewModel implements ChatPresentationImpl
                 FRLogger.msg(" First onComplete");
             }
         };
+    }
+
+    private void handleMessageEventReceived(MessageEvent messageEvent) {
+
+        if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
+            //update incoming/outgoing list and start a chat channel
+        } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
+
+        }
     }
 
     public static class Factory implements ViewModelProvider.Factory {

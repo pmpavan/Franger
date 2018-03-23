@@ -40,9 +40,8 @@ public class SocketManager {
      * private Constructor
      *
      * @param context
-     * @param socketCallbacks
      */
-    private SocketManager(Context context, String url, SocketCallbacks socketCallbacks) {
+    private SocketManager(Context context, String url) {
         this.context = context;
         this.url = url;
 //        setCallBacks(socketCallbacks);
@@ -56,9 +55,9 @@ public class SocketManager {
      * @param url
      * @return SocketManager
      */
-    public static SocketManager getInstance(Context context, String url, SocketCallbacks socketCallbacks) {
+    public static SocketManager getInstance(Context context, String url) {
         if (socketManager == null) {
-            socketManager = new SocketManager(context, url, socketCallbacks);
+            socketManager = new SocketManager(context, url);
         }
         return socketManager;
     }
@@ -72,9 +71,8 @@ public class SocketManager {
         if (this.socketCallbacks == null) {
             this.socketCallbacks = new ArrayList<>();
         }
-        if (!socketCallbacks.contains(callbacks))
+        if (callbacks != null && !socketCallbacks.contains(callbacks))
             this.socketCallbacks.add(callbacks);
-//        this.socketCallbacks = callbacks;
     }
 
     /*

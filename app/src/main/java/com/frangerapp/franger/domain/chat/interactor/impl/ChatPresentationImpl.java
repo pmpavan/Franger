@@ -40,12 +40,6 @@ import io.reactivex.subjects.PublishSubject;
 public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private static final String TAG = ChatPresentationImpl.class.getName();
 
-    public interface ChatPresentationCallbacks {
-        void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming);
-
-        void onChatMessageEventReceived(ChatMessage chatMessage);
-    }
-
     private Context context;
     private ChatApi chatApi;
     private User user;
@@ -57,8 +51,6 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     private List<String> chatEventsBeingListened = new ArrayList<>();
     private List<String> channelsBeingListened = new ArrayList<>();
-
-    private ArrayList<ChatPresentationCallbacks> callbacks = new ArrayList<>();
 
 
     public ChatPresentationImpl(@NonNull Context context, @NonNull ChatApi chatApi, @NotNull User user, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
@@ -200,26 +192,14 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         JSONObject data = (JSONObject) args[0];
 
         if (event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
-//            FeedNewMessageResponse feedNewMessageResponse = gson.fromJson(data.toString(), FeedNewMessageResponse.class);
-//            if (feedNewMessageResponse != null) {
-//            for (ChatPresentationCallbacks callback : callbacks) {
-//                callback.onChatInitiateEventReceived(json, json.getMessageFrom().getId(), isIncoming);
-//            }
-//                broadcastFeedEvent(feedNewMessageResponse);
-//
-//            }
             Observable.just(data)
                     .map(JSONObject::toString)
                     .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
-//                    .map(this::addMessageToDb)
+                    .map(this::addChannelToDb)
                     .map(this::broadcastFeedEvent)
                     .compose(SchedulerUtils.ioToMainObservableScheduler())
                     .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
         } else if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
-//            ChatMessage chatMessage = gson.fromJson(data.toString(), ChatMessage.class);
-//            for (ChatPresentationCallbacks callback : callbacks) {
-//                callback.onChatMessageEventReceived(json);
-//            }
             Observable.just(data)
                     .map(JSONObject::toString)
                     .map(s -> gson.fromJson(s, ChatMessage.class))
@@ -229,6 +209,11 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                     .subscribe(chatMessage -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
 
         }
+    }
+
+    private FeedNewMessageResponse addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
+
+        return feedNewMessageResponse;
     }
 
     private FeedNewMessageResponse broadcastFeedEvent(FeedNewMessageResponse feedNewMessageResponse) {
@@ -278,8 +263,4 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     }
 
-    @Override
-    public void setCallbacks(ChatPresentationCallbacks callback) {
-        this.callbacks.add(callback);
-    }
 }

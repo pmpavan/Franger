@@ -1,6 +1,5 @@
 package com.frangerapp.franger.domain.chat.interactor;
 
-import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 
 import java.util.List;
@@ -17,8 +16,6 @@ import io.reactivex.subjects.PublishSubject;
 public interface ChatInteractor {
 
     PublishSubject<MessageEvent> getMessageEvent();
-
-    void setCallbacks(ChatPresentationImpl.ChatPresentationCallbacks callbacks);
 
     void addEventToBeListened(String event);
 

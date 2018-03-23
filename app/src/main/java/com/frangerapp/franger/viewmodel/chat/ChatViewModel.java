@@ -9,13 +9,11 @@ import android.support.annotation.NonNull;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
-import com.frangerapp.franger.domain.chat.interactor.impl.ChatPresentationImpl;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
-import com.frangerapp.franger.domain.chat.model.ChatMessage;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
+import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
-import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import com.google.gson.Gson;
@@ -29,7 +27,7 @@ import io.reactivex.disposables.Disposable;
  * Created by pavanm on 13/03/18.
  */
 
-public class ChatViewModel extends UserBaseViewModel implements ChatPresentationImpl.ChatPresentationCallbacks {
+public class ChatViewModel extends UserBaseViewModel {
 
     private User user;
     private Context context;
@@ -50,7 +48,6 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
         this.chatInteractor = chatInteractor;
         this.user = user;
         this.gson = gson;
-        chatInteractor.setCallbacks(this);
     }
 
     public void onPageLoaded(ChatContact chatContact, boolean isIncoming, String channelName) {
@@ -84,7 +81,6 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
             public void onNext(MessageEvent messageEvent) {
                 FRLogger.msg("chat First onNext value : " + messageEvent);
                 handleChatMessages(messageEvent);
-//                chatInteractor.sendMessage(messageEvent.getChannel(), isIncoming, "new message");
             }
 
             @Override
@@ -100,7 +96,8 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
     }
 
     private void handleChatMessages(MessageEvent messageEvent) {
-        if (messageEvent.getChannel().equalsIgnoreCase(channelName)) {
+        if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id
+                && messageEvent.getChannel().equalsIgnoreCase(channelName)) {
             // update in list
         }
     }
@@ -111,17 +108,6 @@ public class ChatViewModel extends UserBaseViewModel implements ChatPresentation
             chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, messageTxt.get());
             messageTxt.set("");
         }
-    }
-
-    @Override
-    public void onChatInitiateEventReceived(FeedNewMessageResponse feedNewMessageResponse, String channelName, boolean isIncoming) {
-        FRLogger.msg("chat message is $args " + feedNewMessageResponse.getChannel());
-        chatInteractor.addChatEvent(channelName, isIncoming);
-    }
-
-    @Override
-    public void onChatMessageEventReceived(ChatMessage chatMessage) {
-        FRLogger.msg("chat message is $args ${json.channel}" + chatMessage.getChannel());
     }
 
     public static class Factory implements ViewModelProvider.Factory {

@@ -72,7 +72,7 @@ public class UserModule {
 
     @Provides
     @UserScope
-    SocketManager socketIOManager(FrangerApp app, Context context) {
-        return SocketManager.getInstance(context, ChatDataUtil.getDomainName(), app);
+    SocketManager socketIOManager(Context context) {
+        return SocketManager.getInstance(context, ChatDataUtil.getDomainName());
     }
 }

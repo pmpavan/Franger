@@ -13,7 +13,7 @@ import java.util.Date;
  */
 
 @Entity
-public class Group {
+public class Channel {
 
     @PrimaryKey
     @NotNull
@@ -24,7 +24,7 @@ public class Group {
     public long unreadMsgCount;
     public String otherUserId;
 
-    public Group(@NonNull String channelName) {
+    public Channel(@NonNull String channelName) {
         this.channelName = channelName;
     }
 }
