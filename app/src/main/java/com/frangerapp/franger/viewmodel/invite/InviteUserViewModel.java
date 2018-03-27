@@ -10,13 +10,11 @@ import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import com.crashlytics.android.answers.InviteEvent;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
-import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
 import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.invite.eventbus.InviteUserEvent;
@@ -30,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -41,7 +38,7 @@ import io.reactivex.schedulers.Schedulers;
 public class InviteUserViewModel extends UserBaseViewModel {
 
 
-    private User user;
+    private LoggedInUser loggedInUser;
     private Context context;
     private EventBus eventBus;
     private UserStore userStore;
@@ -52,12 +49,12 @@ public class InviteUserViewModel extends UserBaseViewModel {
     public ObservableField<List<InviteUserListItemViewModel>> inviteUserList = new ObservableField<>(itemViewModels);
 
 
-    public InviteUserViewModel(Context context, EventBus eventBus, UserStore userStore, User user, ProfileInteractor profileInteractor) {
+    public InviteUserViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.profileInteractor = profileInteractor;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
     }
 
     public void checkForContactsPermission(Activity activity) {
@@ -65,7 +62,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
         rxPermissions.request(Manifest.permission.READ_CONTACTS)
                 .subscribe(granted -> {
                     if (granted) { // Always true pre-M
-                        syncContacts(user);
+                        syncContacts(loggedInUser);
                     } else {
                         // Oups permission denied
                         Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
@@ -73,10 +70,10 @@ public class InviteUserViewModel extends UserBaseViewModel {
                 });
     }
 
-    private void syncContacts(User user) {
+    private void syncContacts(LoggedInUser loggedInUser) {
         showLoading.set(true);
 //        profileInteractor.clearUsersList();
-        profileInteractor.syncContacts(user.getUserId())
+        profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
                 .subscribe(this::onSuccess, this::onFailure, this::onComplete);
@@ -102,7 +99,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
     }
 
     private void onPhoneNumberAssociated(List<InviteUserListItemViewModel> inviteUserListItemViewModels) {
-        FRLogger.msg("invite user list " + inviteUserListItemViewModels);
+        FRLogger.msg("invite loggedInUser list " + inviteUserListItemViewModels);
         showLoading.set(false);
         itemViewModels.addAll(inviteUserListItemViewModels);
         inviteUserList.set(itemViewModels);
@@ -138,13 +135,13 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
         private ProfileInteractor profileInteractor;
         private EventBus eventBus;
-        private User user;
+        private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ProfileInteractor profileInteractor) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
             this.context = context;
-            this.user = user;
+            this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
             this.userStore = userStore;
             this.profileInteractor = profileInteractor;
@@ -154,7 +151,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(InviteUserViewModel.class)) {
-                return (T) new InviteUserViewModel(context, eventBus, userStore, user, profileInteractor);
+                return (T) new InviteUserViewModel(context, eventBus, userStore, loggedInUser, profileInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

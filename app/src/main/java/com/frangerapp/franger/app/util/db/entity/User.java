@@ -22,7 +22,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "LoggedInUser{" +
                 "phoneNumber='" + phoneNumber + '\'' +
                 ", cleanedPhoneNumber='" + cleanedPhoneNumber + '\'' +
                 ", userId='" + userId + '\'' +

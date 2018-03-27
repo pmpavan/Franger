@@ -61,7 +61,7 @@ public class VerifyUserViewModel extends LoginBaseViewModel {
     private void requestCompletedEvent() {
         VerifyUserViewEvent loginViewEvent = new VerifyUserViewEvent();
         loginViewEvent.setId(LoginPresentationConstants.VALID_OTP_REQUEST_SUCCESS);
-        loginViewEvent.setMessage("User login successful");
+        loginViewEvent.setMessage("LoggedInUser login successful");
         eventBus.post(loginViewEvent);
     }
 

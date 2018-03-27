@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Fixed user properties. To be shared throughout the user component.
  */
-public class User {
+public class LoggedInUser {
     private final String phoneNumber;
     private final String countryCode;
     private final String userName;
@@ -19,7 +19,7 @@ public class User {
     private final String authToken;
 
 
-    public User(@NotNull String userId,@NotNull String userName,@NotNull String countryCode, @NonNull String phoneNumber, @NonNull String authToken) {
+    public LoggedInUser(@NotNull String userId, @NotNull String userName, @NotNull String countryCode, @NonNull String phoneNumber, @NonNull String authToken) {
         this.userId = userId;
         this.userName = userName;
         this.countryCode = countryCode;

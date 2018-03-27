@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel;
 import com.google.gson.Gson;
@@ -33,7 +33,7 @@ public class ChatModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull User user, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor, Gson gson) {
-        return new ChatViewModel.Factory(context, eventBus, userStore, user, profileInteractor, gson);
+    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor, Gson gson) {
+        return new ChatViewModel.Factory(context, eventBus, userStore, loggedInUser, profileInteractor, gson);
     }
 }

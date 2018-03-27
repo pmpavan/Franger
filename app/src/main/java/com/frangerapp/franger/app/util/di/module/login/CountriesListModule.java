@@ -5,9 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.frangerapp.franger.app.util.di.scope.FragmentScope;
-import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.countries.interactor.CountriesInteractor;
-import com.frangerapp.franger.domain.user.model.User;
 import com.frangerapp.franger.ui.countries.CountriesListDialogFragment;
 import com.frangerapp.franger.viewmodel.countries.CountriesViewModel;
 import com.google.gson.Gson;

@@ -19,7 +19,7 @@ public class Message {
 
     @PrimaryKey(autoGenerate = true)
     public Long id;
-    //    @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "userId", onDelete = CASCADE)
+    //    @ForeignKey(entity = LoggedInUser.class, parentColumns = "id", childColumns = "userId", onDelete = CASCADE)
     @NotNull
     public String userId;
     @NotNull

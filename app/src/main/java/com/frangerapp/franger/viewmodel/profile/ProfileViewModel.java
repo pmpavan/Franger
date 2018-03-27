@@ -10,8 +10,7 @@ import android.view.View;
 
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
-import com.frangerapp.franger.domain.user.model.User;
-import com.frangerapp.franger.viewmodel.BaseViewModel;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.profile.eventbus.ProfileViewEvent;
 import com.frangerapp.franger.viewmodel.profile.util.ProfilePresentationConstants;
@@ -28,7 +27,7 @@ import io.reactivex.disposables.Disposable;
 public class ProfileViewModel extends UserBaseViewModel {
 
     private Context context;
-    private User user;
+    private LoggedInUser loggedInUser;
     private UserStore userStore;
     private EventBus eventBus;
     private ProfileInteractor profileInteractor;
@@ -39,9 +38,9 @@ public class ProfileViewModel extends UserBaseViewModel {
 
     public boolean ifRequestSucceeded = false;
 
-    public ProfileViewModel(Context context, User user, UserStore userStore, EventBus eventBus, ProfileInteractor profileInteractor) {
+    public ProfileViewModel(Context context, LoggedInUser loggedInUser, UserStore userStore, EventBus eventBus, ProfileInteractor profileInteractor) {
         this.context = context;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.profileInteractor = profileInteractor;
@@ -56,7 +55,7 @@ public class ProfileViewModel extends UserBaseViewModel {
             errorVisibility.set(View.INVISIBLE);
             requestSentEvent();
             //send register request
-            Disposable disposable = profileInteractor.submitProfile(user.getUserId(), userNameTxt.get())
+            Disposable disposable = profileInteractor.submitProfile(loggedInUser.getUserId(), userNameTxt.get())
                     .compose(SchedulerUtils.ioToMainCompletableScheduler())
                     .subscribe(this::onSuccess, this::onFailure);
             disposables.add(disposable);
@@ -89,13 +88,13 @@ public class ProfileViewModel extends UserBaseViewModel {
 
         private ProfileInteractor profileInteractor;
         private EventBus eventBus;
-        private User user;
+        private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
 
-        public Factory(Context context, User user, EventBus eventBus, UserStore userStore, ProfileInteractor profileInteractor) {
+        public Factory(Context context, LoggedInUser loggedInUser, EventBus eventBus, UserStore userStore, ProfileInteractor profileInteractor) {
             this.context = context;
-            this.user = user;
+            this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
             this.userStore = userStore;
             this.profileInteractor = profileInteractor;
@@ -106,7 +105,7 @@ public class ProfileViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ProfileViewModel.class)) {
-                return (T) new ProfileViewModel(context, user, userStore, eventBus, profileInteractor);
+                return (T) new ProfileViewModel(context, loggedInUser, userStore, eventBus, profileInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

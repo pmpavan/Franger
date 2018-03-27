@@ -12,7 +12,7 @@ import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
@@ -29,7 +29,7 @@ import io.reactivex.disposables.Disposable;
 
 public class ChatViewModel extends UserBaseViewModel {
 
-    private User user;
+    private LoggedInUser loggedInUser;
     private Context context;
     private EventBus eventBus;
     private UserStore userStore;
@@ -41,12 +41,12 @@ public class ChatViewModel extends UserBaseViewModel {
 
     public ObservableField<String> messageTxt = new ObservableField<>("");
 
-    public ChatViewModel(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor, Gson gson) {
+    public ChatViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor, Gson gson) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
         this.gson = gson;
     }
 
@@ -114,14 +114,14 @@ public class ChatViewModel extends UserBaseViewModel {
 
         private ChatInteractor chatInteractor;
         private EventBus eventBus;
-        private User user;
+        private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
         private Gson gson;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor, Gson gson) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor, Gson gson) {
             this.context = context;
-            this.user = user;
+            this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
             this.userStore = userStore;
             this.gson = gson;
@@ -132,7 +132,7 @@ public class ChatViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ChatViewModel.class)) {
-                return (T) new ChatViewModel(context, eventBus, userStore, user, chatInteractor, gson);
+                return (T) new ChatViewModel(context, eventBus, userStore, loggedInUser, chatInteractor, gson);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

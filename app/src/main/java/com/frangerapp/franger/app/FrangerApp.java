@@ -15,7 +15,7 @@ import com.frangerapp.franger.app.util.di.component.user.UserComponent;
 import com.frangerapp.franger.app.util.di.module.app.AppModule;
 import com.frangerapp.franger.app.util.di.module.login.LoginModule;
 import com.frangerapp.franger.app.util.di.module.user.UserModule;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.network.HttpClientException;
 
 import java.io.IOException;
@@ -79,8 +79,8 @@ public class FrangerApp extends Application {
         FRLogger.setSwitch(AppConstants.IS_LOGGER_ENABLED);
     }
 
-    public UserComponent createUserComponent(@NonNull User user) {
-        userComponent = appComponent.plus(new UserModule(user));
+    public UserComponent createUserComponent(@NonNull LoggedInUser loggedInUser) {
+        userComponent = appComponent.plus(new UserModule(loggedInUser));
         return userComponent;
     }
 

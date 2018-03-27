@@ -21,7 +21,7 @@ public class DataConstants {
 
     public static final String API_HEADER_KEY_ACCEPT = "Accept";
     public static final String API_HEADER_VALUE_ACCEPT = "application/json";
-    public static final String API_HEADER_KEY_USER_AGENT = "User-Agent";
+    public static final String API_HEADER_KEY_USER_AGENT = "LoggedInUser-Agent";
     public static final String API_HEADER_VALUE_USER_AGENT = "Franger_Native_Android";
     public static final String API_HEADER_KEY_AUTHORIZATION = "Authorization";
     public static final String API_HEADER_KEY_MOBILE_TYPE = "mobile_type";

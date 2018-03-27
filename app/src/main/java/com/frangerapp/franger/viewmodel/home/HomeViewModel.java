@@ -10,7 +10,7 @@ import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.viewmodel.home.eventbus.HomeEvent;
 import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
@@ -28,15 +28,15 @@ import io.reactivex.disposables.Disposable;
 public class HomeViewModel extends UserBaseViewModel {
 
     private EventBus eventBus;
-    private User user;
+    private LoggedInUser loggedInUser;
     private Context context;
     private UserStore userStore;
     private ChatInteractor chatInteractor;
     private Gson gson;
 
-    public HomeViewModel(Context context, User user, EventBus eventBus, UserStore userStore, ChatInteractor chatInteractor, Gson gson) {
+    public HomeViewModel(Context context, LoggedInUser loggedInUser, EventBus eventBus, UserStore userStore, ChatInteractor chatInteractor, Gson gson) {
         this.context = context;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
@@ -102,15 +102,15 @@ public class HomeViewModel extends UserBaseViewModel {
     public static class Factory implements ViewModelProvider.Factory {
 
         private EventBus eventBus;
-        private User user;
+        private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
         private ChatInteractor chatInteractor;
         private Gson gson;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ChatInteractor chatInteractor, Gson gson) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor, Gson gson) {
             this.context = context;
-            this.user = user;
+            this.loggedInUser = loggedInUser;
             this.gson = gson;
             this.eventBus = eventBus;
             this.userStore = userStore;
@@ -121,7 +121,7 @@ public class HomeViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(HomeViewModel.class)) {
-                return (T) new HomeViewModel(context, user, eventBus, userStore, chatInteractor, gson);
+                return (T) new HomeViewModel(context, loggedInUser, eventBus, userStore, chatInteractor, gson);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

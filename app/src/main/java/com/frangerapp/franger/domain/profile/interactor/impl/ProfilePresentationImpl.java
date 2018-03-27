@@ -160,7 +160,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
 
     @Override
     public Single<List<User>> getSortedUsersList() {
-//        MediatorLiveData mediatorLiveData = new MediatorLiveData<User>();
+//        MediatorLiveData mediatorLiveData = new MediatorLiveData<LoggedInUser>();
 //        mediatorLiveData.addSource(getFrangerUsersList(),value -> {
 //            mediatorLiveData.setValue(value);
 //        });

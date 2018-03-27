@@ -10,7 +10,7 @@ import io.reactivex.subjects.PublishSubject;
  * Created by pavanm on 14/03/18.
  *
  * TODO split this class into feed and chat events so we can handle them separately.
- * This gives us teh advantage of not having to handle feed events in chat viewmodel
+ * This gives us the advantage of not having to handle feed events in chat viewmodel
  */
 
 public interface ChatInteractor {

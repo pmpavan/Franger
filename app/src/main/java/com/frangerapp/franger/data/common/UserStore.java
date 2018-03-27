@@ -8,7 +8,7 @@ import android.text.TextUtils;
 
 import com.frangerapp.franger.data.common.util.DataConstants;
 import com.frangerapp.franger.data.util.FRUtils;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.google.gson.Gson;
 
 /**
@@ -122,14 +122,14 @@ public class UserStore {
 
 
     @Nullable
-    public User getUser() {
+    public LoggedInUser getUser() {
         String userId = preferences.getString(PREFERENCE_TYPE.USER_ID.key, DataConstants.EMPTY);
         String userName = preferences.getString(PREFERENCE_TYPE.USER_NAME.key, DataConstants.EMPTY);
         String phoneNumber = preferences.getString(PREFERENCE_TYPE.PHONE_NUMBER.key, DataConstants.EMPTY);
         String countryCode = preferences.getString(PREFERENCE_TYPE.COUNTRY_CODE.key, DataConstants.EMPTY);
         String authToken = preferences.getString(PREFERENCE_TYPE.AUTH_TOKEN.key, DataConstants.EMPTY);
         if (!TextUtils.isEmpty(userId) && !TextUtils.isEmpty(phoneNumber) && !TextUtils.isEmpty(countryCode) && !TextUtils.isEmpty(authToken)) {
-            return new User(userId, userName, countryCode, phoneNumber, authToken);
+            return new LoggedInUser(userId, userName, countryCode, phoneNumber, authToken);
         } else {
             return null;
         }
@@ -144,14 +144,14 @@ public class UserStore {
         }
     }
 
-    public void saveUser(@NonNull User user) {
+    public void saveUser(@NonNull LoggedInUser loggedInUser) {
         synchronized (lock) {
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(PREFERENCE_TYPE.PHONE_NUMBER.key, user.getPhoneNumber());
-            editor.putString(PREFERENCE_TYPE.COUNTRY_CODE.key, user.getCountryCode());
-            editor.putString(PREFERENCE_TYPE.USER_ID.key, user.getUserId());
-            editor.putString(PREFERENCE_TYPE.USER_NAME.key, user.getUserName());
-            editor.putString(PREFERENCE_TYPE.AUTH_TOKEN.key, user.getAuthToken());
+            editor.putString(PREFERENCE_TYPE.PHONE_NUMBER.key, loggedInUser.getPhoneNumber());
+            editor.putString(PREFERENCE_TYPE.COUNTRY_CODE.key, loggedInUser.getCountryCode());
+            editor.putString(PREFERENCE_TYPE.USER_ID.key, loggedInUser.getUserId());
+            editor.putString(PREFERENCE_TYPE.USER_NAME.key, loggedInUser.getUserName());
+            editor.putString(PREFERENCE_TYPE.AUTH_TOKEN.key, loggedInUser.getAuthToken());
             editor.commit();
         }
     }

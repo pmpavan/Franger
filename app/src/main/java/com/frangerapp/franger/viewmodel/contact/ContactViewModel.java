@@ -11,11 +11,10 @@ import android.widget.Toast;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.data.common.UserStore;
-import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
 import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
 import com.frangerapp.franger.viewmodel.common.databinding.FieldUtils;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
@@ -41,7 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ContactViewModel extends UserBaseViewModel {
 
 
-    private User user;
+    private LoggedInUser loggedInUser;
     private Context context;
     private EventBus eventBus;
     private UserStore userStore;
@@ -53,12 +52,12 @@ public class ContactViewModel extends UserBaseViewModel {
 
     public ObservableField<String> searchTxt = new ObservableField<>("");
 
-    public ContactViewModel(Context context, EventBus eventBus, UserStore userStore, User user, ProfileInteractor profileInteractor) {
+    public ContactViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.profileInteractor = profileInteractor;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
         initSearch();
         onContactsFetchCompleted();
     }
@@ -73,7 +72,7 @@ public class ContactViewModel extends UserBaseViewModel {
          * TODO Move the logic of loading from db or api to interactor layer
          * https://proandroiddev.com/the-missing-google-sample-of-android-architecture-components-guide-c7d6e7306b8f
          */
-        profileInteractor.syncContacts(user.getUserId())
+        profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
                 .subscribe(this::onSuccess, this::onFailure, this::onContactsFetchCompleted);
@@ -175,13 +174,13 @@ public class ContactViewModel extends UserBaseViewModel {
 
         private ProfileInteractor profileInteractor;
         private EventBus eventBus;
-        private User user;
+        private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, User user, ProfileInteractor profileInteractor) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
             this.context = context;
-            this.user = user;
+            this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
             this.userStore = userStore;
             this.profileInteractor = profileInteractor;
@@ -191,7 +190,7 @@ public class ContactViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ContactViewModel.class)) {
-                return (T) new ContactViewModel(context, eventBus, userStore, user, profileInteractor);
+                return (T) new ContactViewModel(context, eventBus, userStore, loggedInUser, profileInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

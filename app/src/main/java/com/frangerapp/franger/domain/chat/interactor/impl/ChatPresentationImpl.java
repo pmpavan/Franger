@@ -16,7 +16,7 @@ import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.chat.util.ChatDataUtil;
-import com.frangerapp.franger.domain.user.model.User;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.google.gson.Gson;
 
@@ -42,7 +42,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     private Context context;
     private ChatApi chatApi;
-    private User user;
+    private LoggedInUser loggedInUser;
     private AppDatabase appDatabase;
     private SocketManager socketManager;
     private Gson gson;
@@ -53,10 +53,10 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private List<String> channelsBeingListened = new ArrayList<>();
 
 
-    public ChatPresentationImpl(@NonNull Context context, @NonNull ChatApi chatApi, @NotNull User user, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
+    public ChatPresentationImpl(@NonNull Context context, @NonNull ChatApi chatApi, @NotNull LoggedInUser loggedInUser, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
         this.context = context;
         this.chatApi = chatApi;
-        this.user = user;
+        this.loggedInUser = loggedInUser;
         this.appDatabase = appDatabase;
         this.socketManager = socketManager;
         this.gson = gson;
@@ -73,14 +73,14 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public String getFeedEventName() {
-        return ChatDataUtil.getFeedChannelNameJson(user.getUserId());
+        return ChatDataUtil.getFeedChannelNameJson(loggedInUser.getUserId());
     }
 
     @Override
     public void addFeedEvent() {
         ArrayList<String> list = new ArrayList<>();
         list.add(ChatDataConstants.INITIATE_CHAT);
-        FRLogger.msg("user id " + user.getUserId());
+        FRLogger.msg("loggedInUser id " + loggedInUser.getUserId());
         String event = getFeedEventName();
 //        socketManager.emitEvent(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, callbacks, getFeedEventName());
 //        socketManager.startListening(ChatDataUtil.getDomainName(), ChatDataConstants.INITIATE_CHAT, callbacks);
@@ -93,9 +93,9 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     public String getChatEventName(String userId, boolean isIncoming) {
         String chatChannelId;
         if (!isIncoming) {
-            chatChannelId = ChatDataUtil.getChatChannelNameJson(user.getUserId(), userId, gson);
+            chatChannelId = ChatDataUtil.getChatChannelNameJson(loggedInUser.getUserId(), userId, gson);
         } else {
-            chatChannelId = ChatDataUtil.getChatChannelNameJson(userId, user.getUserId(), gson);
+            chatChannelId = ChatDataUtil.getChatChannelNameJson(userId, loggedInUser.getUserId(), gson);
         }
         return chatChannelId;
     }
@@ -120,9 +120,9 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private String getChatName(String userId, boolean isIncoming) {
         String chatChannelId;
         if (!isIncoming) {
-            chatChannelId = ChatDataUtil.getChatChannelName(user.getUserId(), userId);
+            chatChannelId = ChatDataUtil.getChatChannelName(loggedInUser.getUserId(), userId);
         } else {
-            chatChannelId = ChatDataUtil.getChatChannelName(userId, user.getUserId());
+            chatChannelId = ChatDataUtil.getChatChannelName(userId, loggedInUser.getUserId());
         }
         return chatChannelId;
     }
@@ -139,7 +139,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         if (channelName != null) {
             int indexOfOtherUser = 1;
             String[] splitChannelName = channelName.split("_");
-            if (splitChannelName[1].equals(user.getUserId())) {
+            if (splitChannelName[1].equals(loggedInUser.getUserId())) {
                 indexOfOtherUser = 2;
             }
             message.userId = splitChannelName[indexOfOtherUser];
@@ -219,7 +219,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     private FeedNewMessageResponse broadcastFeedEvent(FeedNewMessageResponse feedNewMessageResponse) {
         boolean isIncoming = true;
         if (feedNewMessageResponse.getMessageFrom() != null) {
-            if (feedNewMessageResponse.getChannel() != null && feedNewMessageResponse.getChannel().split("_")[1].equals(user.getUserId())) {
+            if (feedNewMessageResponse.getChannel() != null && feedNewMessageResponse.getChannel().split("_")[1].equals(loggedInUser.getUserId())) {
                 isIncoming = false;
             }
         }

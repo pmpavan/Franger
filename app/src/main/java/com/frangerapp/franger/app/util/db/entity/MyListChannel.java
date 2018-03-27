@@ -13,18 +13,18 @@ import java.util.Date;
  */
 
 @Entity
-public class Channel {
+public class MyListChannel {
 
     @PrimaryKey
     @NotNull
     public String channelName;
     public Date updateAt;
     public Date createdAt;
-    public Boolean isIncoming;
     public long unreadMsgCount;
     public String otherUserId;
+    public boolean isUserMuted;
 
-    public Channel(@NonNull String channelName) {
+    public MyListChannel(@NonNull String channelName) {
         this.channelName = channelName;
     }
 }
