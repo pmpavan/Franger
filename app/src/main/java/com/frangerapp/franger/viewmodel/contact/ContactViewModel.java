@@ -66,7 +66,7 @@ public class ContactViewModel extends UserBaseViewModel {
     private void syncContacts() {
         if (itemViewModels.size() == 0)
             showLoading.set(true);
-//        profileInteractor.clearUsersList();
+        profileInteractor.clearUsersList();
 
         /**
          * TODO Move the logic of loading from db or api to interactor layer
@@ -89,7 +89,7 @@ public class ContactViewModel extends UserBaseViewModel {
         itemViewModels = new ArrayList<>();
 
         profileInteractor.getSortedUsersList()
-                .toObservable()
+//                .toObservable()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
                 .toList()
@@ -101,6 +101,7 @@ public class ContactViewModel extends UserBaseViewModel {
 
     private void onAllPhoneNumbersAssociationFailed(Throwable throwable) {
         //TODO move this to ui
+        showLoading.set(false);
         Toast.makeText(context, R.string.common_error_msg, Toast.LENGTH_SHORT).show();
     }
 

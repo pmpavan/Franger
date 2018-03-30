@@ -24,8 +24,8 @@ public interface MyListChannelDao {
     @Query("select * from MyListChannel")
     LiveData<List<MyListChannel>> getAllChannels();
 
-    @Query("select * from MyListChannel where channelName = :groupId")
-    LiveData<List<MyListChannel>> getChannels(String groupId);
+    @Query("select * from MyListChannel where channelName = :channelName")
+    LiveData<MyListChannel> getChannel(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateChannel(MyListChannel myListChannel);

@@ -104,7 +104,7 @@ public class ChatViewModel extends UserBaseViewModel {
 
     public void onSendButtonClicked() {
         if (!messageTxt.get().isEmpty()) {
-            chatInteractor.addChatEvent(chatContact.getUserId(), isIncoming);
+//            chatInteractor.addChatEvent(chatContact.getUserId(), isIncoming);
             chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, messageTxt.get());
             messageTxt.set("");
         }

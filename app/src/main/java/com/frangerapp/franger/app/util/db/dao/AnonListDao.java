@@ -17,15 +17,14 @@ import java.util.List;
 @Dao
 public interface AnonListDao {
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addChannel(AnonListChannel anonListChannel);
 
     @Query("select * from AnonListChannel")
-     LiveData<List<AnonListChannel>> getAllChannels();
+    LiveData<List<AnonListChannel>> getAllChannels();
 
-    @Query("select * from AnonListChannel where channelName = :groupId")
-    LiveData<List<AnonListChannel>> getChannels(String groupId);
+    @Query("select * from AnonListChannel where channelName = :channelName")
+    LiveData<AnonListChannel> getChannel(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateChannel(AnonListChannel anonListChannel);

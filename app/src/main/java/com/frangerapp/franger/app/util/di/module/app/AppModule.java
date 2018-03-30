@@ -31,11 +31,9 @@ import dagger.Provides;
 public class AppModule {
 
     private FrangerApp app;
-    private AppDatabase appDatabase;
 
-    public AppModule(FrangerApp app, AppDatabase appDatabase) {
+    public AppModule(FrangerApp app) {
         this.app = app;
-        this.appDatabase = appDatabase;
     }
 
     @Singleton
@@ -100,9 +98,9 @@ public class AppModule {
 
     @Provides
     @Singleton
-    AppDatabase getDatabase() {
+    AppDatabase getDatabase(FrangerApp app) {
         // TODO https://android.jlelse.eu/introduction-to-android-architecture-components-with-kotlin-room-livedata-1839c17597e
-        return appDatabase;
+        return AppDatabase.getDatabase(app);
     }
 
 }

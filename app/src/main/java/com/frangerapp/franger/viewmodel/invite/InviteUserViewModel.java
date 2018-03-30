@@ -64,7 +64,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
                     if (granted) { // Always true pre-M
                         syncContacts(loggedInUser);
                     } else {
-                        // Oups permission denied
+                        // Oops permission denied
                         Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -72,7 +72,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     private void syncContacts(LoggedInUser loggedInUser) {
         showLoading.set(true);
-//        profileInteractor.clearUsersList();
+        profileInteractor.clearUsersList();
         profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
@@ -84,7 +84,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
         FRLogger.msg("onComplete");
         itemViewModels = new ArrayList<>();
         profileInteractor.getSortedUsersList()
-                .toObservable()
+//                .toObservable()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
                 .toList()

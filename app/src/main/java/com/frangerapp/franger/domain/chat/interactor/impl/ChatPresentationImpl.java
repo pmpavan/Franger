@@ -14,6 +14,8 @@ import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatMessage;
 import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
+import com.frangerapp.franger.domain.chat.model.MessageResponse;
+import com.frangerapp.franger.domain.chat.model.MessageResponseData;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.chat.util.ChatDataUtil;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
@@ -73,7 +75,8 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public String getFeedEventName() {
-        return ChatDataUtil.getFeedChannelNameJson(loggedInUser.getUserId());
+//        return ChatDataUtil.getFeedChannelNameJson(loggedInUser.getUserId());
+        return ChatDataUtil.getFeedChannelNameJson("2");
     }
 
     @Override
@@ -81,12 +84,12 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         ArrayList<String> list = new ArrayList<>();
         list.add(ChatDataConstants.INITIATE_CHAT);
         FRLogger.msg("loggedInUser id " + loggedInUser.getUserId());
-        String event = getFeedEventName();
+        String feedChannelName = getFeedEventName();
 //        socketManager.emitEvent(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, callbacks, getFeedEventName());
 //        socketManager.startListening(ChatDataUtil.getDomainName(), ChatDataConstants.INITIATE_CHAT, callbacks);
-        socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, event);
+        socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, feedChannelName);
         chatEventsBeingListened.add(ChatDataConstants.INITIATE_CHAT);
-        channelsBeingListened.add(event);
+        channelsBeingListened.add(feedChannelName);
     }
 
     @Override
@@ -97,6 +100,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         } else {
             chatChannelId = ChatDataUtil.getChatChannelNameJson(userId, loggedInUser.getUserId(), gson);
         }
+        chatChannelId = ChatDataUtil.getChatChannelNameJson("1", "2", gson);
         return chatChannelId;
     }
 
@@ -108,7 +112,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public void addChatEvent(String channelName) {
-        if (!chatEventsBeingListened.contains(channelName)) {
+        if (!channelsBeingListened.contains(channelName)) {
             ArrayList<String> list = new ArrayList<>();
             list.add(ChatDataConstants.MESSAGE);
             socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, channelName);
@@ -124,12 +128,16 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         } else {
             chatChannelId = ChatDataUtil.getChatChannelName(userId, loggedInUser.getUserId());
         }
-        return chatChannelId;
+//        return chatChannelId;
+        return ChatDataUtil.getChatChannelName("1", "2");
     }
 
     @Override
     public void sendMessage(String userId, boolean isIncoming, String message) {
         String channelName = getChatName(userId, isIncoming);
+        if (!channelsBeingListened.contains(channelName)) {
+            addChatEvent(userId, isIncoming);
+        }
         sendMessage(channelName, message);
         addMessageToDb(channelName, message);
     }
@@ -166,50 +174,6 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return messageEvent;
     }
 
-    @Override
-    public void onConnecting(String TAG) {
-        FRLogger.msg("onConnecting " + TAG);
-    }
-
-    @Override
-    public void onSocketCreated(String TAG) {
-        FRLogger.msg("onSocketCreated " + TAG);
-    }
-
-    @Override
-    public void onMessage(String TAG, String message) {
-        FRLogger.msg("onMessage " + TAG + ' ' + message);
-    }
-
-    @Override
-    public void progressChanged(String TAG, int progress) {
-        FRLogger.msg("progressChanged " + TAG + ' ' + progress);
-    }
-
-    @Override
-    public void on(String TAG, String event, Object... args) {
-        FRLogger.msg("on " + TAG + ' ' + event + " " + args);
-        JSONObject data = (JSONObject) args[0];
-
-        if (event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
-            Observable.just(data)
-                    .map(JSONObject::toString)
-                    .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
-                    .map(this::addChannelToDb)
-                    .map(this::broadcastFeedEvent)
-                    .compose(SchedulerUtils.ioToMainObservableScheduler())
-                    .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
-        } else if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
-            Observable.just(data)
-                    .map(JSONObject::toString)
-                    .map(s -> gson.fromJson(s, ChatMessage.class))
-                    .map(this::addMessageToDb)
-                    .map(this::broadcastMessageEvent)
-                    .compose(SchedulerUtils.ioToMainObservableScheduler())
-                    .subscribe(chatMessage -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
-
-        }
-    }
 
     private FeedNewMessageResponse addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
 
@@ -231,35 +195,83 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return feedNewMessageResponse;
     }
 
-    private ChatMessage broadcastMessageEvent(ChatMessage chatMessage) {
+    private MessageResponse broadcastMessageEvent(MessageResponse chatMessage) {
         MessageEvent messageEvent = new MessageEvent();
         messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id);
         messageEvent.setMessage(chatMessage.getMessage());
         messageEvent.setChannel(chatMessage.getChannel());
+        messageEvent.setUserId(chatMessage.getData().getFromId());
         getMessageEvent().onNext(messageEvent);
         return chatMessage;
     }
 
-    private ChatMessage addMessageToDb(ChatMessage chatMessage) {
+    private MessageResponse addMessageToDb(MessageResponse chatMessage) {
+        FRLogger.msg("chat message " + chatMessage.getChannel() + " " + chatMessage.getMessage());
         addMessageToDb(chatMessage.getChannel(), chatMessage.getMessage());
         return chatMessage;
     }
 
+    /**
+     * Socket callbacks
+     */
+    @Override
+    public void onConnecting(String TAG) {
+        FRLogger.msg("ChatPresentationImpl onConnecting " + TAG);
+    }
+
+    @Override
+    public void onSocketCreated(String TAG) {
+        FRLogger.msg("ChatPresentationImpl onSocketCreated " + TAG);
+    }
+
+    @Override
+    public void onMessage(String TAG, String message) {
+        FRLogger.msg("ChatPresentationImpl onMessage " + TAG + ' ' + message);
+    }
+
+    @Override
+    public void progressChanged(String TAG, int progress) {
+        FRLogger.msg("ChatPresentationImpl progressChanged " + TAG + ' ' + progress);
+    }
+
+    @Override
+    public void on(String TAG, String event, Object... args) {
+        JSONObject data = (JSONObject) args[0];
+        FRLogger.msg("ChatPresentationImpl on " + TAG + ' ' + event + " " + data.toString());
+
+        if (event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
+            Observable.just(data)
+                    .map(JSONObject::toString)
+                    .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
+                    .map(this::addChannelToDb)
+                    .map(this::broadcastFeedEvent)
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
+        } else if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
+            Observable.just(data)
+                    .map(JSONObject::toString)
+                    .map(s -> gson.fromJson(s, MessageResponse.class))
+                    .map(this::addMessageToDb)
+                    .map(this::broadcastMessageEvent)
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(chatMessage -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
+        }
+    }
+
     @Override
     public void onError(String TAG, SocketHelper errorCode) {
-        FRLogger.msg("onError " + TAG + ' ' + errorCode.getMessage());
-
+        FRLogger.msg("ChatPresentationImpl onError " + TAG + ' ' + errorCode.getMessage());
     }
 
     @Override
     public void onDisconnecting(String TAG) {
-        FRLogger.msg("onDisconnecting " + TAG);
+        FRLogger.msg("ChatPresentationImpl onDisconnecting " + TAG);
 
     }
 
     @Override
     public void onSocketDestroyed(String TAG) {
-        FRLogger.msg("onSocketDestroyed " + TAG);
+        FRLogger.msg("ChatPresentationImpl onSocketDestroyed " + TAG);
 
     }
 

@@ -77,20 +77,24 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     @Override
     public Observable<List<Joined>> syncContacts(@NonNull String userId) {
         return RxContacts.fetch(context)
-                .map(contact -> {
-                    clearUsersList();
-                    return contact;
-                })
+//                .map(contact -> {
+//                    clearUsersList();
+//                    return contact;
+//                })
                 .buffer(50)
                 .flatMapSingle(this::addUserToDb)
                 .flatMapSingle(lists -> profileApi.syncContacts(userId, lists, false))
                 .map(ContactSyncResponse::getJoinedList)
-                .flatMapIterable(joineds -> joineds)
+                .flatMapIterable(joineds -> {
+                    FRLogger.msg("joined   " + joineds);
+                    return joineds;
+                })
                 .flatMapSingle(joined -> Single.fromCallable(() -> {
                     User user = new User();
                     user.phoneNumber = joined.getOriginalNumber();
                     user.userId = joined.getUserId();
                     appDatabase.userDao().updateUser(joined.getUserId(), joined.getOriginalNumber());
+                    FRLogger.msg("user   " + user);
                     return joined;
                 }))
                 .toList()
@@ -159,7 +163,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     }
 
     @Override
-    public Single<List<User>> getSortedUsersList() {
+    public Observable<List<User>> getSortedUsersList() {
 //        MediatorLiveData mediatorLiveData = new MediatorLiveData<LoggedInUser>();
 //        mediatorLiveData.addSource(getFrangerUsersList(),value -> {
 //            mediatorLiveData.setValue(value);
@@ -168,7 +172,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
 //            mediatorLiveData.setValue(value);
 //        });
 
-        return Single.zip(getFrangerUsersList(), getNonFrangerUsersList(),
+        return Observable.zip(getFrangerUsersList().toObservable(), getNonFrangerUsersList().toObservable(),
                 (users, users2) -> {
                     List<com.frangerapp.franger.app.util.db.entity.User> list = new ArrayList<>(users);
                     list.addAll(users2);

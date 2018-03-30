@@ -16,6 +16,11 @@ public class FeedNewMessageResponse {
     @Expose
     private String channel;
 
+
+    public FeedNewMessageResponse() {
+
+    }
+
     public MessageFrom getMessageFrom() {
         return messageFrom;
     }

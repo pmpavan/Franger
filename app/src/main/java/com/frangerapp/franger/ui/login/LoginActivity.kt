@@ -37,8 +37,8 @@ class LoginActivity : LoginBaseActivity() {
         val TAG = "LoginActivity"
         @JvmStatic
         fun newInstance(activity: Activity): Intent {
-            val homeIntent = Intent(activity, LoginActivity::class.java)
-            return homeIntent
+            val intent = Intent(activity, LoginActivity::class.java)
+            return intent
         }
     }
 

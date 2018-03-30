@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.frangerapp.franger.app.util.db.converter.DateConverter;
+import com.frangerapp.franger.app.util.db.dao.AnonListDao;
 import com.frangerapp.franger.app.util.db.dao.MessageDao;
 import com.frangerapp.franger.app.util.db.dao.MyListChannelDao;
 import com.frangerapp.franger.app.util.db.dao.UserDao;
@@ -31,7 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MyListChannelDao myListChannelDao();
 
-    public abstract AnonListChannel anonListChannel();
+    public abstract AnonListDao anonListDao();
 
 
     public static AppDatabase getDatabase(Context context) {
