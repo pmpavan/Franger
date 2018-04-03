@@ -19,7 +19,7 @@ import io.reactivex.Single;
 @Dao
 public interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void addMessage(Message message);
+    long addMessage(Message message);
 
     @Query("select * from message")
     public Single<List<Message>> getAllMessages();

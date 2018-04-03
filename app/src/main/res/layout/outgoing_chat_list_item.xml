@@ -5,23 +5,25 @@
 
         <variable
             name="vm"
-            type="com.frangerapp.franger.viewmodel.chat.ChatListItemViewModel" />
+            type="com.frangerapp.franger.viewmodel.chat.ChatListItemUiState" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(vm.userId)}" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{vm.message}" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{vm.type.type}" />
     </LinearLayout>
 
 </layout>

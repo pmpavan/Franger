@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class MessageResponse {
 
+    private long messageId;
+
     @SerializedName("data")
     @Expose
     private MessageResponseData data;
@@ -71,5 +73,13 @@ public class MessageResponse {
                 ", message='" + message + '\'' +
                 ", channel='" + channel + '\'' +
                 '}';
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 }

@@ -1,5 +1,6 @@
 package com.frangerapp.franger.ui.chat;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,7 +10,8 @@ import android.view.ViewGroup;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.databinding.IncomingChatListItemBinding;
 import com.frangerapp.franger.databinding.OutgoingChatListItemBinding;
-import com.frangerapp.franger.viewmodel.chat.ChatListItemViewModel;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
+import com.frangerapp.franger.viewmodel.chat.ChatListItemUiState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,49 +23,96 @@ import java.util.List;
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    private List<ChatListItemViewModel> models = new ArrayList<>();
+    private Context context;
+    private List<ChatListItemUiState> items = new ArrayList<>();
 
-    public ChatListAdapter(List<ChatListItemViewModel> models) {
-        this.models = models;
+    private ChatListItemUiState.ChatItemClickHandler handler;
+
+    private LoggedInUser loggedInUser;
+
+    private int ITEM_ME = 1;
+    private int ITEM_OTHER = 2;
+
+    public ChatListAdapter(Context context, LoggedInUser loggedInUser) {
+        this.context = context;
+        this.loggedInUser = loggedInUser;
     }
 
-    public void setModels(List<ChatListItemViewModel> models) {
-        this.models = models;
+    public void setItems(List<ChatListItemUiState> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == ChatListItemViewModel.CHAT_ITEM_TYPE.INCOMING.type) {
+        if (viewType == ITEM_ME) {
             return IncomingChatViewHolder.create(LayoutInflater.from(parent.getContext()), parent);
         } else {
             return OutgoingChatViewHolder.create(LayoutInflater.from(parent.getContext()), parent);
         }
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ChatListItemViewModel model = models.get(position);
-        if (model.getType() == ChatListItemViewModel.CHAT_ITEM_TYPE.INCOMING) {
+        ChatListItemUiState model = items.get(position);
+        if (holder.getItemViewType() == ITEM_ME) {
             ((IncomingChatViewHolder) holder).bind(model);
+            ((IncomingChatViewHolder) holder).binding.getRoot().setOnClickListener(v -> {
+                if (handler != null)
+                    handler.onItemClick(position, model);
+            });
         } else {
             ((OutgoingChatViewHolder) holder).bind(model);
+            ((OutgoingChatViewHolder) holder).binding.getRoot().setOnClickListener(v -> {
+                if (handler != null)
+                    handler.onItemClick(position, model);
+            });
         }
     }
 
     @Override
     public int getItemCount() {
-        return models.size();
+        return items.size();
+    }
+
+
+    public ChatListItemUiState getItem(int position) {
+        return items.get(position);
+    }
+
+    public void addAll(List<ChatListItemUiState> items) {
+        this.items.addAll(items);
+    }
+
+    public void clear() {
+        items.clear();
+    }
+
+    public boolean isEmpty() {
+        return items.size() == 0;
     }
 
     @Override
     public int getItemViewType(int position) {
-        ChatListItemViewModel model = models.get(position);
-        return model.getType().type;
+        ChatListItemUiState model = items.get(position);
+        if (loggedInUser.getUserId().equalsIgnoreCase(model.getUserId())) {
+            return ITEM_ME;
+        } else {
+            return ITEM_OTHER;
+        }
     }
 
-    public static class IncomingChatViewHolder extends RecyclerView.ViewHolder {
+    public ChatListItemUiState.ChatItemClickHandler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(ChatListItemUiState.ChatItemClickHandler handler) {
+        this.handler = handler;
+    }
+
+    static class IncomingChatViewHolder extends RecyclerView.ViewHolder {
         private final IncomingChatListItemBinding binding;
 
         static IncomingChatViewHolder create(LayoutInflater inflater, ViewGroup parent) {
@@ -76,13 +125,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
-        public void bind(ChatListItemViewModel item) {
+        public void bind(ChatListItemUiState item) {
             binding.setVm(item);
             binding.executePendingBindings();
         }
     }
 
-    public static class OutgoingChatViewHolder extends RecyclerView.ViewHolder {
+    static class OutgoingChatViewHolder extends RecyclerView.ViewHolder {
         private final OutgoingChatListItemBinding binding;
 
         static OutgoingChatViewHolder create(LayoutInflater inflater, ViewGroup parent) {
@@ -95,7 +144,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
-        public void bind(ChatListItemViewModel item) {
+        public void bind(ChatListItemUiState item) {
             binding.setVm(item);
             binding.executePendingBindings();
         }

@@ -27,9 +27,7 @@ public interface ChatInteractor {
 
     void addChatEvent(String userId, boolean isIncoming);
 
-    void addChatEvent(String channelName);
-
-    void sendMessage(String userId, boolean isIncoming, String message);
+    long sendMessage(String userId, boolean isIncoming, String message);
 
     List<String> getChatEventsBeingListened();
 }

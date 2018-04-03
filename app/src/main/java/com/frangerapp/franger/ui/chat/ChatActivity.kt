@@ -1,17 +1,20 @@
 package com.frangerapp.franger.ui.chat
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import com.franger.mobile.logger.FRLogger
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule
 import com.frangerapp.franger.databinding.ActivityChatBinding
 import com.frangerapp.franger.domain.chat.model.ChatContact
 import com.frangerapp.franger.ui.user.UserBaseActivity
+import com.frangerapp.franger.viewmodel.chat.ChatListItemUiState
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants
@@ -19,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.util.ArrayList
 import javax.inject.Inject
 
 class ChatActivity : UserBaseActivity() {
@@ -41,9 +45,14 @@ class ChatActivity : UserBaseActivity() {
     lateinit var eventBus: EventBus
     @Inject
     lateinit var factory: ViewModelProvider.Factory
+    @Inject
+    lateinit var adapter: ChatListAdapter
+    @Inject
+    lateinit var listState: ChatListUiState
 
     private lateinit var viewDataBinding: ActivityChatBinding
     private lateinit var viewModel: ChatViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FrangerApp.get(this@ChatActivity)
@@ -57,6 +66,8 @@ class ChatActivity : UserBaseActivity() {
         setupViews()
         setupControllers()
         onPageLoaded()
+
+
     }
 
 
@@ -90,15 +101,24 @@ class ChatActivity : UserBaseActivity() {
     private fun setupViews() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        manageStatusBar(R.color.colorAccent)
+        manageStatusBar(R.color.colorPrimary)
         manageActionBarWithTitle(toolbar, "")
     }
 
     private fun setupControllers() {
+        //        adapter.setHandler(viewModel)
+        viewDataBinding.chatList.adapter = adapter
+
+        viewDataBinding.tickets = listState
+        viewDataBinding.handler = viewModel
+        viewModel.data.observe(this@ChatActivity, Observer { t ->
+            FRLogger.msg("received list ${t.toString()}")
+            listState.update(t)
+        })
     }
 
     private fun onPageLoaded() {
-        viewModel.onPageLoaded(chatContact, isIncoming,channelName)
+        viewModel.onPageLoaded(chatContact, isIncoming, channelName)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

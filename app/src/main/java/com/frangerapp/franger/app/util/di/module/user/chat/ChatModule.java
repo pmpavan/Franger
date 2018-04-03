@@ -10,6 +10,8 @@ import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.chat.ChatActivity;
+import com.frangerapp.franger.ui.chat.ChatListAdapter;
+import com.frangerapp.franger.ui.chat.ChatListUiState;
 import com.frangerapp.franger.viewmodel.chat.ChatViewModel;
 import com.google.gson.Gson;
 
@@ -33,7 +35,19 @@ public class ChatModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor, Gson gson) {
-        return new ChatViewModel.Factory(context, eventBus, userStore, loggedInUser, profileInteractor, gson);
+    ChatListAdapter getChatListAdapter(Context context, @NonNull LoggedInUser loggedInUser) {
+        return new ChatListAdapter(context,loggedInUser);
+    }
+
+    @Provides
+    @ActivityScope
+    ChatListUiState getChatListUiState() {
+        return new ChatListUiState();
+    }
+
+    @Provides
+    @ActivityScope
+    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor) {
+        return new ChatViewModel.Factory(context, eventBus, userStore, loggedInUser, profileInteractor);
     }
 }

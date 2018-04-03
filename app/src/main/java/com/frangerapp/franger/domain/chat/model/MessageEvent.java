@@ -1,5 +1,9 @@
 package com.frangerapp.franger.domain.chat.model;
 
+import com.frangerapp.franger.app.util.db.entity.User;
+
+import java.util.Date;
+
 /**
  * Created by pavanm on 19/03/18.
  */
@@ -16,6 +20,12 @@ public class MessageEvent {
     private String channel;
 
     private boolean isIncoming;
+
+    private Date timestamp;
+
+    private User user;
+
+    private long messageId;
 
     public MessageEvent() {
     }
@@ -60,6 +70,30 @@ public class MessageEvent {
         this.eventType = eventType;
     }
 
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
+    }
+
     @Override
     public String toString() {
         return "MessageEvent{" +
@@ -68,6 +102,9 @@ public class MessageEvent {
                 ", message='" + message + '\'' +
                 ", channel='" + channel + '\'' +
                 ", isIncoming=" + isIncoming +
+                ", timestamp=" + timestamp +
+                ", user=" + user +
+                ", messageId=" + messageId +
                 '}';
     }
 }

@@ -8,7 +8,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.frangerapp.franger.BR;
+import com.frangerapp.franger.ui.chat.ChatListAdapter;
 import com.frangerapp.franger.ui.util.RecyclerBindingAdapter;
+import com.frangerapp.franger.viewmodel.chat.ChatListItemUiState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,17 @@ public class BaseBindingAdapters {
                 handler.onItemClick(position, item);
         });
 
+    }
+
+    @BindingAdapter({"chat_items"})
+    public static void setAdapter(RecyclerView recyclerView, ArrayList items) {
+        ChatListAdapter adapter = (ChatListAdapter) recyclerView.getAdapter();
+        if (adapter != null) {
+            adapter.clear();
+            if (items != null)
+                adapter.addAll(items);
+            adapter.notifyDataSetChanged();
+        }
     }
 
 }
