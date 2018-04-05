@@ -163,7 +163,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     }
 
     @Override
-    public Observable<List<User>> getSortedUsersList() {
+    public Single<List<User>> getSortedUsersList() {
 //        MediatorLiveData mediatorLiveData = new MediatorLiveData<LoggedInUser>();
 //        mediatorLiveData.addSource(getFrangerUsersList(),value -> {
 //            mediatorLiveData.setValue(value);
@@ -172,7 +172,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
 //            mediatorLiveData.setValue(value);
 //        });
 
-        return Observable.zip(getFrangerUsersList().toObservable(), getNonFrangerUsersList().toObservable(),
+        return Single.zip(getFrangerUsersList(), getNonFrangerUsersList(),
                 (users, users2) -> {
                     List<com.frangerapp.franger.app.util.db.entity.User> list = new ArrayList<>(users);
                     list.addAll(users2);

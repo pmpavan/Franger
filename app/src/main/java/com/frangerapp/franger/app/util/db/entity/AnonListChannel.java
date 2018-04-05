@@ -22,6 +22,7 @@ public class AnonListChannel {
     public Date createdAt;
     public long unreadMsgCount;
     public String otherUserId;
+    public String anonymisedUserName;
     public boolean isUserBlocked;
 
     public AnonListChannel(@NonNull String channelName) {

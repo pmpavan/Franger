@@ -1,9 +1,11 @@
 package com.frangerapp.franger.domain.chat.interactor;
 
+import com.frangerapp.franger.app.util.db.entity.Message;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 
 import java.util.List;
 
+import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 
 /**
@@ -29,5 +31,6 @@ public interface ChatInteractor {
 
     long sendMessage(String userId, boolean isIncoming, String message);
 
-    List<String> getChatEventsBeingListened();
+    Single<List<Message>> getMessages(String userId, boolean isIncoming);
+
 }

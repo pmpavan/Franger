@@ -42,8 +42,6 @@ public class HomeViewModel extends UserBaseViewModel {
         this.chatInteractor = chatInteractor;
         this.gson = gson;
         chatInteractor.addFeedEvent();
-        //TODO remove this line
-        chatInteractor.addChatEvent("1", true);
     }
 
     public void onFabClicked() {

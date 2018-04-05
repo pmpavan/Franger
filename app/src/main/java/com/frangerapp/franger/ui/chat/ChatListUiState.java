@@ -14,7 +14,7 @@ public class ChatListUiState {
 
     public interface ActionClickHandler {
 
-        void onItemClick();
+        void onItemClick(ChatListUiState chatListUiState);
     }
 
     private ObservableArrayList<ChatListItemUiState> items;

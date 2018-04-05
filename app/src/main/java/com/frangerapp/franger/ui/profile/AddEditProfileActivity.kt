@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 import android.databinding.adapters.TextViewBindingAdapter.setText
 import br.com.simplepass.loading_button_lib.interfaces.OnAnimationEndListener
+import com.frangerapp.franger.ui.login.LoginActivity
 
 
 class AddEditProfileActivity : UserBaseActivity() {
@@ -114,7 +115,9 @@ class AddEditProfileActivity : UserBaseActivity() {
 
     private fun moveToInviteActivity() {
         val intent = InviteActivity.newInstance(this@AddEditProfileActivity)
-        startActivity(intent)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this@AddEditProfileActivity.startActivity(intent)
         finish()
     }
 }

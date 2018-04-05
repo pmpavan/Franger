@@ -101,7 +101,7 @@ class ChatActivity : UserBaseActivity() {
     private fun setupViews() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        manageStatusBar(R.color.colorPrimary)
+        manageStatusBar(R.color.statusbar_color)
         manageActionBarWithTitle(toolbar, "")
     }
 

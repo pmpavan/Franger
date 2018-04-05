@@ -27,10 +27,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -43,7 +45,6 @@ public class ContactViewModel extends UserBaseViewModel {
     private LoggedInUser loggedInUser;
     private Context context;
     private EventBus eventBus;
-    private UserStore userStore;
     private ProfileInteractor profileInteractor;
 
     public ObservableBoolean showLoading = new ObservableBoolean(false);
@@ -52,10 +53,9 @@ public class ContactViewModel extends UserBaseViewModel {
 
     public ObservableField<String> searchTxt = new ObservableField<>("");
 
-    public ContactViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
+    public ContactViewModel(Context context, EventBus eventBus, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
         this.context = context;
         this.eventBus = eventBus;
-        this.userStore = userStore;
         this.profileInteractor = profileInteractor;
         this.loggedInUser = loggedInUser;
         initSearch();
@@ -72,10 +72,11 @@ public class ContactViewModel extends UserBaseViewModel {
          * TODO Move the logic of loading from db or api to interactor layer
          * https://proandroiddev.com/the-missing-google-sample-of-android-architecture-components-guide-c7d6e7306b8f
          */
-        profileInteractor.syncContacts(loggedInUser.getUserId())
+        Disposable disposable=  profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
                 .subscribe(this::onSuccess, this::onFailure, this::onContactsFetchCompleted);
+        disposables.add(disposable);
 
     }
 
@@ -88,14 +89,15 @@ public class ContactViewModel extends UserBaseViewModel {
         FRLogger.msg("onContactsFetchCompleted");
         itemViewModels = new ArrayList<>();
 
-        profileInteractor.getSortedUsersList()
-//                .toObservable()
+        Disposable disposable = profileInteractor.getSortedUsersList()
+                .toObservable()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new ContactListItemViewModel(user)))
                 .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
+        disposables.add(disposable);
     }
 
 
@@ -108,7 +110,7 @@ public class ContactViewModel extends UserBaseViewModel {
     private void onPhoneNumberAssociated(List<ContactListItemViewModel> inviteUserListItemViewModels) {
         showLoading.set(false);
         itemViewModels.addAll(inviteUserListItemViewModels);
-        if (searchTxt.get().isEmpty())
+        if (Objects.requireNonNull(searchTxt.get()).isEmpty())
             inviteUserList.set(itemViewModels);
     }
 
@@ -137,14 +139,15 @@ public class ContactViewModel extends UserBaseViewModel {
     }
 
     private void initSearch() {
-        FieldUtils.toObservable(searchTxt)
+        Disposable disposable=FieldUtils.toObservable(searchTxt)
                 .debounce(30L, TimeUnit.MILLISECONDS)
                 .subscribe(this::filterContacts, t -> FRLogger.msg("Error " + t.getMessage()));
+        disposables.add(disposable);
     }
 
     private void filterContacts(String searchTxt) {
         FRLogger.msg("search Txt " + searchTxt);
-        Observable.just(itemViewModels)
+        Disposable disposable = Observable.just(itemViewModels)
                 .concatMapIterable(list -> list)
                 .filter(contact ->
                         searchTxt.isEmpty()
@@ -153,6 +156,7 @@ public class ContactViewModel extends UserBaseViewModel {
                 .toList()
                 .compose(SchedulerUtils.ioToMainSingleScheduler())
                 .subscribe(this::onListFiltered, t -> FRLogger.msg("Error " + t.getMessage()));
+        disposables.add(disposable);
     }
 
     private void onListFiltered(List<ContactListItemViewModel> contactListItemViewModels) {
@@ -177,13 +181,11 @@ public class ContactViewModel extends UserBaseViewModel {
         private EventBus eventBus;
         private LoggedInUser loggedInUser;
         private Context context;
-        private UserStore userStore;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
+        public Factory(Context context, EventBus eventBus, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
             this.context = context;
             this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
-            this.userStore = userStore;
             this.profileInteractor = profileInteractor;
         }
 
@@ -191,7 +193,7 @@ public class ContactViewModel extends UserBaseViewModel {
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ContactViewModel.class)) {
-                return (T) new ContactViewModel(context, eventBus, userStore, loggedInUser, profileInteractor);
+                return (T) new ContactViewModel(context, eventBus, loggedInUser, profileInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

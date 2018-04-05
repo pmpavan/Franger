@@ -11,6 +11,8 @@ import com.frangerapp.franger.app.util.db.entity.AnonListChannel;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 /**
  * Created by pavanm on 27/03/18.
  */
@@ -21,10 +23,10 @@ public interface AnonListDao {
     void addChannel(AnonListChannel anonListChannel);
 
     @Query("select * from AnonListChannel")
-    LiveData<List<AnonListChannel>> getAllChannels();
+    Single<List<AnonListChannel>> getAllChannels();
 
     @Query("select * from AnonListChannel where channelName = :channelName")
-    LiveData<AnonListChannel> getChannel(String channelName);
+    Single<AnonListChannel> getChannel(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateChannel(AnonListChannel anonListChannel);

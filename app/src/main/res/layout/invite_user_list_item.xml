@@ -31,11 +31,13 @@
             android:text="@{vm.userIdTxt}"
             tools:text="1" />
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{vm::onInviteButtonClicked}"
+            android:padding="3dp"
             android:text="@string/invite"
+            android:textColor="#0D47A1"
             android:visibility="@{!vm.isExistingUser}" />
     </LinearLayout>
 </layout>

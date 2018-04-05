@@ -31,7 +31,7 @@ public class ContactModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory contactActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ProfileInteractor profileInteractor) {
-        return new ContactViewModel.Factory(context, eventBus, userStore, loggedInUser, profileInteractor);
+    ViewModelProvider.Factory contactActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NotNull EventBus eventBus, @NotNull ProfileInteractor profileInteractor) {
+        return new ContactViewModel.Factory(context, eventBus, loggedInUser, profileInteractor);
     }
 }

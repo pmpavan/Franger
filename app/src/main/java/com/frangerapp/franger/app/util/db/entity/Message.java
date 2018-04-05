@@ -23,6 +23,8 @@ public class Message {
     @NotNull
     public String userId;
     @NotNull
+    public String channelName;
+    @NotNull
     public String message;
     @TypeConverters(DateConverter.class)
     public Date sentAt;

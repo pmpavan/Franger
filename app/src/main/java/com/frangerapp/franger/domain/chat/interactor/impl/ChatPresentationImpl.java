@@ -8,7 +8,9 @@ import com.franger.socket.SocketCallbacks;
 import com.franger.socket.SocketHelper;
 import com.franger.socket.socketio.SocketManager;
 import com.frangerapp.franger.app.util.db.AppDatabase;
+import com.frangerapp.franger.app.util.db.entity.AnonListChannel;
 import com.frangerapp.franger.app.util.db.entity.Message;
+import com.frangerapp.franger.app.util.db.entity.MyListChannel;
 import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.data.chat.ChatApi;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
@@ -28,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
 /**
@@ -57,13 +61,16 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     private HashMap<String, User> usersList = new HashMap<>();
 
-    public ChatPresentationImpl(@NonNull Context context, @NonNull ChatApi chatApi, @NotNull LoggedInUser loggedInUser, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
+    private Random random;
+
+    public ChatPresentationImpl(@NonNull Context context, @NonNull ChatApi chatApi, @NotNull LoggedInUser loggedInUser, AppDatabase appDatabase, SocketManager socketManager, Gson gson, Random random) {
         this.context = context;
         this.chatApi = chatApi;
         this.loggedInUser = loggedInUser;
         this.appDatabase = appDatabase;
         this.socketManager = socketManager;
         this.gson = gson;
+        this.random = random;
     }
 
     @NonNull
@@ -77,8 +84,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public String getFeedEventName() {
-//        return ChatDataUtil.getFeedChannelNameJson(loggedInUser.getUserId());
-        return ChatDataUtil.getFeedChannelNameJson("2");
+        return ChatDataUtil.getFeedChannelNameJson(loggedInUser.getUserId());
     }
 
     @Override
@@ -87,8 +93,8 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         list.add(ChatDataConstants.INITIATE_CHAT);
         FRLogger.msg("loggedInUser id " + loggedInUser.getUserId());
         String feedChannelName = getFeedEventName();
-//        socketManager.emitEvent(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, callbacks, getFeedEventName());
-//        socketManager.startListening(ChatDataUtil.getDomainName(), ChatDataConstants.INITIATE_CHAT, callbacks);
+//        socketManager.emitEvent(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, this, getFeedEventName());
+//        socketManager.startListening(ChatDataUtil.getDomainName(), ChatDataConstants.INITIATE_CHAT, this);
         socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, feedChannelName);
         chatEventsBeingListened.add(ChatDataConstants.INITIATE_CHAT);
         channelsBeingListened.add(feedChannelName);
@@ -102,7 +108,6 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         } else {
             chatChannelId = ChatDataUtil.getChatChannelNameJson(userId, loggedInUser.getUserId(), gson);
         }
-        chatChannelId = ChatDataUtil.getChatChannelNameJson("1", "2", gson);
         return chatChannelId;
     }
 
@@ -116,6 +121,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
             socketManager.emitAndListenEvents(ChatDataUtil.getDomainName(), ChatDataConstants.JOIN, list, this, event);
             chatEventsBeingListened.add(ChatDataConstants.MESSAGE);
             channelsBeingListened.add(channelName);
+            FRLogger.msg("channel name " + channelName);
         }
     }
 
@@ -126,8 +132,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         } else {
             chatChannelId = ChatDataUtil.getChatChannelName(userId, loggedInUser.getUserId());
         }
-//        return chatChannelId;
-        return ChatDataUtil.getChatChannelName("1", "2");
+        return chatChannelId;
     }
 
     @Override
@@ -140,19 +145,22 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return addMessageToDb(channelName, message);
     }
 
-    private long addMessageToDb(String channelName, String msg) {
+    private long addMessageToDb(@NotNull String channelName, String msg) {
         Message message = new Message();
-        if (channelName != null) {
-            int indexOfOtherUser = 1;
-            String[] splitChannelName = channelName.split("_");
-            if (splitChannelName[1].equals(loggedInUser.getUserId())) {
-                indexOfOtherUser = 2;
-            }
-            message.userId = splitChannelName[indexOfOtherUser];
-        }
+        message.userId = loggedInUser.getUserId();
         message.message = msg;
+        message.channelName = channelName;
         message.sentAt = new Date();
         return appDatabase.messageDao().addMessage(message);
+    }
+
+    private String getUserId(String channelName) {
+        int indexOfOtherUser = 1;
+        String[] splitChannelName = channelName.split("_");
+        if (splitChannelName[1].equals(loggedInUser.getUserId())) {
+            indexOfOtherUser = 2;
+        }
+        return splitChannelName[indexOfOtherUser];
     }
 
     private void sendMessage(String channel, String message) {
@@ -163,8 +171,13 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     }
 
     @Override
-    public List<String> getChatEventsBeingListened() {
-        return chatEventsBeingListened;
+    public Single<List<Message>> getMessages(String userId, boolean isIncoming) {
+        String channelName = getChatName(userId, isIncoming);
+        return getMessages(channelName);
+    }
+
+    public Single<List<Message>> getMessages(String channelName) {
+        return appDatabase.messageDao().getMessages(channelName);
     }
 
     @Override
@@ -172,10 +185,64 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return messageEvent;
     }
 
+    private String getRandomName() {
+        String name;
+        ArrayList<String> randomNames = chatApi.getRandomNamesList();
+        int index = random.nextInt(randomNames.size());
+        name = randomNames.get(index);
+        randomNames.remove(index);
+        return name;
+    }
 
-    private FeedNewMessageResponse addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
+    private Single<FeedNewMessageResponse> addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
+        return (Single<FeedNewMessageResponse>) addChannelToDb(feedNewMessageResponse, feedNewMessageResponse.getChannel(), feedNewMessageResponse.getMessageFrom().getId());
+    }
 
-        return feedNewMessageResponse;
+    private Single<MessageResponse> addChannelToDb(MessageResponse messageResponse) {
+        return (Single<MessageResponse>) addChannelToDb(messageResponse, messageResponse.getChannel(), messageResponse.getData().getFromId());
+    }
+
+    private Single addChannelToDb(Object object, String channelName, String fromId) {
+        boolean isIncoming = isIncoming(channelName);
+        if (isIncoming) {
+            return appDatabase.myListChannelDao().getChannel(channelName)
+                    .doOnError(t -> {
+                        //New Chat so insert new record
+                        MyListChannel myListChannel = new MyListChannel(channelName);
+                        myListChannel.createdAt = new Date();
+                        myListChannel.otherUserId = fromId;
+                        myListChannel.unreadMsgCount = 0;
+                        myListChannel.updateAt = new Date();
+                        appDatabase.myListChannelDao().addChannel(myListChannel);
+                    })
+                    .map(myListChannel -> {
+                        myListChannel.updateAt = new Date();
+                        myListChannel.unreadMsgCount += 1;
+                        appDatabase.myListChannelDao().updateChannel(myListChannel);
+                        return Single.just(object);
+                    })
+                    .blockingGet();
+        } else {
+            return appDatabase.anonListDao().getChannel(channelName)
+                    .doOnError(t -> {
+                        //New Chat so insert new record
+                        AnonListChannel anonListChannel = new AnonListChannel(channelName);
+                        anonListChannel.createdAt = new Date();
+                        anonListChannel.otherUserId = fromId;
+                        anonListChannel.unreadMsgCount = 0;
+                        anonListChannel.anonymisedUserName = getRandomName();
+                        anonListChannel.updateAt = new Date();
+                        appDatabase.anonListDao().addChannel(anonListChannel);
+                    })
+                    .map(anonListChannel -> {
+
+                        anonListChannel.updateAt = new Date();
+                        anonListChannel.unreadMsgCount += 1;
+                        appDatabase.anonListDao().updateChannel(anonListChannel);
+                        return Single.just(object);
+                    })
+                    .blockingGet();
+        }
     }
 
     private MessageEvent broadcastFeedEvent(FeedNewMessageResponse feedNewMessageResponse) {
@@ -206,6 +273,41 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return chatMessage;
     }
 
+
+    private boolean isIncoming(String channelName) {
+        boolean isIncoming = true;
+        if (channelName != null) {
+            String[] splitChannelName = channelName.split("_");
+            if (splitChannelName[1].equals(loggedInUser.getUserId())) {
+                isIncoming = false;
+            }
+        }
+        return isIncoming;
+    }
+
+    private Single<MessageEvent> getUserDetails(MessageEvent data) {
+        FRLogger.msg("chat message getUserDetails " + data.getUserId());
+        if (!usersList.containsKey(data.getUserId())) {
+            return appDatabase.userDao().getUser(data.getUserId())
+                    .map(user -> {
+                        usersList.put(data.getUserId(), user);
+                        FRLogger.msg("user " + user);
+                        data.setUser(user);
+                        return data;
+                    });
+        } else {
+            User user = usersList.get(data.getUserId());
+            data.setUser(user);
+            return Single.just(data);
+        }
+    }
+
+    private MessageEvent postMessageEvent(MessageEvent messageEvent) {
+        FRLogger.msg("chat message postMessageEvent");
+        getMessageEvent().onNext(messageEvent);
+        return messageEvent;
+    }
+
     /**
      * Socket callbacks
      */
@@ -233,73 +335,36 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     public void on(String TAG, String event, Object... args) {
         JSONObject data = (JSONObject) args[0];
         FRLogger.msg("ChatPresentationImpl on " + TAG + ' ' + event + " " + data.toString());
-
+        Disposable disposable;
         if (event.equalsIgnoreCase(ChatDataConstants.INITIATE_CHAT)) {
-            Observable.just(data)
+            disposable = Observable.just(data)
                     .map(JSONObject::toString)
                     .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
-                    .map(this::addChannelToDb)
+                    .flatMapSingle(this::addChannelToDb)
                     .map(feedNewMessageResponse -> {
                         addChatEvent(feedNewMessageResponse.getMessageFrom().getId(), isIncoming(feedNewMessageResponse.getChannel()));
                         return feedNewMessageResponse;
                     })
                     .map(this::broadcastFeedEvent)
-                    .flatMapSingle(this::getUserDetails)
+//                    .flatMapSingle(this::getUserDetails)
                     .map(this::postMessageEvent)
                     .compose(SchedulerUtils.ioToMainObservableScheduler())
-                    .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure"));
+                    .subscribe(feedNewMessageResponse1 -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure " + throwable.getMessage()));
         } else if (event.equalsIgnoreCase(ChatDataConstants.MESSAGE)) {
-            Observable.just(data)
+            disposable = Observable.just(data)
                     .map(JSONObject::toString)
                     .map(s -> gson.fromJson(s, MessageResponse.class))
+                    .flatMapSingle(this::addChannelToDb)
                     .map(this::addMessageToDb)
                     .map(this::broadcastMessageEvent)
-                    .flatMapSingle(this::getUserDetails)
+//                    .flatMapSingle(this::getUserDetails)
                     .map(this::postMessageEvent)
                     .compose(SchedulerUtils.ioToMainObservableScheduler())
                     .subscribe(chatMessage -> FRLogger.msg("success"), throwable -> FRLogger.msg("failure " + throwable.getMessage()));
         }
+
     }
 
-    private boolean isIncoming(String channelName) {
-        boolean isIncoming = true;
-        if (channelName != null) {
-            String[] splitChannelName = channelName.split("_");
-            if (splitChannelName[1].equals(loggedInUser.getUserId())) {
-                isIncoming = false;
-            }
-        }
-        return isIncoming;
-    }
-
-    private Single<MessageEvent> getUserDetails(MessageEvent data) {
-        FRLogger.msg("chat message getUserDetails " + data.getUserId());
-        if (data.getUserId().equalsIgnoreCase("1")) {
-            User user = new User();
-            user.userId = data.getUserId();
-            user.phoneNumber = "9445589121";
-            data.setUser(user);
-            return Single.just(data);
-        } else if (!usersList.containsKey(data.getUserId())) {
-            return appDatabase.userDao().getUser(data.getUserId())
-                    .map(user -> {
-                        usersList.put(data.getUserId(), user);
-                        FRLogger.msg("user " + user);
-                        data.setUser(user);
-                        return data;
-                    });
-        } else {
-            User user = usersList.get(data.getUserId());
-            data.setUser(user);
-            return Single.just(data);
-        }
-    }
-
-    private MessageEvent postMessageEvent(MessageEvent messageEvent) {
-        FRLogger.msg("chat message postMessageEvent");
-        getMessageEvent().onNext(messageEvent);
-        return messageEvent;
-    }
 
     @Override
     public void onError(String TAG, SocketHelper errorCode) {

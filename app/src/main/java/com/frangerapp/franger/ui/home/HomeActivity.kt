@@ -12,8 +12,10 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.Menu
 import android.view.MenuItem
+import android.view.Window
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
+import com.frangerapp.franger.app.util.AppUtils
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
 import com.frangerapp.franger.databinding.ActivityHomeBinding
 import com.frangerapp.franger.domain.chat.model.ChatContact
@@ -59,6 +61,9 @@ class HomeActivity : UserBaseActivity() {
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (AppUtils.isLollipopCompatible())
+            window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        overridePendingTransition(0, 0)
         super.onCreate(savedInstanceState)
 
 
@@ -158,7 +163,7 @@ class HomeActivity : UserBaseActivity() {
 
     private fun goToChatActivity() {
         val contactModel = ChatContact("8", "+919445589121", "9445589121", "Bsnl", "mobile")
-        val intent = ChatActivity.newInstance(this@HomeActivity, contactModel, false,"chat_8_31")
+        val intent = ChatActivity.newInstance(this@HomeActivity, contactModel, false, "chat_8_31")
         startActivity(intent)
     }
 

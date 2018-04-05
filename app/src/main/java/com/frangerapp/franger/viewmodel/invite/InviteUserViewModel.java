@@ -29,6 +29,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -49,7 +50,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
     public ObservableField<List<InviteUserListItemViewModel>> inviteUserList = new ObservableField<>(itemViewModels);
 
 
-    public InviteUserViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
+    InviteUserViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ProfileInteractor profileInteractor) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
@@ -65,32 +66,34 @@ public class InviteUserViewModel extends UserBaseViewModel {
                         syncContacts(loggedInUser);
                     } else {
                         // Oops permission denied
-                        Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Permission Needed", Toast.LENGTH_SHORT).show();
                     }
-                });
+                }, Throwable::printStackTrace);
     }
 
     private void syncContacts(LoggedInUser loggedInUser) {
         showLoading.set(true);
         profileInteractor.clearUsersList();
-        profileInteractor.syncContacts(loggedInUser.getUserId())
+        Disposable disposable= profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
                 .subscribe(this::onSuccess, this::onFailure, this::onComplete);
+        disposables.add(disposable);
 
     }
 
     private void onComplete() {
         FRLogger.msg("onComplete");
         itemViewModels = new ArrayList<>();
-        profileInteractor.getSortedUsersList()
-//                .toObservable()
+        Disposable disposable = profileInteractor.getSortedUsersList()
+                .toObservable()
                 .concatMapIterable(user -> user)
                 .concatMap(user -> Observable.just(new InviteUserListItemViewModel(user)))
                 .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onPhoneNumberAssociated, this::onAllPhoneNumbersAssociationFailed);
+        disposables.add(disposable);
     }
 
 

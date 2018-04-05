@@ -2,6 +2,7 @@ package com.frangerapp.franger.ui.splash
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import com.frangerapp.franger.R
@@ -83,19 +84,31 @@ class SplashActivity : LoginBaseActivity() {
     }
 
     private fun moveToLoginPage() {
-        this@SplashActivity.startActivity(LoginActivity.newInstance(this@SplashActivity))
+        val intent = LoginActivity.newInstance(this@SplashActivity)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this@SplashActivity.startActivity(intent)
     }
 
     private fun moveToInvitePage() {
-        this@SplashActivity.startActivity(InviteActivity.newInstance(this@SplashActivity))
+        val intent = InviteActivity.newInstance(this@SplashActivity)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this@SplashActivity.startActivity(intent)
     }
 
     private fun moveToEditProfilePage() {
-        this@SplashActivity.startActivity(AddEditProfileActivity.newInstance(this@SplashActivity))
+        val intent = AddEditProfileActivity.newInstance(this@SplashActivity)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this@SplashActivity.startActivity(intent)
     }
 
     private fun moveToHomePage() {
-        this@SplashActivity.startActivity(HomeActivity.newInstance(this@SplashActivity))
+        val intent = HomeActivity.newInstance(this@SplashActivity)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this@SplashActivity.startActivity(intent)
     }
 
 }

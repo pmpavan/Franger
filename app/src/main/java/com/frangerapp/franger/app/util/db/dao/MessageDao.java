@@ -24,8 +24,8 @@ public interface MessageDao {
     @Query("select * from message")
     public Single<List<Message>> getAllMessages();
 
-    @Query("select * from message where userId = :userId")
-    public Single<List<Message>> getMessages(String userId);
+    @Query("select * from message where channelName = :channelName")
+    public Single<List<Message>> getMessages(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateMessage(Message message);

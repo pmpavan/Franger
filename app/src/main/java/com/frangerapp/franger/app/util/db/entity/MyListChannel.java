@@ -2,7 +2,11 @@ package com.frangerapp.franger.app.util.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+
+import com.frangerapp.franger.app.util.db.converter.DateConverter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +23,7 @@ public class MyListChannel {
     @NotNull
     public String channelName;
     public Date updateAt;
+    @TypeConverters({DateConverter.class})
     public Date createdAt;
     public long unreadMsgCount;
     public String otherUserId;
@@ -26,6 +31,9 @@ public class MyListChannel {
 
     public MyListChannel(@NonNull String channelName) {
         this.channelName = channelName;
+    }
+
+    public MyListChannel() {
     }
 }
 

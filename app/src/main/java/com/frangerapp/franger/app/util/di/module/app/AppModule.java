@@ -3,6 +3,7 @@ package com.frangerapp.franger.app.util.di.module.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.frangerapp.franger.app.ChatStore;
 import com.frangerapp.franger.app.FrangerApp;
 import com.frangerapp.franger.app.UserManager;
 import com.frangerapp.franger.app.util.db.AppDatabase;
@@ -17,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.Random;
 
 import javax.inject.Singleton;
 
@@ -58,6 +61,18 @@ public class AppModule {
     @Provides
     UserStore userStore(Context context, Gson gson) {
         return new UserStore(context, gson);
+    }
+
+    @Singleton
+    @Provides
+    Random random() {
+        return new Random();
+    }
+
+    @Singleton
+    @Provides
+    ChatStore chatStore(Context context, Gson gson) {
+        return new ChatStore(context, gson);
     }
 
     @Singleton

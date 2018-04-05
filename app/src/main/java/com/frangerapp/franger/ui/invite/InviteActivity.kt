@@ -80,7 +80,7 @@ class InviteActivity : UserBaseActivity(), LifecycleObserver {
     private fun setupViews() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        manageStatusBar(R.color.colorPrimary)
+        manageStatusBar(R.color.statusbar_color)
     }
 
     private fun setupControllers() {
@@ -93,17 +93,23 @@ class InviteActivity : UserBaseActivity(), LifecycleObserver {
 
     private fun goToHome() {
         val intent = HomeActivity.newInstance(this@InviteActivity)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        this.menuInflater.inflate(R.menu.menu_invite, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        this.menuInflater.inflate(R.menu.menu_invite, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_next -> {
             viewModel.onNextClicked()
+            true
+        }
+        android.R.id.home -> {
+            killPage()
             true
         }
 
@@ -112,6 +118,10 @@ class InviteActivity : UserBaseActivity(), LifecycleObserver {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun killPage() {
+        this@InviteActivity.finish()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

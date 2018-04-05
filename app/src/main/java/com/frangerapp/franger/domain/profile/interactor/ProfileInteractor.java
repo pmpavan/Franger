@@ -27,7 +27,7 @@ public interface ProfileInteractor {
 
     Single<List<User>> getNonFrangerUsersList();
 
-    Observable<List<User>> getSortedUsersList();
+    Single<List<User>> getSortedUsersList();
 
     void clearUsersList();
 

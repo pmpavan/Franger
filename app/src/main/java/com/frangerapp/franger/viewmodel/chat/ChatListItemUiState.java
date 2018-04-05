@@ -14,6 +14,20 @@ import java.util.Date;
 public class ChatListItemUiState implements Parcelable {
 
 
+    public interface ChatItemClickHandler {
+        void onItemClick(int position, ChatListItemUiState model);
+    }
+
+    private String message;
+    private String userId;
+    private User user;
+    private Date timeStamp;
+    private ChatItemClickHandler handler;
+    private long messageId;
+
+    public ChatListItemUiState() {
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -46,45 +60,12 @@ public class ChatListItemUiState implements Parcelable {
         this.messageId = messageId;
     }
 
-    public interface ChatItemClickHandler {
-        void onItemClick(int position, ChatListItemUiState model);
-    }
-
-    public enum CHAT_ITEM_TYPE {
-        INCOMING(1),
-        OUTGOING(2);
-        public int type;
-
-        CHAT_ITEM_TYPE(int type) {
-            this.type = type;
-        }
-    }
-
-    private CHAT_ITEM_TYPE type;
-    private String message;
-    private String userId;
-    private User user;
-    private Date timeStamp;
-    private ChatItemClickHandler handler;
-    private long messageId;
-    public ChatListItemUiState() {
-    }
-
     public ChatItemClickHandler getHandler() {
         return handler;
     }
 
     public void setHandler(ChatItemClickHandler handler) {
         this.handler = handler;
-    }
-
-    public CHAT_ITEM_TYPE getType() {
-        return type;
-    }
-
-
-    public void setType(CHAT_ITEM_TYPE type) {
-        this.type = type;
     }
 
     public String getMessage() {
@@ -99,8 +80,12 @@ public class ChatListItemUiState implements Parcelable {
     @Override
     public String toString() {
         return "ChatListItemUiState{" +
-                "type=" + type +
-                ", message='" + message + '\'' +
+                "message='" + message + '\'' +
+                ", userId='" + userId + '\'' +
+                ", user=" + user +
+                ", timeStamp=" + timeStamp +
+                ", handler=" + handler +
+                ", messageId=" + messageId +
                 '}';
     }
 
@@ -112,7 +97,6 @@ public class ChatListItemUiState implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.type == null ? -1 : this.type.ordinal());
         dest.writeString(this.message);
         dest.writeString(this.userId);
         dest.writeParcelable(this.user, flags);
@@ -121,8 +105,6 @@ public class ChatListItemUiState implements Parcelable {
     }
 
     protected ChatListItemUiState(Parcel in) {
-        int tmpType = in.readInt();
-        this.type = tmpType == -1 ? null : CHAT_ITEM_TYPE.values()[tmpType];
         this.message = in.readString();
         this.userId = in.readString();
         this.user = in.readParcelable(User.class.getClassLoader());

@@ -44,7 +44,6 @@ public class SocketManager {
     private SocketManager(Context context, String url) {
         this.context = context;
         this.url = url;
-//        setCallBacks(socketCallbacks);
         this.mSocket = getSocket(url);
     }
 
@@ -78,9 +77,10 @@ public class SocketManager {
     /*
      * Will create a new socket with the default options
      */
-//    public String createASocket(final String url, final List<String> eventsToBeListened) {
-//        return createASocket(url, eventsToBeListened, null);
-//    }
+    public String createASocket(final String url, final List<String> eventsToBeListened) {
+        return createASocket(url, eventsToBeListened, null);
+    }
+
     private Socket getSocket(final String url) {
         if (url == null) {
             throw new NullPointerException("URL is null");
@@ -122,74 +122,74 @@ public class SocketManager {
      * @param eventsToBeListened the event to which the socket must listen to
      */
 
-//    public String createASocket(final String url, final List<String> eventsToBeListened, SocketOptions opts) {
-//
-//        if (url == null) {
-//            throw new NullPointerException("URL is null");
-//        } else if (eventsToBeListened == null) {
-//            throw new NullPointerException("eventsToBeListened is null");
-//        } else if (socketCallbacks == null) {
-//            throw new NullPointerException("Please set socketCallbacks ( i.e socketManger.setCallBacks()) and then try creating a socket");
-//        }
-//
-//        if (socketCallbacks != null)
-//            for (SocketCallbacks callbacks : socketCallbacks)
-//                callbacks.onConnecting(url);
-//
-//        // Also available is options param to create a socket
-//        if (opts == null) {
-//            //Setting default options
-//            opts = new SocketOptions();
-//            opts.setForceNew(true);
-//            opts.setReconnection(true);
-//            opts.setReconnectionAttempts(5);
-//        }
-//
-//        try {
-//            mSocket = IO.socket(url, opts);
-//        } catch (URISyntaxException e) {
-//            /**
-//             * No need to check if the key is contained, the ConcurrentHashMap.remove() method
-//             * does nothing if the key is not found
-//             */
-//            mSocketMap.remove(url);
-//            Log.d(DEBUG_TAG, "Error creating socket with the given URI : " + url);
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onError(url, SocketHelper.MALFORMED_URI);
-//        }
-//
-//        // Put the created socket into the hashmap
-//        mSocketMap.put(url, mSocket);
-//        Log.d(DEBUG_TAG, "Socket created with the given TAG : " + url);
-//        if (socketCallbacks != null)
-//            for (SocketCallbacks callbacks : socketCallbacks)
-//                callbacks.onSocketCreated(url);
-//
-//        for (final String eventToBeListened : eventsToBeListened) {
-//            mSocket.on(eventToBeListened, new Emitter.Listener() {
-//                @Override
-//                public void call(Object... args) {
-//                    if (socketCallbacks != null)
-//                        for (SocketCallbacks callbacks : socketCallbacks)
-//                            callbacks.on(url, eventToBeListened, args);
-//                }
-//            });
-//        }
-//
-//        //Finally establish connection
-//        try {
-//            mSocket.connect();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onError(url, SocketHelper.UNKNOWN_ERROR_WHILE_CONNECTING);
-//        }
-//        // Register for required event
-//        Log.d(DEBUG_TAG, "is connected : " + mSocket.connected());
-//        return url;
-//    }
+    public String createASocket(final String url, final List<String> eventsToBeListened, SocketOptions opts) {
+
+        if (url == null) {
+            throw new NullPointerException("URL is null");
+        } else if (eventsToBeListened == null) {
+            throw new NullPointerException("eventsToBeListened is null");
+        } else if (socketCallbacks == null) {
+            throw new NullPointerException("Please set socketCallbacks ( i.e socketManger.setCallBacks()) and then try creating a socket");
+        }
+
+        if (socketCallbacks != null)
+            for (SocketCallbacks callbacks : socketCallbacks)
+                callbacks.onConnecting(url);
+
+        // Also available is options param to create a socket
+        if (opts == null) {
+            //Setting default options
+            opts = new SocketOptions();
+            opts.setForceNew(true);
+            opts.setReconnection(true);
+            opts.setReconnectionAttempts(5);
+        }
+
+        try {
+            mSocket = IO.socket(url, opts);
+        } catch (URISyntaxException e) {
+            /**
+             * No need to check if the key is contained, the ConcurrentHashMap.remove() method
+             * does nothing if the key is not found
+             */
+            mSocketMap.remove(url);
+            Log.d(DEBUG_TAG, "Error creating socket with the given URI : " + url);
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onError(url, SocketHelper.MALFORMED_URI);
+        }
+
+        // Put the created socket into the hashmap
+        mSocketMap.put(url, mSocket);
+        Log.d(DEBUG_TAG, "Socket created with the given TAG : " + url);
+        if (socketCallbacks != null)
+            for (SocketCallbacks callbacks : socketCallbacks)
+                callbacks.onSocketCreated(url);
+
+        for (final String eventToBeListened : eventsToBeListened) {
+            mSocket.on(eventToBeListened, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    if (socketCallbacks != null)
+                        for (SocketCallbacks callbacks : socketCallbacks)
+                            callbacks.on(url, eventToBeListened, args);
+                }
+            });
+        }
+
+        //Finally establish connection
+        try {
+            mSocket.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onError(url, SocketHelper.UNKNOWN_ERROR_WHILE_CONNECTING);
+        }
+        // Register for required event
+        Log.d(DEBUG_TAG, "is connected : " + mSocket.connected());
+        return url;
+    }
 
     /**
      * @param eventsToBeListened
@@ -293,52 +293,52 @@ public class SocketManager {
      *
      * @param TAG identifier for the socket
      */
-//    public void closeASocket(String tag) {
-//
-//        if (tag == null) {
-//            throw new NullPointerException("Trying to close a socket with null tag");
-//        }
-//
-//        if (!mSocketMap.containsKey(tag)) {
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
-//            Log.d(DEBUG_TAG, "Trying to close a socket that doesn't exist. TAG : " + tag);
-//        } else {
-//            Socket socketToBeClosed = mSocketMap.get(tag);
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onDisconnecting(tag);
-//            socketToBeClosed.close();
-//            mSocketMap.remove(tag);
-//            Log.d(DEBUG_TAG, "Socket with TAG : " + tag + "has successfully been closed/destroyed");
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onSocketDestroyed(tag);
-//        }
-//    }
+    public void closeASocket(String tag) {
+
+        if (tag == null) {
+            throw new NullPointerException("Trying to close a socket with null tag");
+        }
+
+        if (!mSocketMap.containsKey(tag)) {
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
+            Log.d(DEBUG_TAG, "Trying to close a socket that doesn't exist. TAG : " + tag);
+        } else {
+            Socket socketToBeClosed = mSocketMap.get(tag);
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onDisconnecting(tag);
+            socketToBeClosed.close();
+            mSocketMap.remove(tag);
+            Log.d(DEBUG_TAG, "Socket with TAG : " + tag + "has successfully been closed/destroyed");
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onSocketDestroyed(tag);
+        }
+    }
 
     /**
      * Pauses the socket from listening to events
      *
-     * @param TAG identifier for the socket
+     * @param tag identifier for the socket
      */
-//    public void stopListening(String tag) {
-//
-//        if (tag == null) {
-//            throw new NullPointerException("Trying to stop listening to a socket with null tag");
-//        }
-//
-//        if (!mSocketMap.containsKey(tag)) {
-//            if (socketCallbacks != null)
-//                for (SocketCallbacks callbacks : socketCallbacks)
-//                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
-//        } else {
-//            Socket socket = mSocketMap.get(tag);
-//            socket.off();
-//            Log.d(DEBUG_TAG, "Socket with TAG : " + tag + "has stopped listening for events");
-//        }
-//    }
+    public void stopListening(String tag) {
+
+        if (tag == null) {
+            throw new NullPointerException("Trying to stop listening to a socket with null tag");
+        }
+
+        if (!mSocketMap.containsKey(tag)) {
+            if (socketCallbacks != null)
+                for (SocketCallbacks callbacks : socketCallbacks)
+                    callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
+        } else {
+            Socket socket = mSocketMap.get(tag);
+            socket.off();
+            Log.d(DEBUG_TAG, "Socket with TAG : " + tag + "has stopped listening for events");
+        }
+    }
 
     /**
      * Resumes/starts to listen events
@@ -381,31 +381,31 @@ public class SocketManager {
     /**
      * Returns whether a socket is in connected state
      *
-     * @param TAG identifier for the socket
+     * @param tag identifier for the socket
      * @return if socket is connected
      */
-//    public boolean isConnected(String tag) {
-//        if (mSocketMap.containsKey(tag)) {
-//            return mSocketMap.get(tag).connected();
-//        }
-//        Log.d(DEBUG_TAG, "Trying to close a socket which is not found. TAG : " + tag);
-//        if (socketCallbacks != null)
-//            for (SocketCallbacks callbacks : socketCallbacks)
-//                callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
-//        return false;
-//    }
+    public boolean isConnected(String tag) {
+        if (mSocketMap.containsKey(tag)) {
+            return mSocketMap.get(tag).connected();
+        }
+        Log.d(DEBUG_TAG, "Trying to close a socket which is not found. TAG : " + tag);
+        if (socketCallbacks != null)
+            for (SocketCallbacks callbacks : socketCallbacks)
+                callbacks.onError(tag, SocketHelper.SOCKET_NOT_FOUND);
+        return false;
+    }
 
     /**
      * Closes all socket connections
      * Can be used on the onDestroy method of the application class when there isn't a need to
      * keep any socket connection open in a service/background thread.
      */
-//    public void clearAllSockets() {
-//        for (Socket socket : mSocketMap.values()) {
-//            socket.close();
-//            mSocketMap.remove(mSocketMap.get(socket));
-//        }
-//        mSocketMap.clear();
-//        Log.d(DEBUG_TAG, "All sockets (existing or newly created) are closed/destroyed");
-//    }
+    public void clearAllSockets() {
+        for (Socket socket : mSocketMap.values()) {
+            socket.close();
+            mSocketMap.remove(mSocketMap.get(socket));
+        }
+        mSocketMap.clear();
+        Log.d(DEBUG_TAG, "All sockets (existing or newly created) are closed/destroyed");
+    }
 }

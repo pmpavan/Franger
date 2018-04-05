@@ -11,6 +11,8 @@ import com.frangerapp.franger.app.util.db.entity.MyListChannel;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 /**
  * Created by pavanm on 22/03/18.
  */
@@ -22,10 +24,10 @@ public interface MyListChannelDao {
     void addChannel(MyListChannel myListChannel);
 
     @Query("select * from MyListChannel")
-    LiveData<List<MyListChannel>> getAllChannels();
+    Single<List<MyListChannel>> getAllChannels();
 
     @Query("select * from MyListChannel where channelName = :channelName")
-    LiveData<MyListChannel> getChannel(String channelName);
+    Single<MyListChannel> getChannel(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateChannel(MyListChannel myListChannel);

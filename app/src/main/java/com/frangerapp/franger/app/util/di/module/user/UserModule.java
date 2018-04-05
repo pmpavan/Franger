@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.franger.socket.socketio.SocketManager;
+import com.frangerapp.franger.app.ChatStore;
 import com.frangerapp.franger.app.util.db.AppDatabase;
 import com.frangerapp.franger.app.util.di.scope.UserScope;
 import com.frangerapp.franger.data.chat.ChatApi;
@@ -19,6 +20,8 @@ import com.frangerapp.network.HttpClient;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Random;
 
 import dagger.Module;
 import dagger.Provides;
@@ -52,8 +55,8 @@ public class UserModule {
 
     @UserScope
     @Provides
-    ChatApi chatApi(Context context, SocketManager socketManager, Gson gson) {
-        return new ChatApi(context, gson, socketManager);
+    ChatApi chatApi(Context context, SocketManager socketManager, Gson gson, ChatStore chatStore) {
+        return new ChatApi(context, gson, socketManager, chatStore);
     }
 
     @UserScope
@@ -65,8 +68,8 @@ public class UserModule {
 
     @UserScope
     @Provides
-    ChatInteractor chatInteractor(@NonNull Context context, @NonNull ChatApi loginApi, @NotNull LoggedInUser loggedInUser, AppDatabase appDatabase, SocketManager socketManager, Gson gson) {
-        return new ChatPresentationImpl(context, loginApi, loggedInUser, appDatabase, socketManager, gson);
+    ChatInteractor chatInteractor(@NonNull Context context, @NonNull ChatApi loginApi, @NotNull LoggedInUser loggedInUser, AppDatabase appDatabase, SocketManager socketManager, Gson gson, Random random) {
+        return new ChatPresentationImpl(context, loginApi, loggedInUser, appDatabase, socketManager, gson, random);
     }
 
     @Provides

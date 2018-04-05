@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
+import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.ui.chat.ChatListAdapter;
@@ -36,7 +37,7 @@ public class ChatModule {
     @Provides
     @ActivityScope
     ChatListAdapter getChatListAdapter(Context context, @NonNull LoggedInUser loggedInUser) {
-        return new ChatListAdapter(context,loggedInUser);
+        return new ChatListAdapter(context, loggedInUser);
     }
 
     @Provides
@@ -47,7 +48,7 @@ public class ChatModule {
 
     @Provides
     @ActivityScope
-    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor profileInteractor) {
-        return new ChatViewModel.Factory(context, eventBus, userStore, loggedInUser, profileInteractor);
+    ViewModelProvider.Factory chatActivityViewModel(@NonNull Context context, @NonNull LoggedInUser loggedInUser, @NonNull UserStore userStore, @NotNull EventBus eventBus, @NotNull ChatInteractor chatInteractor, ProfileInteractor profileInteractor) {
+        return new ChatViewModel.Factory(context, eventBus, userStore, loggedInUser, chatInteractor, profileInteractor);
     }
 }
