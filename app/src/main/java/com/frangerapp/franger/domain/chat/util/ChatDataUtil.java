@@ -29,12 +29,13 @@ public class ChatDataUtil {
         return DataConstants.PROTOCOL + DataConstants.BASE_DOMAIN_URL + "/" + ChatDataConstants.SOCKET_URL;
     }
 
-    public static String getChatChannelNameJson(String fromUserId, String toUserId, Gson gson) {
+    public static String getChatChannelNameJson(String fromUserId, String toUserId, Gson gson,String message) {
         ChatBody chatBody = new ChatBody();
         ChatData data = new ChatData();
 
         chatBody.setName(getChatChannelName(fromUserId, toUserId));
         chatBody.setType("chat");
+        chatBody.setMessage(message);
         data.setFromId(fromUserId);
         data.setToId(toUserId);
         chatBody.setData(data);

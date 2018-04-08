@@ -24,8 +24,14 @@ public interface MessageDao {
     @Query("select * from message")
     public Single<List<Message>> getAllMessages();
 
-    @Query("select * from message where channelName = :channelName")
+    @Query("select * from message where channelName = :channelName order by id asc")
     public Single<List<Message>> getMessages(String channelName);
+
+    @Query("select * from message where id = :id")
+    public Single<Message> getMessage(long id);
+
+    @Query("select * from message where channelName = :channelName order by sentAt desc limit 1")
+    public Single<Message> getLastMessage(String channelName);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateMessage(Message message);

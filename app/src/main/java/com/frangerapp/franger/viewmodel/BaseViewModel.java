@@ -17,7 +17,13 @@ public class BaseViewModel extends ViewModel implements BaseView {
 
     @Override
     public void onViewDestroyed() {
-        disposables.dispose();
+        if (disposables != null && !disposables.isDisposed())
+            disposables.dispose();
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        onViewDestroyed();
+    }
 }

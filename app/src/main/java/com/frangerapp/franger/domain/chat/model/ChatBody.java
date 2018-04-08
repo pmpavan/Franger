@@ -15,6 +15,9 @@ public class ChatBody {
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("message")
+    @Expose
+    private String message;
     @SerializedName("data")
     @Expose
     private ChatData data;
@@ -43,11 +46,20 @@ public class ChatBody {
         this.data = data;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return "ChatBody{" +
                 "name='" + name + '\'' +
                 ", type='" + type + '\'' +
+                ", message='" + message + '\'' +
                 ", data=" + data +
                 '}';
     }

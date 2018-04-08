@@ -4,11 +4,16 @@ import com.frangerapp.franger.app.util.di.module.user.UserModule;
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule;
 import com.frangerapp.franger.app.util.di.module.user.contact.ContactModule;
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule;
+import com.frangerapp.franger.app.util.di.module.user.home.IncomingListModule;
+import com.frangerapp.franger.app.util.di.module.user.home.OutgoingListModule;
 import com.frangerapp.franger.app.util.di.module.user.invite.InviteModule;
 import com.frangerapp.franger.app.util.di.module.user.profile.ProfileModule;
 import com.frangerapp.franger.app.util.di.scope.ActivityScope;
+import com.frangerapp.franger.app.util.di.scope.FragmentScope;
 import com.frangerapp.franger.app.util.di.scope.UserScope;
 import com.frangerapp.franger.ui.chat.ChatActivity;
+import com.frangerapp.franger.ui.home.IncomingFragment;
+import com.frangerapp.franger.ui.home.OutgoingFragment;
 import com.frangerapp.franger.ui.contact.ContactActivity;
 import com.frangerapp.franger.ui.home.HomeActivity;
 import com.frangerapp.franger.ui.invite.InviteActivity;
@@ -33,6 +38,10 @@ public interface UserComponent {
     ContactComponent plus(ContactModule module);
 
     ChatComponent plus(ChatModule module);
+
+    OutgoingListComponent plus(OutgoingListModule module);
+
+    IncomingListComponent plus(IncomingListModule module);
 
     /**
      * HOME
@@ -65,6 +74,18 @@ public interface UserComponent {
     @Subcomponent(modules = ChatModule.class)
     interface ChatComponent {
         void inject(ChatActivity activity);
+    }
+
+    @FragmentScope
+    @Subcomponent(modules = OutgoingListModule.class)
+    interface OutgoingListComponent {
+        void inject(OutgoingFragment activity);
+    }
+
+    @FragmentScope
+    @Subcomponent(modules = IncomingListModule.class)
+    interface IncomingListComponent {
+        void inject(IncomingFragment activity);
     }
 
 

@@ -15,12 +15,10 @@ import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
-import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.chat.ChatListUiState;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
-import com.frangerapp.franger.viewmodel.contact.ContactListItemViewModel;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,7 +45,6 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     private EventBus eventBus;
     private UserStore userStore;
     private ChatInteractor chatInteractor;
-    private ProfileInteractor profileInteractor;
     private ChatContact chatContact;
     private boolean isIncoming;
     private String channelName;
@@ -57,13 +54,12 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     private ArrayList<ChatListItemUiState> items = new ArrayList<>();
     public ObservableField<String> messageTxt = new ObservableField<>("");
 
-    ChatViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor, ProfileInteractor profileInteractor) {
+    ChatViewModel(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor) {
         this.context = context;
         this.eventBus = eventBus;
         this.userStore = userStore;
         this.chatInteractor = chatInteractor;
         this.loggedInUser = loggedInUser;
-        this.profileInteractor = profileInteractor;
         this.data = new MutableLiveData<>();
         data.setValue(new ArrayList<>());
     }
@@ -73,7 +69,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         this.chatContact = chatContact;
         this.channelName = channelName;
         if (channelName == null || channelName.isEmpty()) {
-            this.channelName = chatInteractor.getChatEventName(chatContact.getUserId(), isIncoming);
+            this.channelName = chatInteractor.getChatName(chatContact.getUserId(), isIncoming);
         }
         sendSetToolbarTitleTxtEvent();
         chatInteractor.getMessageEvent()
@@ -194,6 +190,12 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         FRLogger.msg("onItemClicked chat " + chatListUiState);
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        getChatMsgObserver().onComplete();
+    }
+
     public static class Factory implements ViewModelProvider.Factory {
 
         private ChatInteractor chatInteractor;
@@ -201,13 +203,11 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         private LoggedInUser loggedInUser;
         private Context context;
         private UserStore userStore;
-        private ProfileInteractor profileInteractor;
 
-        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor, ProfileInteractor profileInteractor) {
+        public Factory(Context context, EventBus eventBus, UserStore userStore, LoggedInUser loggedInUser, ChatInteractor chatInteractor) {
             this.context = context;
             this.loggedInUser = loggedInUser;
             this.eventBus = eventBus;
-            this.profileInteractor = profileInteractor;
             this.userStore = userStore;
             this.chatInteractor = chatInteractor;
         }
@@ -216,7 +216,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(ChatViewModel.class)) {
-                return (T) new ChatViewModel(context, eventBus, userStore, loggedInUser, chatInteractor, profileInteractor);
+                return (T) new ChatViewModel(context, eventBus, userStore, loggedInUser, chatInteractor);
             }
             throw new IllegalArgumentException("Unknown class name");
         }

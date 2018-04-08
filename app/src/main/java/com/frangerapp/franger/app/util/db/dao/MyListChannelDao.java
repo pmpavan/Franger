@@ -21,9 +21,9 @@ import io.reactivex.Single;
 public interface MyListChannelDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void addChannel(MyListChannel myListChannel);
+    long addChannel(MyListChannel myListChannel);
 
-    @Query("select * from MyListChannel")
+    @Query("select * from MyListChannel order by updateAt desc")
     Single<List<MyListChannel>> getAllChannels();
 
     @Query("select * from MyListChannel where channelName = :channelName")

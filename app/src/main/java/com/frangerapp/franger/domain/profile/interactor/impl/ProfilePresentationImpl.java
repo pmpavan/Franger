@@ -15,6 +15,7 @@ import com.frangerapp.franger.data.profile.model.ContactSyncResponse;
 import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.profile.exception.ProfileUpdateFailed;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
+import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -40,13 +41,14 @@ public class ProfilePresentationImpl implements ProfileInteractor {
     private ProfileApi profileApi;
     private UserStore userStore;
     private AppDatabase appDatabase;
+    private LoggedInUser loggedInUser;
 
-    public ProfilePresentationImpl(@NonNull Context context, @NonNull ProfileApi profileApi, UserStore userStore, AppDatabase appDatabase) {
+    public ProfilePresentationImpl(@NonNull Context context, @NonNull ProfileApi profileApi, UserStore userStore, AppDatabase appDatabase, LoggedInUser loggedInUser) {
         this.context = context;
         this.profileApi = profileApi;
         this.userStore = userStore;
         this.appDatabase = appDatabase;
-
+        this.loggedInUser = loggedInUser;
     }
 
     @Override
@@ -89,6 +91,7 @@ public class ProfilePresentationImpl implements ProfileInteractor {
                     FRLogger.msg("joined   " + joineds);
                     return joineds;
                 })
+//                .filter(contact -> !contact.getUserId().equals(loggedInUser.getUserId()))
                 .flatMapSingle(joined -> Single.fromCallable(() -> {
                     User user = new User();
                     user.phoneNumber = joined.getOriginalNumber();

@@ -15,6 +15,9 @@ public class FeedNewMessageResponse {
     @SerializedName("channel")
     @Expose
     private String channel;
+    @SerializedName("message")
+    @Expose
+    private String message;
 
 
     public FeedNewMessageResponse() {
@@ -35,5 +38,13 @@ public class FeedNewMessageResponse {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

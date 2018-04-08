@@ -20,7 +20,7 @@ import com.frangerapp.franger.app.util.db.entity.User;
  * Created by pavanm on 22/02/18.
  */
 @Database(entities = {User.class, Message.class, MyListChannel.class, AnonListChannel.class},
-        version = 5, exportSchema = false)
+        version = 7, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 

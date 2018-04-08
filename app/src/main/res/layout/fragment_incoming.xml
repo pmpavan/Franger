@@ -1,24 +1,36 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <variable
             name="vm"
-            type="com.frangerapp.franger.viewmodel.chat.IncomingListViewModel" />
+            type="com.frangerapp.franger.viewmodel.home.IncomingListViewModel" />
+
+        <variable
+            name="uiState"
+            type="com.frangerapp.franger.ui.home.IncomingListUiState" />
+
+        <variable
+            name="handler"
+            type="com.frangerapp.franger.ui.home.IncomingListItemUiState.IncomingGroupItemClickHandler" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.frangerapp.franger.ui.chat.IncomingFragment">
+        tools:context="com.frangerapp.franger.ui.home.IncomingFragment">
 
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/incomingListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            bind:incoming_items="@{uiState.getItems}" />
 
     </RelativeLayout>
 </layout>

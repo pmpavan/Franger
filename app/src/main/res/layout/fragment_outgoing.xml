@@ -1,24 +1,36 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="vm"
-            type="com.frangerapp.franger.viewmodel.chat.OutgoingListViewModel" />
+            type="com.frangerapp.franger.viewmodel.home.OutgoingListViewModel" />
+
+        <variable
+            name="uiState"
+            type="com.frangerapp.franger.ui.home.OutgoingListUiState" />
+
+        <variable
+            name="handler"
+            type="com.frangerapp.franger.ui.home.OutgoingListItemUiState.OutgoingGroupItemClickHandler" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.frangerapp.franger.ui.chat.OutgoingFragment">
+        tools:context="com.frangerapp.franger.ui.home.OutgoingFragment">
 
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/outgoingListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            bind:outgoing_items="@{uiState.getItems}" />
 
     </RelativeLayout>
 </layout>

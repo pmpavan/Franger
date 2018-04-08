@@ -73,9 +73,6 @@ public class HomeViewModel extends UserBaseViewModel {
             public void onNext(MessageEvent messageEvent) {
                 FRLogger.msg("home First onNext value : " + messageEvent);
                 handleMessageEventReceived(messageEvent);
-//                HomeEvent event = new HomeEvent();
-//                event.setId(1);
-//                eventBus.post(event);
             }
 
             @Override
@@ -97,6 +94,13 @@ public class HomeViewModel extends UserBaseViewModel {
         } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
 
         }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        getChatObserver().onComplete();
+        chatInteractor.onAppClosed();
     }
 
     public static class Factory implements ViewModelProvider.Factory {

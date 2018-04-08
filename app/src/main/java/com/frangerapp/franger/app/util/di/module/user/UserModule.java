@@ -62,8 +62,8 @@ public class UserModule {
     @UserScope
     @Provides
     ProfileInteractor profileInteractor(@NonNull Context context, @NonNull ProfileApi loginApi,
-                                        @NonNull UserStore userStore, AppDatabase appDatabase) {
-        return new ProfilePresentationImpl(context, loginApi, userStore, appDatabase);
+                                        @NonNull UserStore userStore, AppDatabase appDatabase, LoggedInUser loggedInUser) {
+        return new ProfilePresentationImpl(context, loginApi, userStore, appDatabase, loggedInUser);
     }
 
     @UserScope

@@ -22,18 +22,18 @@ public class MyListChannel {
     @PrimaryKey
     @NotNull
     public String channelName;
+    @TypeConverters({DateConverter.class})
     public Date updateAt;
     @TypeConverters({DateConverter.class})
     public Date createdAt;
     public long unreadMsgCount;
     public String otherUserId;
     public boolean isUserMuted;
+    public String message;
 
     public MyListChannel(@NonNull String channelName) {
         this.channelName = channelName;
     }
 
-    public MyListChannel() {
-    }
 }
 

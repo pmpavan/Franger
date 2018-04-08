@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.franger.socket.socketio.SocketManager;
 import com.frangerapp.franger.app.ChatStore;
 import com.frangerapp.franger.data.BaseApi;
+import com.frangerapp.franger.data.chat.model.AnonymousUser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -33,15 +34,17 @@ public class ChatApi extends BaseApi {
     }
 
 
-    public ArrayList<String> getRandomNamesList() {
+    public ArrayList<AnonymousUser> getRandomNamesList() {
         String json = chatStore.getRandomNames(context, "");
-        ArrayList<String> randomNames = new ArrayList<>();
+        ArrayList<AnonymousUser> randomNames = new ArrayList<>();
         if (json.isEmpty()) {
-            randomNames.add("Superman");
-            randomNames.add("Spiderman");
-            randomNames.add("Green Lantern");
-            randomNames.add("Nityananda");
-            randomNames.add("Yogi ji");
+            randomNames.add(new AnonymousUser("Superman"));
+            randomNames.add(new AnonymousUser("Spiderman"));
+            randomNames.add(new AnonymousUser("Green Lantern"));
+            randomNames.add(new AnonymousUser("Nityananda"));
+            randomNames.add(new AnonymousUser("Yogi ji"));
+            randomNames.add(new AnonymousUser("Hardik"));
+            randomNames.add(new AnonymousUser("Dhoni"));
             json = gson.toJson(randomNames);
             chatStore.storeRandomNames(context, json);
         } else {

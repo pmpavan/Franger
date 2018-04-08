@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="@{vm::onSendButtonClicked}"
                 android:padding="5dp"
-                app:srcCompat="@drawable/ic_done_black_24dp" />
+                app:srcCompat="@drawable/ic_send_black_24dp" />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -62,7 +62,7 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/bottomLayout"
             android:layout_below="@+id/toolbar"
-            app:layoutManager="LinearLayoutManager"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             bind:chat_items="@{tickets.getItems}" />
     </RelativeLayout>
 

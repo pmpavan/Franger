@@ -23,7 +23,9 @@ public class AnonListChannel {
     public long unreadMsgCount;
     public String otherUserId;
     public String anonymisedUserName;
-    public boolean isUserBlocked;
+    public int anonymisedUserImg;
+    public boolean isUserBlocked = false;
+    public String message;
 
     public AnonListChannel(@NonNull String channelName) {
         this.channelName = channelName;

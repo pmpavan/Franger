@@ -22,7 +22,7 @@ public interface AnonListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addChannel(AnonListChannel anonListChannel);
 
-    @Query("select * from AnonListChannel")
+    @Query("select * from AnonListChannel order by updateAt desc")
     Single<List<AnonListChannel>> getAllChannels();
 
     @Query("select * from AnonListChannel where channelName = :channelName")

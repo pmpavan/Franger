@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.frangerapp.franger.ui.home.OutgoingListItemUiState" />
+
+        <variable
+            name="handler"
+            type="com.frangerapp.franger.ui.home.OutgoingListItemUiState" />
+
+    </data>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <!--<com.frangerapp.ui.CircularTextDrawableView-->
+            <!--android:layout_width="@dimen/avatar_medium"-->
+            <!--android:layout_height="@dimen/avatar_medium"-->
+            <!--android:textSize="12sp"-->
+            <!--app:imageHeight="@{@dimen/avatar_medium}"-->
+            <!--android:text="@{vm.channelName}"-->
+            <!--app:imageUrl="@{vm.imageUrl}"-->
+            <!--app:imageWidth="@{@dimen/avatar_medium}"-->
+            <!--app:noOfCharactersToDisplay="@{1}" />-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/time_stamp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:maxLines="1"
+                        android:text="@{vm.timeStamp}"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="10sp"
+                        tools:text="2 mins ago" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/time_stamp"
+                        android:layout_toStartOf="@+id/time_stamp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@{vm.user.displayName}"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Dinesh" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/unread_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:background="@drawable/unread_count_bg"
+                        android:maxLines="1"
+                        android:padding="3dp"
+                        android:text="@{String.valueOf(vm.unreadCount)}"
+                        android:textSize="10sp"
+                        android:visibility="@{vm.unreadCount!=0}"
+                        tools:text="1" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/unread_count"
+                        android:layout_toStartOf="@+id/unread_count"
+                        android:maxLines="1"
+                        android:text="@{vm.lastMessage}"
+                        android:textSize="12sp"
+                        tools:text="You have a new message" />
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</layout>
