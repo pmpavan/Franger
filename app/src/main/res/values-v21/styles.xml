@@ -11,5 +11,6 @@
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="statusBarBackground">@color/colorPrimary</item>
         <item name="android:actionModeBackground">@color/statusbar_color</item>
+        <item name="android:windowBackground">@color/app_bg</item>
     </style>
 </resources>

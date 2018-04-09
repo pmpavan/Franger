@@ -37,7 +37,7 @@
             android:onClick="@{vm::onInviteButtonClicked}"
             android:padding="3dp"
             android:text="@string/invite"
-            android:textColor="#0D47A1"
+            android:textColor="@color/invite_text_color"
             android:visibility="@{!vm.isExistingUser}" />
     </LinearLayout>
 </layout>

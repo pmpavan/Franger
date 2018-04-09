@@ -94,7 +94,7 @@ public class CountriesViewModel extends LoginBaseViewModel {
     }
 
 
-    public final BaseBindingAdapters.ItemClickHandler<CountriesListItemViewModel> itemClickHandler = (position, item) -> {
+    public final BaseBindingAdapters.ItemClickHandler<CountriesListItemViewModel> itemClickHandler = (item) -> {
         FRLogger.msg("item " + item);
         CountriesViewEvent countriesViewEvent = CountriesViewEvent.builder();
         countriesViewEvent.setId(CountriesPresentationConstants.COUNTRY_ITEM_CLICKED);

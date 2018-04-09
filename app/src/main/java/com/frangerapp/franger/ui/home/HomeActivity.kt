@@ -18,10 +18,15 @@ import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.AppUtils
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule
 import com.frangerapp.franger.databinding.ActivityHomeBinding
+import com.frangerapp.franger.domain.chat.model.ChatContact
+import com.frangerapp.franger.ui.chat.ChatActivity
 import com.frangerapp.franger.ui.contact.ContactActivity
 import com.frangerapp.franger.ui.user.UserBaseActivity
+import com.frangerapp.franger.ui.util.ActivityConstants
 import com.frangerapp.franger.viewmodel.home.HomeViewModel
 import com.frangerapp.franger.viewmodel.home.eventbus.HomeEvent
+import com.frangerapp.franger.viewmodel.home.eventbus.IncomingListEvent
+import com.frangerapp.franger.viewmodel.home.eventbus.OutgoingListEvent
 import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants
 import kotlinx.android.synthetic.main.activity_home.*
 import org.greenrobot.eventbus.EventBus
@@ -157,6 +162,29 @@ class HomeActivity : UserBaseActivity() {
         }
     }
 
+    private fun showChatPage(chatContact: ChatContact, isIncoming: Boolean, channelName: String) {
+        val intent = ChatActivity.newInstance(this@HomeActivity, chatContact, isIncoming, channelName)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivityForResult(intent, ActivityConstants.RESULT_CODE_CHAT_ACTIVITY)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onIncomingListEventReceived(event: IncomingListEvent) {
+        when (event.id) {
+            HomePresentationConstants.ON_INCOMING_CHANNEL_CLICKED -> {
+                showChatPage(event.contact, event.isIncoming, event.channelName)
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onOutgoingListEventReceived(event: OutgoingListEvent) {
+        when (event.id) {
+            HomePresentationConstants.ON_OUTGOING_CHANNEL_CLICKED -> {
+                showChatPage(event.contact, event.isIncoming, event.channelName)
+            }
+        }
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(event: HomeEvent) {

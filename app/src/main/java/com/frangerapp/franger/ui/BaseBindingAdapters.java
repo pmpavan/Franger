@@ -16,6 +16,7 @@ import com.frangerapp.franger.app.util.DateUtils;
 import com.frangerapp.franger.ui.chat.ChatListAdapter;
 import com.frangerapp.franger.ui.home.IncomingListAdapter;
 import com.frangerapp.franger.ui.home.OutgoingListAdapter;
+import com.frangerapp.franger.ui.home.OutgoingListItemUiState;
 import com.frangerapp.franger.ui.util.RecyclerBindingAdapter;
 import com.frangerapp.franger.ui.util.UiUtils;
 import com.frangerapp.ui.CircularTextDrawableView;
@@ -53,7 +54,7 @@ public class BaseBindingAdapters {
     }
 
     public interface ItemClickHandler<T> {
-        void onItemClick(int position, T item);
+        void onItemClick(T item);
     }
 
     @BindingAdapter("ellipsize")
@@ -69,9 +70,9 @@ public class BaseBindingAdapters {
         }
         RecyclerBindingAdapter<T> adapter = new RecyclerBindingAdapter<T>(layoutId, BR.vm, listItemViewModels);
         recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener((position, item) -> {
+        adapter.setOnItemClickListener((item) -> {
             if (handler != null)
-                handler.onItemClick(position, item);
+                handler.onItemClick(item);
         });
 
     }
@@ -88,24 +89,32 @@ public class BaseBindingAdapters {
     }
 
 
-    @BindingAdapter({"outgoing_items"})
-    public static void setOutgoingAdapter(RecyclerView recyclerView, ArrayList items) {
+    @BindingAdapter(value = {"outgoing_items", "onItemClick"})
+    public static void setOutgoingAdapter(RecyclerView recyclerView, ArrayList items, ItemClickHandler handler) {
         OutgoingListAdapter adapter = (OutgoingListAdapter) recyclerView.getAdapter();
         if (adapter != null) {
             adapter.clear();
             if (items != null)
                 adapter.addAll(items);
+            adapter.setOnItemClickListener(item -> {
+                if (handler != null)
+                    handler.onItemClick(item);
+            });
             adapter.notifyDataSetChanged();
         }
     }
 
-    @BindingAdapter({"incoming_items"})
-    public static void setIncomingAdapter(RecyclerView recyclerView, ArrayList items) {
+    @BindingAdapter(value = {"incoming_items", "onItemClick"})
+    public static void setIncomingAdapter(RecyclerView recyclerView, ArrayList items, ItemClickHandler handler) {
         IncomingListAdapter adapter = (IncomingListAdapter) recyclerView.getAdapter();
         if (adapter != null) {
             adapter.clear();
             if (items != null)
                 adapter.addAll(items);
+            adapter.setOnItemClickListener((item) -> {
+                if (handler != null)
+                    handler.onItemClick(item);
+            });
             adapter.notifyDataSetChanged();
         }
     }

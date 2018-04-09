@@ -15,9 +15,11 @@ import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.home.IncomingListModule
 import com.frangerapp.franger.databinding.FragmentIncomingBinding
+import com.frangerapp.franger.ui.chat.ChatActivity
 import com.frangerapp.franger.ui.user.UserBaseFragment
 import com.frangerapp.franger.viewmodel.home.IncomingListViewModel
 import com.frangerapp.franger.viewmodel.home.eventbus.IncomingListEvent
+import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -42,6 +44,7 @@ class IncomingFragment : UserBaseFragment() {
 
     private lateinit var viewDataBinding: FragmentIncomingBinding
     private lateinit var viewModel: IncomingListViewModel
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -115,7 +118,8 @@ class IncomingFragment : UserBaseFragment() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(event: IncomingListEvent) {
         when (event.id) {
-
+            HomePresentationConstants.ON_INCOMING_CHANNEL_CLICKED -> {
+            }
         }
     }
 

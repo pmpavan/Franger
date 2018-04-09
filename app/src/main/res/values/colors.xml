@@ -2,11 +2,14 @@
 <resources>
     <color name="colorPrimary">#00AA8D</color>
     <color name="colorPrimaryDark">#008975</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff0000</color>
     <color name="red">#ff0000</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="app_bg">#FFFFFF</color>
 
     <color name="statusbar_color">#008975</color>
 
     <color name="unread_circle_bg">#Ff5959</color>
+    <color name="invite_text_color">#0D47A1</color>
 </resources>

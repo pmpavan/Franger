@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class FeedNewMessageResponse {
 
+    private long messageId;
     @SerializedName("messageFrom")
     @Expose
     private MessageFrom messageFrom;
@@ -46,5 +47,13 @@ public class FeedNewMessageResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 }

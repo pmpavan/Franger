@@ -73,7 +73,7 @@ public class RecyclerBindingAdapter<T> extends RecyclerView.Adapter<RecyclerBind
             final T item = items.get(position);
             holder.getBinding().getRoot().setOnClickListener(v -> {
                 if (onItemClickListener != null)
-                    onItemClickListener.onItemClick(position, item);
+                    onItemClickListener.onItemClick(item);
             });
             holder.getBinding().setVariable(variableId, item);
         } else if (holder.getItemViewType() == ITEM_TYPE_LOAD_MORE) {
@@ -194,7 +194,7 @@ public class RecyclerBindingAdapter<T> extends RecyclerView.Adapter<RecyclerBind
 
 
     public interface OnItemClickListener<T> {
-        void onItemClick(int position, T item);
+        void onItemClick(T item);
     }
 
     public static class BindingHolder extends RecyclerView.ViewHolder {

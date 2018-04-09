@@ -17,6 +17,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.frangerapp.franger.ui.login.VerifyUserActivity"
+        android:background="@drawable/login_page_bg"
         tools:showIn="@layout/activity_verify">
 
         <TextView

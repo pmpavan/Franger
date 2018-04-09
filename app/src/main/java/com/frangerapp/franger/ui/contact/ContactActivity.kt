@@ -83,7 +83,6 @@ class ContactActivity : UserBaseActivity() {
 
     private fun setupControllers() {
 
-
     }
 
     private fun onPageLoaded() {
@@ -102,14 +101,14 @@ class ContactActivity : UserBaseActivity() {
     fun onViewModelInteraction(loginViewEvent: ContactEvent) {
         when (loginViewEvent.id) {
             ContactPresentaionConstants.ON_CONTACT_ITEM_CLCKD -> {
-                val contact = loginViewEvent.contactObj;
+                val contact = loginViewEvent.contactObj
                 goToChatActivity(contact)
             }
         }
     }
 
     private fun goToChatActivity(contact: ContactListItemViewModel) {
-        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false, "chat_8_31")
+        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false, "")
         startActivity(intent)
     }
 

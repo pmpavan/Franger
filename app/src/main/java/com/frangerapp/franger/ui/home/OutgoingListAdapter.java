@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.databinding.MyListChannelListItemBinding;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
+import com.frangerapp.franger.ui.util.RecyclerBindingAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,8 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
 
     private int ITEM_CHANNEL = 1;
 
+    private RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener;
+
     public OutgoingListAdapter(Context context, LoggedInUser loggedInUser) {
         this.context = context;
         this.loggedInUser = loggedInUser;
@@ -43,8 +46,8 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
         OutgoingListItemUiState model = items.get(position);
         holder.bind(model);
         holder.binding.getRoot().setOnClickListener(v -> {
-            if (handler != null)
-                handler.onItemClick(model);
+            if (onItemClickListener != null)
+                onItemClickListener.onItemClick(model);
         });
     }
 
@@ -76,6 +79,10 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
 
     public void setHandler(@NotNull OutgoingListItemUiState.OutgoingGroupItemClickHandler handler) {
         this.handler=handler;
+    }
+
+    public void setOnItemClickListener(RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
 

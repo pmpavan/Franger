@@ -38,19 +38,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="horizontal">
+            android:background="#CCCCCC"
+            android:orientation="horizontal"
+            android:padding="5dp">
 
             <EditText
                 android:id="@+id/messageBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@drawable/rounded_text_bg"
+                android:maxLines="6"
+                android:padding="5dp"
                 android:text="@={vm.messageTxt}" />
 
             <ImageView
                 android:id="@+id/sendBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:onClick="@{vm::onSendButtonClicked}"
                 android:padding="5dp"
                 app:srcCompat="@drawable/ic_send_black_24dp" />

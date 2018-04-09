@@ -112,7 +112,6 @@ class ChatActivity : UserBaseActivity() {
         viewDataBinding.tickets = listState
         viewDataBinding.handler = viewModel
         viewModel.data.observe(this@ChatActivity, Observer { t ->
-            FRLogger.msg("received list ${t.toString()}")
             listState.update(t)
         })
     }

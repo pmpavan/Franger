@@ -14,7 +14,7 @@ public class IncomingListItemUiState {
     public String userId;
     public String imageUrl;
     public User user;
-    public int unreadCount = 0;
+    public long unreadCount = 0;
     public Date timeStamp;
     public IncomingGroupItemClickHandler handler;
     public long messageId;
@@ -51,11 +51,11 @@ public class IncomingListItemUiState {
         this.user = user;
     }
 
-    public int getUnreadCount() {
+    public long getUnreadCount() {
         return unreadCount;
     }
 
-    public void setUnreadCount(int unreadCount) {
+    public void setUnreadCount(long unreadCount) {
         this.unreadCount = unreadCount;
     }
 
@@ -140,9 +140,10 @@ public class IncomingListItemUiState {
 
     @Override
     public String toString() {
-        return "IncomingGroupItemClickHandler{" +
+        return "IncomingListItemUiState{" +
                 "lastMessage='" + lastMessage + '\'' +
                 ", userId='" + userId + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", user=" + user +
                 ", unreadCount=" + unreadCount +
                 ", timeStamp=" + timeStamp +
@@ -150,6 +151,9 @@ public class IncomingListItemUiState {
                 ", messageId=" + messageId +
                 ", channelName='" + channelName + '\'' +
                 ", isUserMuted=" + isUserMuted +
+                ", anonymisedUserName='" + anonymisedUserName + '\'' +
+                ", anonymisedUserImg=" + anonymisedUserImg +
+                ", isUserBlocked=" + isUserBlocked +
                 '}';
     }
 }

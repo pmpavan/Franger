@@ -83,9 +83,9 @@
                         android:background="@drawable/unread_count_bg"
                         android:maxLines="1"
                         android:padding="3dp"
+                        android:textColor="@color/white"
                         android:text="@{String.valueOf(vm.unreadCount)}"
                         android:textSize="10sp"
-                        android:visibility="@{vm.unreadCount!=0}"
                         tools:text="1" />
 
                     <TextView

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.frangerapp.franger.R;
 import com.frangerapp.franger.databinding.IncomingChannelListItemBinding;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
+import com.frangerapp.franger.ui.util.RecyclerBindingAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,7 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
 
     private IncomingListItemUiState.IncomingGroupItemClickHandler handler;
 
+    private RecyclerBindingAdapter.OnItemClickListener<IncomingListItemUiState> onItemClickListener;
     private LoggedInUser loggedInUser;
 
     private int ITEM_CHANNEL = 1;
@@ -43,8 +45,8 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
         IncomingListItemUiState model = items.get(position);
         holder.bind(model);
         holder.binding.getRoot().setOnClickListener(v -> {
-            if (handler != null)
-                handler.onItemClick(model);
+            if (onItemClickListener != null)
+                onItemClickListener.onItemClick(model);
         });
     }
 
@@ -76,6 +78,10 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
 
     public void setHandler(@NotNull IncomingListItemUiState.IncomingGroupItemClickHandler handler) {
         this.handler = handler;
+    }
+
+    public void setOnItemClickListener(RecyclerBindingAdapter.OnItemClickListener<IncomingListItemUiState> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
 

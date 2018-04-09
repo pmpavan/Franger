@@ -71,6 +71,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         if (channelName == null || channelName.isEmpty()) {
             this.channelName = chatInteractor.getChatName(chatContact.getUserId(), isIncoming);
         }
+        FRLogger.msg("channel name in chat page " + channelName);
         sendSetToolbarTitleTxtEvent();
         chatInteractor.getMessageEvent()
                 .subscribe(getChatMsgObserver());
@@ -113,7 +114,10 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     private void sendSetToolbarTitleTxtEvent() {
         ChatEvent event = new ChatEvent();
         event.setId(ChatPresentationConstants.SET_TOOLBAR_TXT);
-        event.setMessage(chatContact.getDisplayName());
+        String userName = chatContact.getDisplayName();
+        if (isIncoming)
+            userName = chatContact.getAnonymisedUserName();
+        event.setMessage(userName);
         eventBus.post(event);
     }
 
@@ -144,11 +148,16 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     }
 
     private void handleChatMessages(MessageEvent messageEvent) {
-        if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id
-                && messageEvent.getChannel().equalsIgnoreCase(channelName)) {
-            // update in list
-            FRLogger.msg("received the message event in chat page " + messageEvent.getUser());
-            addMsgToAdapter(messageEvent.getMessage(), messageEvent.getUserId(), messageEvent.getTimestamp(), messageEvent.getUser(), messageEvent.getMessageId());
+        FRLogger.msg("chat page message Event " + messageEvent.getChannel());
+        if (messageEvent.getChannel().equalsIgnoreCase(channelName)) {
+            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
+                // update in list
+                addMsgToAdapter(messageEvent.getMessage(), messageEvent.getUserId(), messageEvent.getTimestamp(), messageEvent.getUser(), messageEvent.getMessageId());
+            } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
+                // update in list
+                FRLogger.msg("received the message event in chat page " + messageEvent.getUser());
+                addMsgToAdapter(messageEvent.getMessage(), messageEvent.getUserId(), messageEvent.getTimestamp(), messageEvent.getUser(), messageEvent.getMessageId());
+            }
         }
     }
 

@@ -8,10 +8,18 @@ import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
 import com.franger.mobile.logger.FRLogger;
+import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
+import com.frangerapp.franger.domain.chat.model.ChatContact;
+import com.frangerapp.franger.domain.chat.model.MessageEvent;
+import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
+import com.frangerapp.franger.ui.BaseBindingAdapters;
+import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.ui.home.IncomingListItemUiState;
+import com.frangerapp.franger.viewmodel.home.eventbus.IncomingListEvent;
+import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -19,6 +27,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -50,10 +59,8 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
     }
 
     public void onPageLoaded() {
-//        chatInteractor.getMessageEvent()
-//                .subscribe(getChatMsgObserver());
-
         pullChannelsFromDb();
+        chatInteractor.getMessageEvent().subscribe(getChatObserver());
     }
 
     private void pullChannelsFromDb() {
@@ -76,15 +83,70 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
         FRLogger.msg("error onMessageFetchFailed " + throwable.getMessage());
     }
 
+    private Observer<MessageEvent> getChatObserver() {
+        return new Observer<MessageEvent>() {
+
+            @Override
+            public void onSubscribe(Disposable d) {
+                FRLogger.msg(" First onSubscribe : " + d.isDisposed());
+            }
+
+            @Override
+            public void onNext(MessageEvent messageEvent) {
+                FRLogger.msg("home First onNext value : " + messageEvent);
+                handleMessageEventReceived(messageEvent);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                FRLogger.msg(" First onError : " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                FRLogger.msg(" First onComplete");
+            }
+        };
+    }
+
+    private void handleMessageEventReceived(MessageEvent messageEvent) {
+
+        if(messageEvent.isIncoming()) {
+            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
+                //update incoming/outgoing list and start a chat channel
+            } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
+
+            }
+        }
+    }
+
     public MutableLiveData<List<IncomingListItemUiState>> getData() {
         return data;
     }
 
     @Override
-    public void onItemClick(IncomingListItemUiState model) {
-        FRLogger.msg("item clicked OutgoingListUiState " + model);
-
+    protected void onCleared() {
+        super.onCleared();
     }
+
+    @Override
+    public void onItemClick(IncomingListItemUiState model) {
+        FRLogger.msg("item clicked IncomingListItemUiState " + model);
+    }
+
+    public final BaseBindingAdapters.ItemClickHandler<IncomingListItemUiState> itemClickHandler = (item) -> {
+        FRLogger.msg("item clicked IncomingListItemUiState " + item);
+        ChatContact contact = new ChatContact(item.user);
+        contact.setAnonymisedUserName(item.anonymisedUserName);
+        contact.setAnonymisedUserImg(item.anonymisedUserImg);
+        IncomingListEvent incomingListEvent = new IncomingListEvent();
+        incomingListEvent.setId(HomePresentationConstants.ON_INCOMING_CHANNEL_CLICKED);
+        incomingListEvent.setContact(contact);
+        incomingListEvent.setIncoming(true);
+        incomingListEvent.setChannelName(item.getChannelName());
+        eventBus.post(incomingListEvent);
+
+    };
 
     public static class Factory implements ViewModelProvider.Factory {
 

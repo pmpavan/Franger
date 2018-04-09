@@ -34,4 +34,17 @@ public class Message {
     public Date sentAt;
     public int messageStatus;
     public boolean isMessageRead = false;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
+                ", channelName='" + channelName + '\'' +
+                ", message='" + message + '\'' +
+                ", sentAt=" + sentAt +
+                ", messageStatus=" + messageStatus +
+                ", isMessageRead=" + isMessageRead +
+                '}';
+    }
 }

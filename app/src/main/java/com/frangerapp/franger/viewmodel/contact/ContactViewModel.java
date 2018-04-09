@@ -47,7 +47,7 @@ public class ContactViewModel extends UserBaseViewModel {
     private EventBus eventBus;
     private ProfileInteractor profileInteractor;
 
-    public ObservableBoolean showLoading = new ObservableBoolean(false);
+    public ObservableBoolean showLoading = new ObservableBoolean(true);
     private List<ContactListItemViewModel> itemViewModels = new ArrayList<>();
     public ObservableField<List<ContactListItemViewModel>> inviteUserList = new ObservableField<>(itemViewModels);
 
@@ -58,6 +58,7 @@ public class ContactViewModel extends UserBaseViewModel {
         this.eventBus = eventBus;
         this.profileInteractor = profileInteractor;
         this.loggedInUser = loggedInUser;
+        showLoading.set(true);
         initSearch();
         onContactsFetchCompleted();
     }
@@ -72,7 +73,7 @@ public class ContactViewModel extends UserBaseViewModel {
          * TODO Move the logic of loading from db or api to interactor layer
          * https://proandroiddev.com/the-missing-google-sample-of-android-architecture-components-guide-c7d6e7306b8f
          */
-        Disposable disposable=  profileInteractor.syncContacts(loggedInUser.getUserId())
+        Disposable disposable = profileInteractor.syncContacts(loggedInUser.getUserId())
                 .retry(2)
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
                 .subscribe(this::onSuccess, this::onFailure, this::onContactsFetchCompleted);
@@ -120,7 +121,7 @@ public class ContactViewModel extends UserBaseViewModel {
         Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    public final BaseBindingAdapters.ItemClickHandler<ContactListItemViewModel> itemClickHandler = (position, item) -> {
+    public final BaseBindingAdapters.ItemClickHandler<ContactListItemViewModel> itemClickHandler = (item) -> {
         FRLogger.msg("item " + item);
         if (item.getUserId() != null && Long.parseLong(item.getUserId()) != 0) {
             ContactEvent contactEvent = new ContactEvent();
@@ -139,7 +140,7 @@ public class ContactViewModel extends UserBaseViewModel {
     }
 
     private void initSearch() {
-        Disposable disposable=FieldUtils.toObservable(searchTxt)
+        Disposable disposable = FieldUtils.toObservable(searchTxt)
                 .debounce(30L, TimeUnit.MILLISECONDS)
                 .subscribe(this::filterContacts, t -> FRLogger.msg("Error " + t.getMessage()));
         disposables.add(disposable);

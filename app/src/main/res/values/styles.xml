@@ -10,6 +10,7 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="statusBarBackground">@color/colorPrimary</item>
         <item name="android:actionModeBackground">@color/statusbar_color</item>
+        <item name="android:windowBackground">@color/app_bg</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

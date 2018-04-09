@@ -126,7 +126,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
         eventBus.post(event);
     }
 
-    public final BaseBindingAdapters.ItemClickHandler<InviteUserListItemViewModel> itemClickHandler = (position, item) -> {
+    public final BaseBindingAdapters.ItemClickHandler<InviteUserListItemViewModel> itemClickHandler = (item) -> {
         FRLogger.msg("invite item " + item);
 //        CountriesViewEvent countriesViewEvent = CountriesViewEvent.builder();
 //        countriesViewEvent.setId(CountriesPresentationConstants.COUNTRY_ITEM_CLICKED);

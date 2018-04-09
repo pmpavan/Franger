@@ -30,6 +30,7 @@
             android:layout_height="match_parent"
             android:visibility="visible"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:onItemClick="@{vm.itemClickHandler}"
             bind:outgoing_items="@{uiState.getItems}" />
 
     </RelativeLayout>

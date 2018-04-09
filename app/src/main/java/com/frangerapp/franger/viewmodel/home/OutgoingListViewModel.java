@@ -10,8 +10,16 @@ import android.support.annotation.NonNull;
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
+import com.frangerapp.franger.domain.chat.model.ChatContact;
+import com.frangerapp.franger.domain.chat.model.MessageEvent;
+import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
+import com.frangerapp.franger.ui.BaseBindingAdapters;
+import com.frangerapp.franger.ui.home.IncomingListItemUiState;
 import com.frangerapp.franger.ui.home.OutgoingListItemUiState;
+import com.frangerapp.franger.viewmodel.home.eventbus.IncomingListEvent;
+import com.frangerapp.franger.viewmodel.home.eventbus.OutgoingListEvent;
+import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -19,6 +27,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -50,10 +59,8 @@ public class OutgoingListViewModel extends UserBaseViewModel implements Outgoing
     }
 
     public void onPageLoaded() {
-//        chatInteractor.getMessageEvent()
-//                .subscribe(getChatMsgObserver());
-
         pullChannelsFromDb();
+        chatInteractor.getMessageEvent().subscribe(getChatObserver());
     }
 
     private void pullChannelsFromDb() {
@@ -80,12 +87,63 @@ public class OutgoingListViewModel extends UserBaseViewModel implements Outgoing
         return data;
     }
 
+    private Observer<MessageEvent> getChatObserver() {
+        return new Observer<MessageEvent>() {
+
+            @Override
+            public void onSubscribe(Disposable d) {
+                FRLogger.msg(" First onSubscribe : " + d.isDisposed());
+            }
+
+            @Override
+            public void onNext(MessageEvent messageEvent) {
+                FRLogger.msg("home First onNext value : " + messageEvent);
+                handleMessageEventReceived(messageEvent);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                FRLogger.msg(" First onError : " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                FRLogger.msg(" First onComplete");
+            }
+        };
+    }
+
+    private void handleMessageEventReceived(MessageEvent messageEvent) {
+
+        if (!messageEvent.isIncoming()) {
+            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
+                //update outgoing list and start a chat channel
+            } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
+
+            }
+        }
+    }
+
     @Override
     public void onItemClick(OutgoingListItemUiState model) {
         FRLogger.msg("item clicked OutgoingListUiState " + model);
 
     }
 
+    public final BaseBindingAdapters.ItemClickHandler<OutgoingListItemUiState> itemClickHandler = (model) -> {
+        FRLogger.msg("item clicked " + model);
+        OutgoingListEvent incomingListEvent = new OutgoingListEvent();
+        incomingListEvent.setId(HomePresentationConstants.ON_OUTGOING_CHANNEL_CLICKED);
+        incomingListEvent.setContact(new ChatContact(model.user));
+        incomingListEvent.setIncoming(false);
+        incomingListEvent.setChannelName(model.getChannelName());
+        eventBus.post(incomingListEvent);
+    };
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+    }
 
     public static class Factory implements ViewModelProvider.Factory {
 

@@ -47,6 +47,7 @@ public class FrangerApp extends Application {
         enableLogger();
 
     }
+
     public static FrangerApp get(Context context) {
         return (FrangerApp) context.getApplicationContext();
     }
