@@ -73,6 +73,7 @@ dependencies {
 
     // Dagger core
     implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
     kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
     implementation "com.google.dagger:dagger:${daggerVersion}"
@@ -129,3 +130,5 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
 }
+
+apply plugin: 'com.google.gms.google-services'

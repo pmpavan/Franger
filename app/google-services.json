@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "631022611366",
+    "firebase_url": "https://frangerapp-bc288.firebaseio.com",
+    "project_id": "frangerapp-bc288",
+    "storage_bucket": "frangerapp-bc288.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631022611366:android:7efeef3dcc42dd05",
+        "android_client_info": {
+          "package_name": "com.frangerapp.franger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "631022611366-sssr9k92vu7utl70i38p11bugtm3t40e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frangerapp.franger",
+            "certificate_hash": "761da3c56844042788e63f747efed5fa0fc9277a"
+          }
+        },
+        {
+          "client_id": "631022611366-6certiko0k74je6t2accums80d5kd4d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX20CrZXRXHgwx4yLyNVBJ3Bbu52sGgBI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "631022611366-6certiko0k74je6t2accums80d5kd4d3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
