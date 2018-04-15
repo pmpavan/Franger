@@ -4,10 +4,10 @@
         <shape android:shape="rectangle" />
     </item>
     <item
-        android:bottom="400dp"
+        android:bottom="450dp"
         android:left="-100dp"
         android:right="-900dp"
-        android:top="-100dp">
+        android:top="-150dp">
         <shape android:shape="oval">
             <size android:height="20dp" />
             <gradient
