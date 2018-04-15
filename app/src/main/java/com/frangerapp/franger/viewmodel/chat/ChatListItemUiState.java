@@ -77,6 +77,10 @@ public class ChatListItemUiState implements Parcelable {
     }
 
 
+    public void onViewClicked() {
+
+    }
+
     @Override
     public String toString() {
         return "ChatListItemUiState{" +

@@ -3,6 +3,7 @@ package com.frangerapp.franger.ui.home;
 import com.frangerapp.franger.app.util.db.entity.User;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class IncomingListItemUiState {
 
@@ -155,5 +156,30 @@ public class IncomingListItemUiState {
                 ", anonymisedUserImg=" + anonymisedUserImg +
                 ", isUserBlocked=" + isUserBlocked +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IncomingListItemUiState that = (IncomingListItemUiState) o;
+        return unreadCount == that.unreadCount &&
+                messageId == that.messageId &&
+                isUserMuted == that.isUserMuted &&
+                anonymisedUserImg == that.anonymisedUserImg &&
+                isUserBlocked == that.isUserBlocked &&
+                Objects.equals(lastMessage, that.lastMessage) &&
+                Objects.equals(userId, that.userId) &&
+                Objects.equals(imageUrl, that.imageUrl) &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(timeStamp, that.timeStamp) &&
+                Objects.equals(channelName, that.channelName) &&
+                Objects.equals(anonymisedUserName, that.anonymisedUserName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(lastMessage, userId, imageUrl, user, unreadCount, timeStamp, messageId, channelName, isUserMuted, anonymisedUserName, anonymisedUserImg, isUserBlocked);
     }
 }

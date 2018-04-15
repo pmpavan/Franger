@@ -38,4 +38,12 @@
     <string name="time_ago_hours_ago">" hours ago"</string>
     <string name="time_ago_yesterday">yesterday</string>
     <string name="time_ago_days_ago">" days ago"</string>
+
+    <string name="block">Block</string>
+    <string name="unblock">UnBlock</string>
+    <string name="mute">Mute</string>
+    <string name="unmute">Unmute</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

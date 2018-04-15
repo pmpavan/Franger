@@ -60,9 +60,12 @@ class LoginActivity : LoginBaseActivity() {
         invokeDataBinding()
         setupViews()
         setupControllers()
-        onPageLoaded()
     }
 
+    override fun onResume() {
+        super.onResume()
+        onPageLoaded()
+    }
     private fun setupViews() {
         UiUtils.setEditTextAsClickable(viewDataBinding.countryCodeTxt)
     }

@@ -6,7 +6,7 @@ ext {
     volleyVersion = "1.0.0"
     eventBusVersion = "3.0.0"
     archComponentVersion = "1.1.1"
-    supportLibVersion = "27.1.0"
+    supportLibVersion = "27.1.1"
     archComponentExtVersion = "1.1.1"
     archComponentCompilerVersion = "1.1.1"
     archRoomVersion = "1.0.0"

@@ -46,9 +46,11 @@ class SplashActivity : LoginBaseActivity() {
                 .inject(this@SplashActivity)
         eventBus.register(this)
         invokeDataBinding()
+    }
+    override fun onResume() {
+        super.onResume()
         onPageLoaded()
     }
-
     private fun invokeDataBinding() {
         viewModel = ViewModelProviders.of(this@SplashActivity, factory).get(SplashViewModel::class.java)
         viewDataBinding = DataBindingUtil.setContentView(this@SplashActivity, R.layout.activity_splash)

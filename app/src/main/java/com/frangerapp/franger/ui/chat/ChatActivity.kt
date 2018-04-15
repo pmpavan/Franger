@@ -7,7 +7,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import com.franger.mobile.logger.FRLogger
+import android.view.Menu
+import android.view.MenuItem
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule
@@ -22,7 +23,6 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.ArrayList
 import javax.inject.Inject
 
 class ChatActivity : UserBaseActivity() {
@@ -32,11 +32,13 @@ class ChatActivity : UserBaseActivity() {
         private const val ARG_CONTACT = "arg_contact"
         private const val ARG_IS_INCOMING = "arg_is_incoming"
         private const val ARG_CHANNEL = "arg_channel"
-        fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean, channelName: String): Intent {
+        private const val ARG_IS_CHANNEL_MUTED = "arg_channel_is_muted"
+        fun newInstance(activity: Activity, user: ChatContact, isIncoming: Boolean, channelName: String, isChannelBlockedOrMuted: Boolean): Intent {
             val intent = Intent(activity, ChatActivity::class.java)
             intent.putExtra(ARG_CONTACT, user)
             intent.putExtra(ARG_IS_INCOMING, isIncoming)
             intent.putExtra(ARG_CHANNEL, channelName)
+            intent.putExtra(ARG_IS_CHANNEL_MUTED, isChannelBlockedOrMuted)
             return intent
         }
     }
@@ -65,11 +67,13 @@ class ChatActivity : UserBaseActivity() {
         invokeDataBinding()
         setupViews()
         setupControllers()
-        onPageLoaded()
-
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        onPageLoaded()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -82,11 +86,14 @@ class ChatActivity : UserBaseActivity() {
 
     private var channelName: String? = ""
 
+    private var isChannelBlockedOrMuted = false
+
     private fun messageFromAliens() {
         if (intent != null) {
             chatContact = intent.getParcelableExtra(ARG_CONTACT)
             isIncoming = intent.getBooleanExtra(ARG_IS_INCOMING, false)
             channelName = intent.getStringExtra(ARG_CHANNEL)
+            isChannelBlockedOrMuted = intent.getBooleanExtra(ARG_IS_CHANNEL_MUTED, false)
         }
     }
 
@@ -102,29 +109,79 @@ class ChatActivity : UserBaseActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         manageStatusBar(R.color.statusbar_color)
-        manageActionBarWithTitle(toolbar, "")
+//        manageActionBarWithTitle(toolbar, "")
     }
 
     private fun setupControllers() {
-        //        adapter.setHandler(viewModel)
+        adapter.handler = viewModel as ChatListItemUiState.ChatItemClickHandler
         viewDataBinding.chatList.adapter = adapter
 
-        viewDataBinding.tickets = listState
-        viewDataBinding.handler = viewModel
+        viewDataBinding.chats = listState
         viewModel.data.observe(this@ChatActivity, Observer { t ->
             listState.update(t)
         })
+        viewModel.titleTxt.observe(this@ChatActivity, Observer { t ->
+            manageActionBarWithTitle(toolbar, t)
+
+        })
+        viewModel.onViewLoaded(chatContact, isIncoming, channelName, isChannelBlockedOrMuted)
     }
 
     private fun onPageLoaded() {
-        viewModel.onPageLoaded(chatContact, isIncoming, channelName)
+        viewModel.onPageLoaded()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        this.menuInflater.inflate(R.menu.menu_chat, menu)
+        updateMenuTitles(menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun updateMenuTitles(menu: Menu) {
+        val menuItem = menu.findItem(R.id.action_block)
+        menuItem.title = getStringValue(viewModel.blockMenuTitle)
+        menuItem.setIcon(viewModel.blockMenuIcon)
+        menuItem.isVisible = viewModel.blockMenuVisibility
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_block -> {
+            viewModel.onBlockPressed()
+            true
+        }
+        R.id.action_delete -> {
+            viewModel.onDeletePressed()
+            true
+        }
+        android.R.id.home -> {
+            onBackPressed()
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun invalidateMenu() {
+        invalidateOptionsMenu()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onViewModelInteraction(event: ChatEvent) {
         when (event.id) {
-            ChatPresentationConstants.SET_TOOLBAR_TXT ->
+            ChatPresentationConstants.SET_TOOLBAR_TXT -> {
                 manageActionBarWithTitle(toolbar, event.message)
+            }
+            ChatPresentationConstants.ON_BLOCK_CLKD -> {
+                invalidateMenu()
+            }
+            ChatPresentationConstants.ON_MUTE_CLKD -> {
+                invalidateMenu()
+            }
 
         }
     }

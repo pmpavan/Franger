@@ -36,6 +36,9 @@ public interface MessageDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateMessage(Message message);
 
+    @Query("delete from message where channelName = :channelName")
+    void removeChannelMessages(String channelName);
+
     @Query("delete from message")
     void removeAllMessages();
 

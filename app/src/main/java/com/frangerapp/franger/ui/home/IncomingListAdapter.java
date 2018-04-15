@@ -3,6 +3,7 @@ package com.frangerapp.franger.ui.home;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,9 +23,8 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
     private Context context;
     private List<IncomingListItemUiState> items = new ArrayList<>();
 
-    private IncomingListItemUiState.IncomingGroupItemClickHandler handler;
+    public IncomingListItemUiState.IncomingGroupItemClickHandler handler;
 
-    private RecyclerBindingAdapter.OnItemClickListener<IncomingListItemUiState> onItemClickListener;
     private LoggedInUser loggedInUser;
 
     private int ITEM_CHANNEL = 1;
@@ -45,8 +45,8 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
         IncomingListItemUiState model = items.get(position);
         holder.bind(model);
         holder.binding.getRoot().setOnClickListener(v -> {
-            if (onItemClickListener != null)
-                onItemClickListener.onItemClick(model);
+            if (handler != null)
+                handler.onItemClick(model);
         });
     }
 
@@ -76,14 +76,14 @@ public class IncomingListAdapter extends RecyclerView.Adapter<IncomingListAdapte
         return items.size() == 0;
     }
 
+    public void updateList(ArrayList<IncomingListItemUiState> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new IncomingChannelListDiffUtil(this.items, newList));
+        diffResult.dispatchUpdatesTo(this);
+    }
+
     public void setHandler(@NotNull IncomingListItemUiState.IncomingGroupItemClickHandler handler) {
         this.handler = handler;
     }
-
-    public void setOnItemClickListener(RecyclerBindingAdapter.OnItemClickListener<IncomingListItemUiState> onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
 
     static class IncomingChannelViewHolder extends RecyclerView.ViewHolder {
         private final IncomingChannelListItemBinding binding;

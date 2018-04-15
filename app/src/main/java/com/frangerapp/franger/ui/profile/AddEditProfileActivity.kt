@@ -54,11 +54,15 @@ class AddEditProfileActivity : UserBaseActivity() {
         invokeDataBinding()
         setupViews()
         setupControllers()
+    }
+    override fun onResume() {
+        super.onResume()
         onPageLoaded()
     }
-
     private fun setupViews() {
-        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        manageStatusBar(R.color.statusbar_color)
+        manageActionBarWithTitle(toolbar, "Profile")
     }
 
     private fun setupControllers() {

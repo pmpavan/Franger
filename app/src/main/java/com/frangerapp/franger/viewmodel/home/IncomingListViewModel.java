@@ -8,7 +8,6 @@ import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
 import com.franger.mobile.logger.FRLogger;
-import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
@@ -16,8 +15,8 @@ import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
 import com.frangerapp.franger.ui.BaseBindingAdapters;
-import com.frangerapp.franger.ui.chat.ChatActivity;
 import com.frangerapp.franger.ui.home.IncomingListItemUiState;
+import com.frangerapp.franger.ui.home.OutgoingListItemUiState;
 import com.frangerapp.franger.viewmodel.home.eventbus.IncomingListEvent;
 import com.frangerapp.franger.viewmodel.home.util.HomePresentationConstants;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
@@ -25,8 +24,11 @@ import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -74,7 +76,7 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
 
     private void onMessagesFetched(List<IncomingListItemUiState> outgoingListItemUiStates) {
         items.addAll(outgoingListItemUiStates);
-        FRLogger.msg("items onMessagesFetched " + items);
+//        FRLogger.msg("items onMessagesFetched " + items);
         getData().postValue(items);
 
     }
@@ -111,13 +113,70 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
 
     private void handleMessageEventReceived(MessageEvent messageEvent) {
 
-        if(messageEvent.isIncoming()) {
-            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
+        if (messageEvent.isIncoming()) {
+            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id
+                    || messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
                 //update incoming/outgoing list and start a chat channel
-            } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
-
+                updateList(messageEvent);
             }
         }
+    }
+
+    private void updateList(MessageEvent messageEvent) {
+        Disposable disposable = Observable.just(items)
+                .flatMapIterable(incomingListItemUiStates -> incomingListItemUiStates)
+                .filter(incomingListItemUiState -> incomingListItemUiState.getChannelName().equals(messageEvent.getChannel()))
+                .map(incomingListItemUiState -> {
+                    if (incomingListItemUiState.channelName.equals(messageEvent.getChannel())) {
+                        if (messageEvent.isSentMessage())
+                            incomingListItemUiState.setUnreadCount(0);
+                        else
+                            incomingListItemUiState.setUnreadCount(incomingListItemUiState.unreadCount + 1);
+                        incomingListItemUiState.lastMessage = messageEvent.getMessage();
+                        incomingListItemUiState.timeStamp = messageEvent.getTimestamp();
+                    }
+                    return incomingListItemUiState;
+                })
+                .switchIfEmpty(observer -> {
+                    IncomingListItemUiState outgoingListItemUiState = new IncomingListItemUiState();
+                    outgoingListItemUiState.setAnonymisedUserName(messageEvent.getAnonymisedUserName());
+                    outgoingListItemUiState.setAnonymisedUserImg(messageEvent.getAnonymisedUserImg());
+                    outgoingListItemUiState.setLastMessage(messageEvent.getMessage());
+                    outgoingListItemUiState.setUserId(messageEvent.getUserId());
+                    outgoingListItemUiState.setTimeStamp(messageEvent.getTimestamp());
+                    outgoingListItemUiState.setUnreadCount(0);
+                    outgoingListItemUiState.setChannelName(messageEvent.getChannel());
+                    outgoingListItemUiState.setImageUrl("");
+                    outgoingListItemUiState.setUser(messageEvent.getUser());
+//                    items.add(0, outgoingListItemUiState);
+                    observer.onNext(outgoingListItemUiState);
+                })
+                .toList()
+                .map(this::sortArray)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onMessagesFetched, this::onMessageFetchFailed);
+        disposables.add(disposable);
+
+    }
+
+    private List<IncomingListItemUiState> sortArray(List<IncomingListItemUiState> sortedList) {
+//        List<IncomingListItemUiState> sortedList = new ArrayList<>(unsortedList.size());
+//        Collections.copy(sortedList, unsortedList);
+        Collections.sort(sortedList, this::isDateGreater);
+        return sortedList;
+    }
+
+    private int isDateGreater(IncomingListItemUiState incomingListItemUiState1, IncomingListItemUiState incomingListItemUiState2) {
+        if (getTimestampInMillis(incomingListItemUiState1.getTimeStamp()) > getTimestampInMillis(incomingListItemUiState2.getTimeStamp())) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+    private long getTimestampInMillis(Date dateTime) {
+        return dateTime.getTime();
     }
 
     public MutableLiveData<List<IncomingListItemUiState>> getData() {
@@ -130,11 +189,7 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
     }
 
     @Override
-    public void onItemClick(IncomingListItemUiState model) {
-        FRLogger.msg("item clicked IncomingListItemUiState " + model);
-    }
-
-    public final BaseBindingAdapters.ItemClickHandler<IncomingListItemUiState> itemClickHandler = (item) -> {
+    public void onItemClick(IncomingListItemUiState item) {
         FRLogger.msg("item clicked IncomingListItemUiState " + item);
         ChatContact contact = new ChatContact(item.user);
         contact.setAnonymisedUserName(item.anonymisedUserName);
@@ -144,9 +199,9 @@ public class IncomingListViewModel extends UserBaseViewModel implements Incoming
         incomingListEvent.setContact(contact);
         incomingListEvent.setIncoming(true);
         incomingListEvent.setChannelName(item.getChannelName());
+        incomingListEvent.setChannelMutedOrBlocked(item.isUserBlocked);
         eventBus.post(incomingListEvent);
-
-    };
+    }
 
     public static class Factory implements ViewModelProvider.Factory {
 

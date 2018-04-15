@@ -8,23 +8,31 @@
             type="com.frangerapp.franger.viewmodel.chat.ChatListItemUiState" />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(vm.userId)}" />
+            android:layout_alignParentStart="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/out_message_bg"
+            android:gravity="start"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="@{vm.message}" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.message}"
+                android:textSize="16sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@{vm.timeStamp}" />
+        </LinearLayout>
+    </RelativeLayout>
 </layout>

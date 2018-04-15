@@ -30,6 +30,9 @@ public interface AnonListDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateChannel(AnonListChannel anonListChannel);
 
+    @Query("delete from AnonListChannel where channelName= :channelName")
+    void removeChannel(String channelName);
+
     @Query("delete from AnonListChannel")
     void removeAllChannels();
 }

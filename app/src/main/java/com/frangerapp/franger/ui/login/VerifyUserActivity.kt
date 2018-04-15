@@ -55,9 +55,12 @@ class VerifyUserActivity : LoginBaseActivity() {
         messageFromAliens()
         setupViews()
         setupControllers()
-        onPageLoaded()
     }
 
+    override fun onResume() {
+        super.onResume()
+        onPageLoaded()
+    }
     private fun messageFromAliens() {
     }
 

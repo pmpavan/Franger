@@ -72,6 +72,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
 
     // Dagger core
+    implementation 'com.android.support:support-v4:27.1.1'
     annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
     kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
     implementation "com.google.dagger:dagger:${daggerVersion}"
@@ -87,7 +88,7 @@ dependencies {
     implementation('br.com.simplepass:loading-button-android:1.12.0') {
         exclude module: 'support-annotations'
     }
-    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.4.2'
 
     //Architecture Components
@@ -106,7 +107,7 @@ dependencies {
     implementation "android.arch.persistence.room:rxjava2:${archLifecycleVersion}"
 
     //Cardview
-    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
 
     //Permissions
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'

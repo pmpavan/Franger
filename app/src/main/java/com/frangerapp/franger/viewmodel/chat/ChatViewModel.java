@@ -4,11 +4,15 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
 import com.franger.mobile.logger.FRLogger;
+import com.frangerapp.franger.R;
+import com.frangerapp.franger.app.util.db.entity.AnonListChannel;
 import com.frangerapp.franger.app.util.db.entity.Message;
+import com.frangerapp.franger.app.util.db.entity.MyListChannel;
 import com.frangerapp.franger.app.util.db.entity.User;
 import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
@@ -16,12 +20,13 @@ import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
-import com.frangerapp.franger.ui.chat.ChatListUiState;
 import com.frangerapp.franger.viewmodel.chat.eventbus.ChatEvent;
 import com.frangerapp.franger.viewmodel.chat.util.ChatPresentationConstants;
+import com.frangerapp.franger.viewmodel.common.rx.SchedulerUtils;
 import com.frangerapp.franger.viewmodel.user.UserBaseViewModel;
 
 import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +43,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by pavanm on 13/03/18.
  */
 
-public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.ActionClickHandler {
+public class ChatViewModel extends UserBaseViewModel implements ChatListItemUiState.ChatItemClickHandler {
 
     private LoggedInUser loggedInUser;
     private Context context;
@@ -48,6 +53,16 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     private ChatContact chatContact;
     private boolean isIncoming;
     private String channelName;
+
+    private boolean isChannelBlocked = false;
+    private boolean isChannelMuted = false;
+    public ObservableBoolean scrollToBottom = new ObservableBoolean(true);
+
+    public MutableLiveData<String> getTitleTxt() {
+        return titleTxt;
+    }
+
+    private MutableLiveData<String> titleTxt = new MutableLiveData<>();
 
     private MutableLiveData<List<ChatListItemUiState>> data = new MutableLiveData<>();
 
@@ -61,21 +76,31 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         this.chatInteractor = chatInteractor;
         this.loggedInUser = loggedInUser;
         this.data = new MutableLiveData<>();
+        this.titleTxt = new MutableLiveData<>();
         data.setValue(new ArrayList<>());
+        titleTxt.setValue("");
     }
 
-    public void onPageLoaded(ChatContact chatContact, boolean isIncoming, String channelName) {
+    public void onViewLoaded(ChatContact chatContact, boolean isIncoming, String channelName, boolean isChannelBlockedOrMuted) {
         this.isIncoming = isIncoming;
         this.chatContact = chatContact;
         this.channelName = channelName;
         if (channelName == null || channelName.isEmpty()) {
             this.channelName = chatInteractor.getChatName(chatContact.getUserId(), isIncoming);
         }
+        if (isIncoming) {
+            isChannelBlocked = isChannelBlockedOrMuted;
+        } else {
+            isChannelMuted = isChannelBlockedOrMuted;
+        }
         FRLogger.msg("channel name in chat page " + channelName);
         sendSetToolbarTitleTxtEvent();
         chatInteractor.getMessageEvent()
                 .subscribe(getChatMsgObserver());
 
+    }
+
+    public void onPageLoaded() {
         pullMessagesFromDb();
     }
 
@@ -96,8 +121,9 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     }
 
     private void onMessagesFetched(List<ChatListItemUiState> chatListItemUiStates) {
+        items.clear();
         items.addAll(chatListItemUiStates);
-        FRLogger.msg("items onMessagesFetched " + items);
+//        FRLogger.msg("items onMessagesFetched " + items);
         getData().postValue(items);
     }
 
@@ -112,13 +138,14 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     }
 
     private void sendSetToolbarTitleTxtEvent() {
-        ChatEvent event = new ChatEvent();
-        event.setId(ChatPresentationConstants.SET_TOOLBAR_TXT);
         String userName = chatContact.getDisplayName();
         if (isIncoming)
             userName = chatContact.getAnonymisedUserName();
-        event.setMessage(userName);
-        eventBus.post(event);
+        titleTxt.postValue(userName + " ");
+//        ChatEvent event = new ChatEvent();
+//        event.setId(ChatPresentationConstants.SET_TOOLBAR_TXT);
+//        event.setMessage(userName);
+//        eventBus.post(event);
     }
 
     private Observer<MessageEvent> getChatMsgObserver() {
@@ -149,11 +176,9 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
 
     private void handleChatMessages(MessageEvent messageEvent) {
         FRLogger.msg("chat page message Event " + messageEvent.getChannel());
-        if (messageEvent.getChannel().equalsIgnoreCase(channelName)) {
-            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id) {
-                // update in list
-                addMsgToAdapter(messageEvent.getMessage(), messageEvent.getUserId(), messageEvent.getTimestamp(), messageEvent.getUser(), messageEvent.getMessageId());
-            } else if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
+        if (messageEvent.getChannel().equalsIgnoreCase(channelName) && !messageEvent.isSentMessage()) {
+            if (messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id
+                    || messageEvent.getEventType() == ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id) {
                 // update in list
                 FRLogger.msg("received the message event in chat page " + messageEvent.getUser());
                 addMsgToAdapter(messageEvent.getMessage(), messageEvent.getUserId(), messageEvent.getTimestamp(), messageEvent.getUser(), messageEvent.getMessageId());
@@ -162,18 +187,23 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
     }
 
     public void onSendButtonClicked() {
-        if (!Objects.requireNonNull(messageTxt.get()).isEmpty()) {
-            long messageId = chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, messageTxt.get());
+        if (!Objects.requireNonNull(getMessage()).isEmpty()) {
+            long messageId = chatInteractor.sendMessage(chatContact.getUserId(), isIncoming, getMessage());
             addMsgToAdapter(messageId);
             messageTxt.set("");
         }
+    }
+
+    private String getMessage() {
+        return messageTxt.get().trim();
     }
 
     public MutableLiveData<List<ChatListItemUiState>> getData() {
         return data;
     }
 
-    private void addMsgToAdapter(String message, String userId, Date timeStamp, User user, long messageId) {
+    private void addMsgToAdapter(String message, String userId, Date timeStamp, User user,
+                                 long messageId) {
         ChatListItemUiState chatListItemUiState = new ChatListItemUiState();
         chatListItemUiState.setMessage(message);
         chatListItemUiState.setUserId(userId);
@@ -181,7 +211,7 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         chatListItemUiState.setMessageId(messageId);
         chatListItemUiState.setTimeStamp(timeStamp);
         items.add(chatListItemUiState);
-        FRLogger.msg("items " + items);
+//        FRLogger.msg("items " + items);
         getData().postValue(items);
     }
 
@@ -191,18 +221,96 @@ public class ChatViewModel extends UserBaseViewModel implements ChatListUiState.
         user.userId = loggedInUser.getUserId();
         user.phoneNumber = loggedInUser.getPhoneNumber();
         user.displayName = loggedInUser.getUserName();
-        addMsgToAdapter(messageTxt.get(), loggedInUser.getUserId(), new Date(), user, messageId);
+        addMsgToAdapter(getMessage(), loggedInUser.getUserId(), new Date(), user, messageId);
     }
 
     @Override
-    public void onItemClick(ChatListUiState chatListUiState) {
-        FRLogger.msg("onItemClicked chat " + chatListUiState);
+    public void onItemClick(int position, ChatListItemUiState model) {
+        FRLogger.msg("onItemClicked chat " + model);
+
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        getChatMsgObserver().onComplete();
+    public void onBlockPressed() {
+        if (isIncoming) {
+            chatInteractor.blockChannel(channelName, isChannelBlocked);
+            Disposable disposable = chatInteractor.blockChannel(channelName, isChannelBlocked)
+                    .toObservable()
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(this::onBlockSuccess, this::onError);
+            disposables.add(disposable);
+        } else {
+            Disposable disposable = chatInteractor.muteChannel(channelName, isChannelMuted)
+                    .toObservable()
+                    .compose(SchedulerUtils.ioToMainObservableScheduler())
+                    .subscribe(this::onMuteSuccess, this::onError);
+            disposables.add(disposable);
+        }
+    }
+
+    public void onDeletePressed() {
+        items.clear();
+        getData().postValue(items);
+        if (isIncoming) {
+            chatInteractor.clearIncomingChannelChat(channelName);
+        } else {
+            chatInteractor.clearOutgoingChannelChat(channelName);
+
+        }
+    }
+
+    private void onMuteSuccess(MyListChannel myListChannel) {
+        ChatEvent chatEvent = new ChatEvent();
+        chatEvent.setId(ChatPresentationConstants.ON_MUTE_CLKD);
+        eventBus.post(chatEvent);
+    }
+
+    private void onError(Throwable throwable) {
+
+    }
+
+    private void onBlockSuccess(AnonListChannel anonListChannel) {
+        ChatEvent chatEvent = new ChatEvent();
+        chatEvent.setId(ChatPresentationConstants.ON_BLOCK_CLKD);
+        eventBus.post(chatEvent);
+    }
+
+    @NotNull
+    public int getBlockMenuTitle() {
+        if (isIncoming) {
+            if (isChannelBlocked)
+                return R.string.block;
+            else {
+                return R.string.unblock;
+            }
+        } else {
+            if (isChannelMuted)
+                return R.string.mute;
+            else {
+                return R.string.unmute;
+            }
+        }
+    }
+
+    @NotNull
+    public boolean getBlockMenuVisibility() {
+        return !(isIncoming && !isChannelBlocked);
+    }
+
+    @NotNull
+    public int getBlockMenuIcon() {
+        if (isIncoming) {
+            if (isChannelBlocked)
+                return R.drawable.ic_block_black_24dp;
+            else {
+                return R.drawable.ic_send_black_24dp;
+            }
+        } else {
+            if (isChannelMuted)
+                return R.drawable.ic_volume_mute_black_24dp;
+            else {
+                return R.drawable.ic_volume_up_black_24dp;
+            }
+        }
     }
 
     public static class Factory implements ViewModelProvider.Factory {

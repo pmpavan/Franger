@@ -26,4 +26,12 @@ public class AnonymousUser {
     public void setImageRes(int imageRes) {
         this.imageRes = imageRes;
     }
+
+    @Override
+    public String toString() {
+        return "AnonymousUser{" +
+                "name='" + name + '\'' +
+                ", imageRes=" + imageRes +
+                '}';
+    }
 }

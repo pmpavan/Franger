@@ -9,6 +9,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.SearchView
 import android.view.Menu
+import android.view.MenuItem
 import com.frangerapp.franger.R
 import com.frangerapp.franger.app.FrangerApp
 import com.frangerapp.franger.app.util.di.module.user.contact.ContactModule
@@ -54,6 +55,10 @@ class ContactActivity : UserBaseActivity() {
         invokeDataBinding()
         setupViews()
         setupControllers()
+    }
+
+    override fun onResume() {
+        super.onResume()
         onPageLoaded()
     }
 
@@ -87,6 +92,7 @@ class ContactActivity : UserBaseActivity() {
 
     private fun onPageLoaded() {
         checkForContactsPermission(this@ContactActivity)
+        viewModel.onPageLoaded()
     }
 
     private fun checkForContactsPermission(activity: Activity) {
@@ -108,7 +114,7 @@ class ContactActivity : UserBaseActivity() {
     }
 
     private fun goToChatActivity(contact: ContactListItemViewModel) {
-        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false, "")
+        val intent = ChatActivity.newInstance(this@ContactActivity, viewModel.getContactModel(contact), false, "", false)
         startActivity(intent)
     }
 
@@ -129,6 +135,23 @@ class ContactActivity : UserBaseActivity() {
         })
 
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        android.R.id.home -> {
+            killPage()
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun killPage() {
+        this@ContactActivity.finish()
     }
 
     override fun onDestroy() {

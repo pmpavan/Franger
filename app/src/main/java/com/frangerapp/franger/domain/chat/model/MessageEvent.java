@@ -27,6 +27,12 @@ public class MessageEvent {
 
     private long messageId;
 
+    private String anonymisedUserName;
+
+    private int anonymisedUserImg;
+
+    private boolean isSentMessage = false;
+
     public MessageEvent() {
     }
 
@@ -94,6 +100,30 @@ public class MessageEvent {
         this.messageId = messageId;
     }
 
+    public boolean isSentMessage() {
+        return isSentMessage;
+    }
+
+    public void setSentMessage(boolean sentMessage) {
+        isSentMessage = sentMessage;
+    }
+
+    public String getAnonymisedUserName() {
+        return anonymisedUserName;
+    }
+
+    public void setAnonymisedUserName(String anonymisedUserName) {
+        this.anonymisedUserName = anonymisedUserName;
+    }
+
+    public int getAnonymisedUserImg() {
+        return anonymisedUserImg;
+    }
+
+    public void setAnonymisedUserImg(int anonymisedUserImg) {
+        this.anonymisedUserImg = anonymisedUserImg;
+    }
+
     @Override
     public String toString() {
         return "MessageEvent{" +
@@ -105,6 +135,9 @@ public class MessageEvent {
                 ", timestamp=" + timestamp +
                 ", user=" + user +
                 ", messageId=" + messageId +
+                ", anonymisedUserName='" + anonymisedUserName + '\'' +
+                ", anonymisedUserImg=" + anonymisedUserImg +
+                ", isSentMessage=" + isSentMessage +
                 '}';
     }
 }

@@ -93,7 +93,6 @@ public class FrangerApp extends Application {
         return loginComponent;
     }
 
-
     /**
      * Used to initialize RXJava global error consumer.
      * <p>

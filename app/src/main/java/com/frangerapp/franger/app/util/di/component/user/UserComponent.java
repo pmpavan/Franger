@@ -1,7 +1,9 @@
 package com.frangerapp.franger.app.util.di.component.user;
 
+import com.frangerapp.franger.app.util.di.module.login.CountriesListModule;
 import com.frangerapp.franger.app.util.di.module.user.UserModule;
 import com.frangerapp.franger.app.util.di.module.user.chat.ChatModule;
+import com.frangerapp.franger.app.util.di.module.user.common.AlertDialogModule;
 import com.frangerapp.franger.app.util.di.module.user.contact.ContactModule;
 import com.frangerapp.franger.app.util.di.module.user.home.HomeModule;
 import com.frangerapp.franger.app.util.di.module.user.home.IncomingListModule;
@@ -12,6 +14,8 @@ import com.frangerapp.franger.app.util.di.scope.ActivityScope;
 import com.frangerapp.franger.app.util.di.scope.FragmentScope;
 import com.frangerapp.franger.app.util.di.scope.UserScope;
 import com.frangerapp.franger.ui.chat.ChatActivity;
+import com.frangerapp.franger.ui.common.AlertDialogFragment;
+import com.frangerapp.franger.ui.countries.CountriesListDialogFragment;
 import com.frangerapp.franger.ui.home.IncomingFragment;
 import com.frangerapp.franger.ui.home.OutgoingFragment;
 import com.frangerapp.franger.ui.contact.ContactActivity;
@@ -42,6 +46,8 @@ public interface UserComponent {
     OutgoingListComponent plus(OutgoingListModule module);
 
     IncomingListComponent plus(IncomingListModule module);
+
+    AlertDialogComponent plus(AlertDialogModule module);
 
     /**
      * HOME
@@ -88,5 +94,10 @@ public interface UserComponent {
         void inject(IncomingFragment activity);
     }
 
+    @FragmentScope
+    @Subcomponent(modules = AlertDialogModule.class)
+    interface AlertDialogComponent {
+        void inject(AlertDialogFragment activity);
+    }
 
 }

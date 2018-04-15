@@ -55,8 +55,12 @@ class InviteActivity : UserBaseActivity(), LifecycleObserver {
         invokeDataBinding()
         setupViews()
         setupControllers()
-        onPageLoaded()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onPageLoaded()
     }
 
     override fun onStart() {

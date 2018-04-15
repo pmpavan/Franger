@@ -3,6 +3,7 @@ package com.frangerapp.franger.ui.home;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,13 +23,13 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
     private Context context;
     private List<OutgoingListItemUiState> items = new ArrayList<>();
 
-    private OutgoingListItemUiState.OutgoingGroupItemClickHandler handler;
+    public OutgoingListItemUiState.OutgoingGroupItemClickHandler handler;
 
     private LoggedInUser loggedInUser;
 
     private int ITEM_CHANNEL = 1;
 
-    private RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener;
+//    private RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener;
 
     public OutgoingListAdapter(Context context, LoggedInUser loggedInUser) {
         this.context = context;
@@ -46,8 +47,8 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
         OutgoingListItemUiState model = items.get(position);
         holder.bind(model);
         holder.binding.getRoot().setOnClickListener(v -> {
-            if (onItemClickListener != null)
-                onItemClickListener.onItemClick(model);
+            if (handler != null)
+                handler.onItemClick(model);
         });
     }
 
@@ -77,13 +78,19 @@ public class OutgoingListAdapter extends RecyclerView.Adapter<OutgoingListAdapte
         return items.size() == 0;
     }
 
-    public void setHandler(@NotNull OutgoingListItemUiState.OutgoingGroupItemClickHandler handler) {
-        this.handler=handler;
+    public void updateList(ArrayList<OutgoingListItemUiState> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new OutgoingChannelListDiffUtil(this.items, newList));
+        diffResult.dispatchUpdatesTo(this);
+        items.addAll(newList);
     }
 
-    public void setOnItemClickListener(RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+    public void setHandler(@NotNull OutgoingListItemUiState.OutgoingGroupItemClickHandler handler) {
+        this.handler = handler;
     }
+
+//    public void setOnItemClickListener(RecyclerBindingAdapter.OnItemClickListener<OutgoingListItemUiState> onItemClickListener) {
+//        this.onItemClickListener = onItemClickListener;
+//    }
 
 
     static class MyListChannelViewHolder extends RecyclerView.ViewHolder {

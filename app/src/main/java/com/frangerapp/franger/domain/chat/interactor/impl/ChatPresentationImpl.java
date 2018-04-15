@@ -18,6 +18,7 @@ import com.frangerapp.franger.domain.chat.interactor.ChatInteractor;
 import com.frangerapp.franger.domain.chat.model.FeedNewMessageResponse;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
 import com.frangerapp.franger.domain.chat.model.MessageResponse;
+import com.frangerapp.franger.domain.chat.model.MessageResponseWrapper;
 import com.frangerapp.franger.domain.chat.util.ChatDataConstants;
 import com.frangerapp.franger.domain.chat.util.ChatDataUtil;
 import com.frangerapp.franger.domain.user.model.LoggedInUser;
@@ -143,28 +144,50 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
     }
 
     @Override
-    public long sendMessage(String userId, boolean isIncoming, String message) {
-        String channelName = getChatName(userId, isIncoming);
+    public long sendMessage(String receivingUserId, boolean isIncoming, String message) {
+        String channelName = getChatName(receivingUserId, isIncoming);
         if (!channelsBeingListened.contains(channelName)) {
-            addChatEvent(userId, isIncoming, message);
+            addChatEvent(receivingUserId, isIncoming, message);
         } else {
             sendMessage(channelName, message);
         }
-        handleSentMessageInDb(channelName, userId, message);
+        handleSentMessageInDb(channelName, receivingUserId, message);
         return addMessageToDb(channelName, message, loggedInUser.getUserId());
+    }
+
+    private MessageEvent broadcastSentMessageEvent(String channelName, String message, String receivingUserId, AnonymousUser anonymousUser) {
+        boolean isIncoming = isIncoming(channelName);
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id);
+        messageEvent.setIncoming(isIncoming);
+        messageEvent.setChannel(channelName);
+        messageEvent.setTimestamp(new Date());
+        messageEvent.setMessage(message);
+        messageEvent.setUserId(receivingUserId);
+        messageEvent.setSentMessage(true);
+        messageEvent.setAnonymisedUserImg(anonymousUser.imageRes);
+        messageEvent.setAnonymisedUserName(anonymousUser.name);
+        return messageEvent;
     }
 
     private void handleSentMessageInDb(String channelName, String userId, String message) {
         Disposable disposable = addChannelToDb(channelName, userId, message)
+                .map(messageResponseWrapper -> broadcastSentMessageEvent(messageResponseWrapper.getChannel(), messageResponseWrapper.getMessage(), messageResponseWrapper.getFromId(), messageResponseWrapper.getAnonymousUser()))
+                .flatMap(this::getUserDetails)
+                .map(this::postMessageEvent)
                 .toObservable()
                 .compose(SchedulerUtils.ioToMainObservableScheduler())
-                .subscribe(object -> FRLogger.msg("success " + object), throwable -> FRLogger.msg("failure add to channel " + throwable.getMessage()));
+                .subscribe(messageEvent -> FRLogger.msg("success " + messageEvent), throwable -> FRLogger.msg("failure add to channel " + throwable.getMessage()));
         disposables.add(disposable);
 
     }
 
-    private Single<FeedNewMessageResponse> addChannelToDb(String channelName, String fromId, String message) {
-        return (Single<FeedNewMessageResponse>) addChannelToDb(new FeedNewMessageResponse(), channelName, fromId, message, true);
+    private Single<MessageResponseWrapper> addChannelToDb(String channelName, String fromId, String message) {
+        MessageResponseWrapper wrapper = MessageResponseWrapper.builder()
+                .setChannel(channelName)
+                .setFromId(fromId)
+                .setMessage(message);
+        return (Single<MessageResponseWrapper>) addChannelToDb(wrapper, channelName, fromId, message, true);
     }
 
     private long addMessageToDb(@NotNull String channelName, String msg, String fromId) {
@@ -218,17 +241,25 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return anonymousUser;
     }
 
-    private Single<FeedNewMessageResponse> addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
-        return (Single<FeedNewMessageResponse>) addChannelToDb(feedNewMessageResponse, feedNewMessageResponse.getChannel(), feedNewMessageResponse.getMessageFrom().getId(), feedNewMessageResponse.getMessage(), false)
+    private Single<MessageResponseWrapper> addChannelToDb(FeedNewMessageResponse feedNewMessageResponse) {
+        MessageResponseWrapper wrapper = MessageResponseWrapper.builder()
+                .setChannel(feedNewMessageResponse.getChannel())
+                .setFromId(feedNewMessageResponse.getMessageFrom().getId())
+                .setMessage(feedNewMessageResponse.getMessage());
+        return (Single<MessageResponseWrapper>) addChannelToDb(wrapper, feedNewMessageResponse.getChannel(), feedNewMessageResponse.getMessageFrom().getId(), feedNewMessageResponse.getMessage(), false)
                 .blockingGet();
     }
 
-    private Single<MessageResponse> addChannelToDb(MessageResponse messageResponse) {
-        return (Single<MessageResponse>) addChannelToDb(messageResponse, messageResponse.getChannel(), messageResponse.getData().getFromId(), messageResponse.getMessage(), false)
+    private Single<MessageResponseWrapper> addChannelToDb(MessageResponse messageResponse) {
+        MessageResponseWrapper wrapper = MessageResponseWrapper.builder()
+                .setChannel(messageResponse.getChannel())
+                .setFromId(messageResponse.getData().getFromId())
+                .setMessage(messageResponse.getMessage());
+        return (Single<MessageResponseWrapper>) addChannelToDb(wrapper, messageResponse.getChannel(), messageResponse.getData().getFromId(), messageResponse.getMessage(), false)
                 .blockingGet();
     }
 
-    private Single addChannelToDb(Object object, String channelName, String otherUserId, String message, boolean isSentMessage) {
+    private Single addChannelToDb(MessageResponseWrapper wrapper, String channelName, String otherUserId, String message, boolean isSentMessage) {
         boolean isIncoming = isIncoming(channelName);
         String id = otherUserId;
         if (otherUserId != null && !otherUserId.equals(loggedInUser.getUserId())) {
@@ -247,7 +278,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                         }
                         myListChannel.message = message;
                         appDatabase.myListChannelDao().updateChannel(myListChannel);
-                        return Single.just(object);
+                        return Single.just(wrapper);
                     })
                     .onErrorReturn(t -> {
                         //New Chat so insert new record
@@ -259,7 +290,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                         myListChannel.updateAt = new Date();
                         myListChannel.message = message;
                         appDatabase.myListChannelDao().addChannel(myListChannel);
-                        return Single.just(object);
+                        return Single.just(wrapper);
                     });
         } else {
             String userId = id;
@@ -273,7 +304,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                         }
                         anonListChannel.message = message;
                         appDatabase.anonListDao().updateChannel(anonListChannel);
-                        return Single.just(object);
+                        return Single.just(wrapper);
                     })
                     .onErrorReturn(t -> {
                         //New Chat so insert new record
@@ -288,44 +319,26 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                         anonListChannel.message = message;
                         anonListChannel.updateAt = new Date();
                         appDatabase.anonListDao().addChannel(anonListChannel);
-                        return Single.just(object);
+                        wrapper.setAnonymousUser(anonymousUser);
+                        return Single.just(wrapper);
                     });
         }
     }
 
-    private MessageEvent broadcastFeedEvent(FeedNewMessageResponse feedNewMessageResponse) {
-        boolean isIncoming = isIncoming(feedNewMessageResponse.getChannel());
+    private MessageEvent broadcastMessageEvent(MessageResponseWrapper chatMessage, ChatDataConstants.SOCKET_EVENT_TYPE type) {
         MessageEvent messageEvent = new MessageEvent();
-        messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.FEED.id);
-        messageEvent.setIncoming(isIncoming);
-        messageEvent.setChannel(feedNewMessageResponse.getChannel());
-        messageEvent.setTimestamp(new Date());
-        messageEvent.setMessage(feedNewMessageResponse.getMessage());
-        messageEvent.setUserId(feedNewMessageResponse.getMessageFrom().getId());
-        messageEvent.setMessageId(feedNewMessageResponse.getMessageId());
-        return messageEvent;
-    }
-
-    private MessageEvent broadcastMessageEvent(MessageResponse chatMessage) {
-        MessageEvent messageEvent = new MessageEvent();
-        messageEvent.setEventType(ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE.id);
+        messageEvent.setEventType(type.id);
         messageEvent.setMessage(chatMessage.getMessage());
         messageEvent.setChannel(chatMessage.getChannel());
-        messageEvent.setUserId(chatMessage.getData().getFromId());
+        messageEvent.setUserId(chatMessage.getFromId());
         messageEvent.setTimestamp(new Date());
         messageEvent.setMessageId(chatMessage.getMessageId());
         FRLogger.msg("message Event MessageResponse " + messageEvent);
         return messageEvent;
     }
 
-    private MessageResponse addMessageToDb(MessageResponse chatMessage) {
-        long messageId = addMessageToDb(chatMessage.getChannel(), chatMessage.getMessage(), chatMessage.getData().getFromId());
-        chatMessage.setMessageId(messageId);
-        return chatMessage;
-    }
-
-    private FeedNewMessageResponse addMessageToDb(FeedNewMessageResponse chatMessage) {
-        long messageId = addMessageToDb(chatMessage.getChannel(), chatMessage.getMessage(), chatMessage.getMessageFrom().getId());
+    private MessageResponseWrapper addMessageToDb(MessageResponseWrapper chatMessage) {
+        long messageId = addMessageToDb(chatMessage.getChannel(), chatMessage.getMessage(), chatMessage.getFromId());
         chatMessage.setMessageId(messageId);
         return chatMessage;
     }
@@ -490,6 +503,91 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         return appDatabase.myListChannelDao().getAllChannels();
     }
 
+    @Override
+    public Single<AnonListChannel> blockChannel(String channelName, boolean isChannelBlocked) {
+        return appDatabase.anonListDao().getChannel(channelName)
+                .map(anonListChannel -> {
+                    anonListChannel.isUserBlocked = isChannelBlocked;
+                    appDatabase.anonListDao().updateChannel(anonListChannel);
+                    return anonListChannel;
+                })
+                .onErrorReturn(t -> {
+                    //New Chat so insert new record
+                    FRLogger.msg("Anon New Chat so insert new record");
+                    String userId = getUserId(channelName);
+                    AnonListChannel anonListChannel = new AnonListChannel(channelName);
+                    anonListChannel.createdAt = new Date();
+                    anonListChannel.otherUserId = userId;
+                    anonListChannel.unreadMsgCount = 0;
+                    anonListChannel.isUserBlocked = isChannelBlocked;
+                    AnonymousUser anonymousUser = getRandomName();
+                    anonListChannel.anonymisedUserName = anonymousUser.name;
+                    anonListChannel.anonymisedUserImg = anonymousUser.imageRes;
+                    anonListChannel.message = "";
+                    anonListChannel.updateAt = new Date();
+                    appDatabase.anonListDao().addChannel(anonListChannel);
+                    return anonListChannel;
+                });
+
+    }
+
+    @Override
+    public Single<MyListChannel> muteChannel(String channelName, boolean isChannelMuted) {
+        return appDatabase.myListChannelDao().getChannel(channelName)
+                .map(myListChannel -> {
+                    myListChannel.isUserMuted = isChannelMuted;
+                    appDatabase.myListChannelDao().updateChannel(myListChannel);
+                    return myListChannel;
+                })
+                .onErrorReturn(t -> {
+                    //New Chat so insert new record
+                    FRLogger.msg("My New Chat so insert new record");
+                    String userId = getUserId(channelName);
+                    MyListChannel myListChannel = new MyListChannel(channelName);
+                    myListChannel.createdAt = new Date();
+                    myListChannel.otherUserId = userId;
+                    myListChannel.unreadMsgCount = 0;
+                    myListChannel.updateAt = new Date();
+                    myListChannel.isUserMuted = isChannelMuted;
+                    myListChannel.message = "";
+                    appDatabase.myListChannelDao().addChannel(myListChannel);
+                    return myListChannel;
+                });
+//                .toObservable()
+//                .compose(SchedulerUtils.ioToMainObservableScheduler())
+//                .subscribe(object -> FRLogger.msg("success " + object), throwable -> FRLogger.msg("failure mute to channel " + throwable.getMessage()));
+    }
+
+    @Override
+    public void clearIncomingChannelChat(String channelName) {
+        appDatabase.messageDao().removeChannelMessages(channelName);
+        Disposable disposable = appDatabase.anonListDao().getChannel(channelName)
+                .map(anonListChannel -> {
+                    anonListChannel.message = "";
+                    appDatabase.anonListDao().updateChannel(anonListChannel);
+                    return anonListChannel;
+                })
+                .toObservable()
+                .compose(SchedulerUtils.ioToMainObservableScheduler())
+                .subscribe(object -> FRLogger.msg("success " + object), throwable -> FRLogger.msg("failure clear to channel " + throwable.getMessage()));
+        disposables.add(disposable);
+    }
+
+    @Override
+    public void clearOutgoingChannelChat(String channelName) {
+        appDatabase.messageDao().removeChannelMessages(channelName);
+        Disposable disposable = appDatabase.myListChannelDao().getChannel(channelName)
+                .map(myListChannel -> {
+                    myListChannel.message = "";
+                    appDatabase.myListChannelDao().updateChannel(myListChannel);
+                    return myListChannel;
+                })
+                .toObservable()
+                .compose(SchedulerUtils.ioToMainObservableScheduler())
+                .subscribe(object -> FRLogger.msg("success " + object), throwable -> FRLogger.msg("failure clear to channel " + throwable.getMessage()));
+        disposables.add(disposable);
+    }
+
     private MessageEvent postMessageEvent(MessageEvent messageEvent) {
         FRLogger.msg("chat message postMessageEvent");
         getMessageEvent().onNext(messageEvent);
@@ -530,11 +628,11 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                     .map(s -> gson.fromJson(s, FeedNewMessageResponse.class))
                     .flatMapSingle(this::addChannelToDb)
                     .map(feedNewMessageResponse -> {
-                        addChatEvent(feedNewMessageResponse.getMessageFrom().getId(), isIncoming(feedNewMessageResponse.getChannel()), null);
+                        addChatEvent(feedNewMessageResponse.getFromId(), isIncoming(feedNewMessageResponse.getChannel()), null);
                         return feedNewMessageResponse;
                     })
                     .map(this::addMessageToDb)
-                    .map(this::broadcastFeedEvent)
+                    .map(messageResponseWrapper -> broadcastMessageEvent(messageResponseWrapper, ChatDataConstants.SOCKET_EVENT_TYPE.FEED))
                     .flatMapSingle(this::getUserDetails)
                     .map(this::postMessageEvent)
                     .compose(SchedulerUtils.ioToMainObservableScheduler())
@@ -547,7 +645,7 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
                     .map(s -> gson.fromJson(s, MessageResponse.class))
                     .flatMapSingle(this::addChannelToDb)
                     .map(this::addMessageToDb)
-                    .map(this::broadcastMessageEvent)
+                    .map(messageResponseWrapper -> broadcastMessageEvent(messageResponseWrapper, ChatDataConstants.SOCKET_EVENT_TYPE.MESSAGE))
                     .flatMapSingle(this::getUserDetails)
                     .map(this::postMessageEvent)
                     .compose(SchedulerUtils.ioToMainObservableScheduler())
@@ -581,4 +679,6 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
         if (!disposables.isDisposed())
             disposables.dispose();
     }
+
+
 }

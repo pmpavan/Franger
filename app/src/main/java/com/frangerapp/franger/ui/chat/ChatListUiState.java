@@ -12,11 +12,6 @@ import java.util.List;
 
 public class ChatListUiState {
 
-    public interface ActionClickHandler {
-
-        void onItemClick(ChatListUiState chatListUiState);
-    }
-
     private ObservableArrayList<ChatListItemUiState> items;
 
 

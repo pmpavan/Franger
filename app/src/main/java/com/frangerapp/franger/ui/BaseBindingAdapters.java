@@ -16,7 +16,6 @@ import com.frangerapp.franger.app.util.DateUtils;
 import com.frangerapp.franger.ui.chat.ChatListAdapter;
 import com.frangerapp.franger.ui.home.IncomingListAdapter;
 import com.frangerapp.franger.ui.home.OutgoingListAdapter;
-import com.frangerapp.franger.ui.home.OutgoingListItemUiState;
 import com.frangerapp.franger.ui.util.RecyclerBindingAdapter;
 import com.frangerapp.franger.ui.util.UiUtils;
 import com.frangerapp.ui.CircularTextDrawableView;
@@ -85,36 +84,29 @@ public class BaseBindingAdapters {
             if (items != null)
                 adapter.addAll(items);
             adapter.notifyDataSetChanged();
+            recyclerView.scrollToPosition(items.size() - 1);
         }
     }
 
 
-    @BindingAdapter(value = {"outgoing_items", "onItemClick"})
-    public static void setOutgoingAdapter(RecyclerView recyclerView, ArrayList items, ItemClickHandler handler) {
+    @BindingAdapter(value = {"outgoing_items"})
+    public static void setOutgoingAdapter(RecyclerView recyclerView, ArrayList items) {
         OutgoingListAdapter adapter = (OutgoingListAdapter) recyclerView.getAdapter();
         if (adapter != null) {
             adapter.clear();
             if (items != null)
-                adapter.addAll(items);
-            adapter.setOnItemClickListener(item -> {
-                if (handler != null)
-                    handler.onItemClick(item);
-            });
+                adapter.updateList(items);
             adapter.notifyDataSetChanged();
         }
     }
 
-    @BindingAdapter(value = {"incoming_items", "onItemClick"})
-    public static void setIncomingAdapter(RecyclerView recyclerView, ArrayList items, ItemClickHandler handler) {
+    @BindingAdapter(value = {"incoming_items"})
+    public static void setIncomingAdapter(RecyclerView recyclerView, ArrayList items) {
         IncomingListAdapter adapter = (IncomingListAdapter) recyclerView.getAdapter();
         if (adapter != null) {
             adapter.clear();
             if (items != null)
-                adapter.addAll(items);
-            adapter.setOnItemClickListener((item) -> {
-                if (handler != null)
-                    handler.onItemClick(item);
-            });
+                adapter.updateList(items);
             adapter.notifyDataSetChanged();
         }
     }
@@ -181,6 +173,14 @@ public class BaseBindingAdapters {
     @BindingAdapter("android:text")
     public static void setDate(TextView textView, Date date) {
         textView.setText(DateUtils.getTimeAgo(date.getTime(), textView.getContext()));
+    }
+
+    @BindingAdapter("scrollToBottom")
+    public static void moveToBottom(RecyclerView textView, boolean date) {
+        RecyclerView.Adapter adapter = textView.getAdapter();
+        if (adapter != null && date) {
+            textView.scrollToPosition(adapter.getItemCount());
+        }
     }
 
 }

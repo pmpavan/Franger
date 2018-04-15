@@ -7,7 +7,7 @@
         android:bottom="400dp"
         android:left="-100dp"
         android:right="-900dp"
-        android:top="-80dp">
+        android:top="-100dp">
         <shape android:shape="oval">
             <size android:height="20dp" />
             <gradient

@@ -78,6 +78,10 @@ class HomeActivity : UserBaseActivity() {
         invokeDataBinding()
         setupViews()
         setupControllers()
+    }
+
+    override fun onResume() {
+        super.onResume()
         onPageLoaded()
     }
 
@@ -162,8 +166,8 @@ class HomeActivity : UserBaseActivity() {
         }
     }
 
-    private fun showChatPage(chatContact: ChatContact, isIncoming: Boolean, channelName: String) {
-        val intent = ChatActivity.newInstance(this@HomeActivity, chatContact, isIncoming, channelName)
+    private fun showChatPage(chatContact: ChatContact, isIncoming: Boolean, channelName: String, isChannelMutedOrBlocked: Boolean) {
+        val intent = ChatActivity.newInstance(this@HomeActivity, chatContact, isIncoming, channelName, isChannelMutedOrBlocked)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivityForResult(intent, ActivityConstants.RESULT_CODE_CHAT_ACTIVITY)
     }
@@ -172,7 +176,7 @@ class HomeActivity : UserBaseActivity() {
     fun onIncomingListEventReceived(event: IncomingListEvent) {
         when (event.id) {
             HomePresentationConstants.ON_INCOMING_CHANNEL_CLICKED -> {
-                showChatPage(event.contact, event.isIncoming, event.channelName)
+                showChatPage(event.contact, event.isIncoming, event.channelName, event.isChannelMutedOrBlocked)
             }
         }
     }
@@ -181,7 +185,7 @@ class HomeActivity : UserBaseActivity() {
     fun onOutgoingListEventReceived(event: OutgoingListEvent) {
         when (event.id) {
             HomePresentationConstants.ON_OUTGOING_CHANNEL_CLICKED -> {
-                showChatPage(event.contact, event.isIncoming, event.channelName)
+                showChatPage(event.contact, event.isIncoming, event.channelName, event.isChannelMutedOrBlocked)
             }
         }
     }

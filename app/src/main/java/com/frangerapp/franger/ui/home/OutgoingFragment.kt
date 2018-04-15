@@ -72,8 +72,7 @@ class OutgoingFragment : UserBaseFragment() {
     private fun invokeDataBinding(inflater: LayoutInflater, container: ViewGroup?) {
 
         viewModel = ViewModelProviders.of(this, factory).get(OutgoingListViewModel::class.java)
-        viewDataBinding = DataBindingUtil
-                .inflate(inflater, R.layout.fragment_outgoing, container, false)
+        viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_outgoing, container, false)
         viewDataBinding.vm = viewModel
         viewDataBinding.executePendingBindings()
     }
@@ -83,12 +82,16 @@ class OutgoingFragment : UserBaseFragment() {
         invokeDataBinding(inflater, container)
         setupViews()
         setupControllers()
-        onPageLoaded()
         return viewDataBinding.root
     }
 
-    private fun setupViews() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onPageLoaded()
 
+    }
+
+    private fun setupViews() {
 
     }
 
@@ -96,9 +99,8 @@ class OutgoingFragment : UserBaseFragment() {
         viewDataBinding.outgoingListView.adapter = adapter
 
         viewDataBinding.uiState = listState
-        viewDataBinding.handler = viewModel
+        adapter.handler = viewModel
         viewModel.data.observe(this, Observer { t ->
-            FRLogger.msg("received list ${t.toString()}")
             listState.update(t)
         })
 
@@ -106,6 +108,12 @@ class OutgoingFragment : UserBaseFragment() {
 
     private fun onPageLoaded() {
         viewModel.onPageLoaded()
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onAppResumed()
     }
 
     override fun onDestroy() {

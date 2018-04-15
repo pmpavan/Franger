@@ -1,5 +1,6 @@
 package com.frangerapp.franger.domain.chat.interactor;
 
+import com.frangerapp.franger.app.util.db.entity.AnonListChannel;
 import com.frangerapp.franger.app.util.db.entity.Message;
 import com.frangerapp.franger.app.util.db.entity.MyListChannel;
 import com.frangerapp.franger.domain.chat.model.MessageEvent;
@@ -30,7 +31,7 @@ public interface ChatInteractor {
 
     String getChatEventName(String userId, boolean isIncoming, String message);
 
-    void addChatEvent(String userId, boolean isIncoming,String message);
+    void addChatEvent(String userId, boolean isIncoming, String message);
 
     String getChatName(String userId, boolean isIncoming);
 
@@ -44,5 +45,14 @@ public interface ChatInteractor {
 
     Single<List<MyListChannel>> getMyListChannelList();
 
+    Single<AnonListChannel> blockChannel(String channelName, boolean isChannelBlocked);
+
+    Single<MyListChannel> muteChannel(String channelName, boolean isChannelBlocked);
+
+    void clearIncomingChannelChat(String channelName);
+
+    void clearOutgoingChannelChat(String channelName);
+
     void onAppClosed();
+
 }

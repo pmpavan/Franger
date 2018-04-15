@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.franger.mobile.logger.FRLogger;
 import com.frangerapp.franger.R;
-import com.frangerapp.franger.data.common.UserStore;
 import com.frangerapp.franger.data.profile.model.Joined;
 import com.frangerapp.franger.domain.chat.model.ChatContact;
 import com.frangerapp.franger.domain.profile.interactor.ProfileInteractor;
@@ -59,15 +58,13 @@ public class ContactViewModel extends UserBaseViewModel {
         this.profileInteractor = profileInteractor;
         this.loggedInUser = loggedInUser;
         showLoading.set(true);
-        initSearch();
-        onContactsFetchCompleted();
     }
 
 
     private void syncContacts() {
         if (itemViewModels.size() == 0)
             showLoading.set(true);
-        profileInteractor.clearUsersList();
+//        profileInteractor.clearUsersList();
 
         /**
          * TODO Move the logic of loading from db or api to interactor layer
@@ -82,7 +79,7 @@ public class ContactViewModel extends UserBaseViewModel {
     }
 
     private void onSuccess(List<Joined> joinedList) {
-        FRLogger.msg("onSuccess " + joinedList);
+//        FRLogger.msg("onSuccess " + joinedList);
         //TODO update the progress in ui
     }
 
@@ -103,8 +100,8 @@ public class ContactViewModel extends UserBaseViewModel {
 
 
     private void onAllPhoneNumbersAssociationFailed(Throwable throwable) {
-        //TODO move this to ui
         showLoading.set(false);
+        //TODO move this to ui
         Toast.makeText(context, R.string.common_error_msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -173,6 +170,11 @@ public class ContactViewModel extends UserBaseViewModel {
             // Oops permission denied
             Toast.makeText(context, "permission Needed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void onPageLoaded() {
+        initSearch();
+        onContactsFetchCompleted();
     }
 
 

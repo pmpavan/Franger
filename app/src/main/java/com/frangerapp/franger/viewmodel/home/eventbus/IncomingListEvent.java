@@ -8,6 +8,7 @@ public class IncomingListEvent extends BaseEvent {
     private ChatContact contact;
     private boolean isIncoming;
     private String channelName;
+    private boolean isChannelMutedOrBlocked = false;
 
     public ChatContact getContact() {
         return contact;
@@ -31,5 +32,13 @@ public class IncomingListEvent extends BaseEvent {
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
+    }
+
+    public boolean isChannelMutedOrBlocked() {
+        return isChannelMutedOrBlocked;
+    }
+
+    public void setChannelMutedOrBlocked(boolean channelMutedOrBlocked) {
+        isChannelMutedOrBlocked = channelMutedOrBlocked;
     }
 }

@@ -84,8 +84,13 @@ class IncomingFragment : UserBaseFragment() {
         invokeDataBinding(inflater, container)
         setupViews()
         setupControllers()
-        onPageLoaded()
         return viewDataBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onPageLoaded()
+
     }
 
     private fun setupViews() {
@@ -97,7 +102,7 @@ class IncomingFragment : UserBaseFragment() {
         viewDataBinding.incomingListView.adapter = adapter
 
         viewDataBinding.uiState = listState
-        viewDataBinding.handler = viewModel
+        adapter.handler = viewModel
         viewModel.data.observe(this, Observer { t ->
             FRLogger.msg("received list ${t.toString()}")
             listState.update(t)

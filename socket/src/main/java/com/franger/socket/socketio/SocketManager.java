@@ -92,6 +92,7 @@ public class SocketManager {
         opts.setReconnection(true);
         opts.setReconnectionAttempts(5);
 
+
         try {
             mSocket = IO.socket(url, opts);
             // Put the created socket into the hashmap
