@@ -113,7 +113,7 @@ class ChatActivity : UserBaseActivity() {
     }
 
     private fun setupControllers() {
-        adapter.handler = viewModel as ChatListItemUiState.ChatItemClickHandler
+        adapter.handler = viewModel
         viewDataBinding.chatList.adapter = adapter
 
         viewDataBinding.chats = listState

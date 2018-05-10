@@ -60,7 +60,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
 
     public void checkForContactsPermission(Activity activity) {
         RxPermissions rxPermissions = new RxPermissions(activity);
-        rxPermissions.request(Manifest.permission.READ_CONTACTS)
+        Disposable disposable = rxPermissions.request(Manifest.permission.READ_CONTACTS)
                 .subscribe(granted -> {
                     if (granted) { // Always true pre-M
                         syncContacts(loggedInUser);
@@ -69,6 +69,7 @@ public class InviteUserViewModel extends UserBaseViewModel {
                         Toast.makeText(context, "Permission Needed", Toast.LENGTH_SHORT).show();
                     }
                 }, Throwable::printStackTrace);
+        disposables.add(disposable);
     }
 
     private void syncContacts(LoggedInUser loggedInUser) {

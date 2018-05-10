@@ -19,6 +19,8 @@ apply plugin: 'io.fabric'
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: 'com.akaita.android.easylauncher'
+
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -39,6 +41,41 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable true
+            testCoverageEnabled = false
+        }
+
+    }
+
+    flavorDimensions "server", "development"
+
+    productFlavors {
+
+        staging {
+            dimension "development"
+        }
+
+        prod {
+            dimension "development"
+        }
+
+        playstore {
+            dimension "server"
+        }
+
+        canary {
+            versionNameSuffix "-canary"
+//            applicationId "com.frangerapp.franger.snapshot"
+            dimension "server"
+        }
+
+        qa {
+            versionNameSuffix "-qa"
+//            applicationId "com.frangerapp.franger.mobile.qa"
+            dimension "server"
+        }
+
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -52,6 +89,72 @@ android {
     }
 }
 
+easylauncher {
+    iconNames "@mipmap/ic_launcher_foreground" // Traditional launcher icon
+    foregroundIconNames "@mipmap/ic_launcher_foreground" // Foreground of adaptive launcher icon
+
+    defaultFlavorNaming = true // Use flavor name for default ribbon, instead of the type name
+
+    productFlavors {
+        staging {
+            filters = redRibbonFilter()
+        }
+
+        prod {}
+
+    }
+
+    buildTypes {
+        release {
+            enable false
+        }
+        debug {
+            enable true
+            // Add two more filters to all `debug` variants
+            filters = [
+                    customColorRibbonFilter("#0000FF"),
+            ]
+        }
+    }
+
+    variants {
+        canaryStagingDebug {
+            // OVERRIDE all previous filters defined for `stagingDebug` variant
+            filters = orangeRibbonFilter("custom")
+        }
+    }
+
+//    productFlavors {
+//        local {}
+//        qa {
+//            // Add one more filter to all `qa` variants
+//            filters = redRibbonFilter()
+//        }
+//        staging {}
+//        production {}
+//    }
+//
+//    buildTypes {
+//        debug {
+//            // Add two more filters to all `beta` variants
+//            filters = [
+//                    customColorRibbonFilter("#0000FF"),
+//            ]
+//        }
+////        canary {
+////            // Remove ALL filters to `canary` variants
+////            enable false
+////        }
+//        release {}
+//    }
+//
+//    variants {
+//        productionDebug {
+//            // OVERRIDE all previous filters defined for `productionDebug` variant
+//            filters = orangeRibbonFilter("custom")
+//        }
+//    }
+}
 dependencies {
     implementation project(path: ':network')
     implementation project(path: ':logger')
@@ -63,8 +166,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
         transitive = true
     }
@@ -73,13 +176,12 @@ dependencies {
 
     // Dagger core
     implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.google.firebase:firebase-messaging:11.8.0'
-    annotationProcessor "com.google.dagger:dagger-compiler:${daggerVersion}"
+    implementation 'com.google.firebase:firebase-messaging:15.0.2'
     kapt "com.google.dagger:dagger-compiler:${daggerVersion}"
     implementation "com.google.dagger:dagger:${daggerVersion}"
 
     // Dagger Android
-    annotationProcessor "com.google.dagger:dagger-android-processor:${daggerVersion}"
+    kapt "com.google.dagger:dagger-android-processor:${daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${daggerVersion}"
     implementation "com.google.code.gson:gson:${gsonVersion}"
 
@@ -102,8 +204,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:${archLifecycleVersion}"
     implementation "android.arch.persistence.room:runtime:${archRoomVersion}"
     kapt "android.arch.persistence.room:runtime:${archRoomVersion}"
-    annotationProcessor "android.arch.lifecycle:compiler:${archLifecycleVersion}"
-    annotationProcessor "android.arch.persistence.room:compiler:${archRoomVersion}"
+    kapt "android.arch.lifecycle:compiler:${archLifecycleVersion}"
     kapt "android.arch.persistence.room:compiler:${archRoomVersion}"
     implementation "android.arch.persistence.room:rxjava2:${archLifecycleVersion}"
 
@@ -113,8 +214,8 @@ dependencies {
     //Permissions
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     //Socket
     implementation('com.github.nkzawa:socket.io-client:0.3.0') {

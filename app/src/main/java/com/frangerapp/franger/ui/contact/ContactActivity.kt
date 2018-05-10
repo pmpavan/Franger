@@ -21,6 +21,7 @@ import com.frangerapp.franger.viewmodel.contact.ContactViewModel
 import com.frangerapp.franger.viewmodel.contact.eventbus.ContactEvent
 import com.frangerapp.franger.viewmodel.contact.util.ContactPresentaionConstants
 import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_contact.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -97,7 +98,7 @@ class ContactActivity : UserBaseActivity() {
 
     private fun checkForContactsPermission(activity: Activity) {
         val rxPermissions = RxPermissions(activity)
-        rxPermissions.request(Manifest.permission.READ_CONTACTS)
+        val disposable = rxPermissions.request(Manifest.permission.READ_CONTACTS)
                 .subscribe { granted ->
                     viewModel.handleReadContactsPermission(granted)
                 }
