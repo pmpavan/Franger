@@ -201,10 +201,8 @@ dependencies {
     kapt "android.arch.lifecycle:compiler:${archComponentCompilerVersion}"
 
     //Room
-    implementation "android.arch.lifecycle:extensions:${archLifecycleVersion}"
     implementation "android.arch.persistence.room:runtime:${archRoomVersion}"
     kapt "android.arch.persistence.room:runtime:${archRoomVersion}"
-    kapt "android.arch.lifecycle:compiler:${archLifecycleVersion}"
     kapt "android.arch.persistence.room:compiler:${archRoomVersion}"
     implementation "android.arch.persistence.room:rxjava2:${archLifecycleVersion}"
 

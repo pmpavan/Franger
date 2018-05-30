@@ -3,7 +3,7 @@ apply from: 'gradle-scripts/dependencies.gradle'
 
 buildscript {
     ext {
-        kotlin_version = '1.2.31'
+        kotlin_version = '1.2.41'
         androidGradlePluginVersion = '3.0.1'
     }
     repositories {

@@ -145,6 +145,8 @@ public class ChatPresentationImpl implements ChatInteractor, SocketCallbacks {
 
     @Override
     public long sendMessage(String receivingUserId, boolean isIncoming, String message) {
+
+        //TODO add connect to feed if not connected code
         String channelName = getChatName(receivingUserId, isIncoming);
         if (!channelsBeingListened.contains(channelName)) {
             addChatEvent(receivingUserId, isIncoming, message);

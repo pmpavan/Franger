@@ -13,4 +13,9 @@
         <item name="android:actionModeBackground">@color/statusbar_color</item>
         <item name="android:windowBackground">@color/app_bg</item>
     </style>
+
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
 </resources>
